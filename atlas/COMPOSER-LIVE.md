@@ -1,0 +1,1 @@
+The visual Composer is available at atlas/composer.html. The Project Viewer button will be wired to this surface in the next prototype revision.
