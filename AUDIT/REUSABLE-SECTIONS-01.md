@@ -132,7 +132,85 @@ The current Media Library mainly applies selected media to a scene. The stronger
 
 This should be treated as a future Composer abstraction, not as an already-existing feature of Timeline Theater.
 
-## 5. OPUS — Lean project follow-up
+## 5. SILLAGE / Tempo Narrative — Collaborative composition
+
+Sources:
+- `mattmezstitchlab/SILLAGE` — `artifacts/api-server/src/routes/sillage.ts`
+- `mattmezstitchlab/tempo-narrative` — `src/lib/allagi.functions.ts`, `src/routes/_authenticated/studio.tsx`
+
+Evidence: CONFIRMED
+
+Both projects independently establish a collaboration layer around a composition rather than merely a shared editor.
+
+### SILLAGE
+
+The server builds a unified owner state containing:
+- event
+- track library
+- playlists
+- folders
+- timeline moments
+- guest proposals
+
+Timeline moments contain time, duration, expected energy, notes, revision and attached tracks. Guest proposals carry guest identity/message/status and vote counts. Uploaded audio has an explicit rights confirmation and private storage flow. fileciteturn213file0
+
+Reusable primitive:
+
+`RESOURCE → COLLECTION / MOMENT → COLLABORATIVE PROPOSAL → VOTE / STATUS → COMPOSITION`
+
+### Tempo Narrative
+
+The authenticated Studio exposes three coordinated surfaces: Playlists, Timeline and Invités. Its workspace model contains playlists, timeline moments, track placements and guest suggestions with status and vote count. fileciteturn216file0 fileciteturn219file0
+
+Suggestions are explicitly modeled as `track_id + guest_name + message + status + votes`, and the owner can move a suggestion through `proposed`, `validated`, `refused` or `discuss`. fileciteturn219file0
+
+Guests can participate without an account through a share token, submit a suggestion and vote with a voter key. fileciteturn219file0 fileciteturn220file0
+
+Reusable primitive:
+
+`SHARED PROJECT → CONTRIBUTION → DISCUSSION / VOTE → OWNER VALIDATION → COMPOSITION`
+
+Reusable classification: **COMPOSE**.
+
+The generic value is not the music domain. It is the collaboration protocol:
+
+```text
+PROJECT
+  ↓
+RESOURCE
+  ↓
+CONTRIBUTION
+  ↓
+DISCUSSION / VOTE
+  ↓
+VALIDATION
+  ↓
+VERSION / COMPOSITION
+```
+
+### Creative Web Studio adaptation
+
+This maps directly to client website production:
+
+```text
+CLIENT PROJECT
+      ↓
+CONTENT / DESIGN ELEMENT
+      ↓
+CLIENT COMMENT / PROPOSAL
+      ↓
+DISCUSSION
+      ↓
+CLIENT APPROVAL
+      ↓
+REVISION
+      ↓
+NEW VERSION
+```
+
+Important: this is an architectural adaptation of the verified collaboration primitive, not a claim that SILLAGE or Tempo Narrative already implements a generic client website workflow.
+
+## 6. OPUS — Lean project follow-up
 
 Sources:
 - `src/routes/suivi.$token.tsx`
@@ -155,7 +233,7 @@ Creative Web Studio role:
 
 This is preferable to creating a large client dashboard when the client only needs to review and act on one project.
 
-## 6. Mission Proof — validation/proof loop
+## 7. Mission Proof — validation/proof loop
 
 Evidence: CONFIRMED
 
@@ -186,7 +264,9 @@ COMPOSER / STUDIO
       ↓
 VERSION
       ↓
-COMMENT
+COMMENT / PROPOSAL
+      ↓
+DISCUSSION / VOTE
       ↓
 REVISION
       ↓
@@ -211,7 +291,6 @@ PUBLICATION
 1. Real media registry/storage paths for DISPOO.
 2. Direct internals of `DiscoverSection` and its media resolution.
 3. Timeline Theater preview/variants/publication composition.
-4. SILLAGE collaborative composition details.
-5. WEDDINGCITY cascade/projection sections.
-6. AIME-TIMELINE review/document sections.
-7. Map these records into the Project Viewer.
+4. WEDDINGCITY cascade/projection sections.
+5. AIME-TIMELINE review/document sections.
+6. Map these records into the Project Viewer.
