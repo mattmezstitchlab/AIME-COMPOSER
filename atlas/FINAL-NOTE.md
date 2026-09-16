@@ -1,1 +1,0 @@
-The next revision will wire the Composer entry point.
