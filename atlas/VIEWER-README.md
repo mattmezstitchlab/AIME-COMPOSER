@@ -1,0 +1,1 @@
+The former Project Viewer remains available as atlas/viewer.html.
