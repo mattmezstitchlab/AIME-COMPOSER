@@ -187,6 +187,98 @@ Future Composer abstraction:
 
 `MEDIA ASSET → MEDIA CLIP → TIMELINE POSITION → DURATION → LAYER → PREVIEW`
 
+## AIME Network — canonical project media projection
+
+### Sources
+
+- `src/lib/aime/world/types.ts`
+- `src/lib/aime/world/derive.ts`
+
+### Evidence
+
+**CONFIRMED** by direct source inspection.
+
+### Canonical model
+
+`WorldProject` is explicitly described as the single source model. Its `media` collection is part of the canonical project alongside people, providers, moments, tasks, documents, payments, tracks and messages. The project model also carries `Confidence` and optional `Fact.source` provenance fields.
+
+`WorldMedia` currently contains:
+
+- `id`
+- `kind`: `photo | video`
+- `at`
+- `title`
+- optional `detail`
+- optional `url`
+- optional `thumb`
+- optional `personIds`
+- `confidence`
+
+### Projection behavior
+
+`deriveTimeline(project)` does not create a second media store. It projects each `WorldMedia` item into a timeline marker with:
+
+- semantic timeline id
+- temporal position
+- media kind
+- optional thumbnail URL
+- optional media URL
+- title/detail
+- project/universe context
+- person relations
+- source `média`
+- confidence metadata
+
+The resulting timeline is then enriched with project relations and user edits without replacing the canonical source object.
+
+### Reusable primitive
+
+**CANONICAL MEDIA → PROJECTION**
+
+Pattern:
+
+`PROJECT MEMORY → MEDIA RECORD → TIMELINE PROJECTION`
+
+Reuse classification: **REUSE_ADAPT**.
+
+### Important limitation
+
+AIME Network's current `WorldMedia` model is a **project-memory media record**, not a global asset-management model. It has no verified storage-provider field, storage path, dimensions, duration, variants, media role or independent clip/layer placement.
+
+Therefore it should **not** become the final `MediaRecord` schema for AIME-COMPOSER. It is stronger as the source-of-truth/projection pattern than as the complete asset schema.
+
+### Architectural convergence
+
+AIME Network provides the missing upstream layer in the current atlas:
+
+`PROJECT MEMORY → CANONICAL MEDIA → PROJECTION`
+
+Timeline Theater provides composition:
+
+`MEDIA ASSET → CLIP → TIMELINE`
+
+DISPOO provides resolution/provenance:
+
+`MEDIA KEY → SOURCE CANDIDATES → AVAILABLE ASSET`
+
+Together these suggest a three-layer media architecture for AIME-COMPOSER:
+
+```text
+PROJECT MEMORY
+      ↓
+CANONICAL MEDIA RECORD
+      ↓
+ASSET / STORAGE RESOLUTION
+      ↓
+MEDIA SLOT or MEDIA CLIP
+      ↓
+TIMELINE / PAGE / SECTION COMPOSITION
+      ↓
+PREVIEW / PUBLICATION
+```
+
+No final schema should be implemented yet: storage, asset metadata and clip placement still need direct inspection across the priority repositories.
+
 ## Cross-project conclusion
 
 The audit now distinguishes three levels:
