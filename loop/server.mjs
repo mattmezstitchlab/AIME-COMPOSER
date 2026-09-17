@@ -50,11 +50,27 @@ const REPO = resolve(HERE, '..');
 const PORT = Number(process.env.PORT || 8090);
 const DB = join(HERE, 'data', 'world.json');
 
-const store = createStore(DB);
-if (store.all().length === 0) {
-  seed(store);
-  store.save();
+/* `let` et non `const` : la fabrique ci-dessous réassigne le store, ce qui
+   permet de tester le serveur sur un monde jetable, port éphémère compris. */
+let store;
+
+/**
+ * Construit un serveur de boucle. Exporté pour les tests : sans cela, la
+ * seule façon d'exercer une route était de lancer le serveur à la main et
+ * de le consulter à la main — c'est exactement ainsi que le 404 sur
+ * `/loop/` avait été trouvé, et rien n'empêchait sa réapparition.
+ */
+export function createLoopServer({ db = DB } = {}) {
+  store = createStore(db);
+  if (db && store.all().length === 0) {
+    seed(store);
+    store.save();
+  }
+  return createServer(handler);
 }
+
+/** Le store courant — utile aux tests qui vérifient l'état persisté. */
+export const currentStore = () => store;
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -94,7 +110,7 @@ function snapshot() {
   };
 }
 
-const server = createServer(async (req, res) => {
+async function handler(req, res) {
   const url = new URL(req.url, `http://${req.headers.host}`);
   const path = decodeURIComponent(url.pathname);
 
@@ -252,11 +268,16 @@ const server = createServer(async (req, res) => {
   }
   res.writeHead(200, { 'content-type': MIME[extname(file)] || 'application/octet-stream' });
   res.end(readFileSync(file));
-});
+}
 
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`\nAIME / NOEMA — boucle minimale`);
-  console.log(`  écran   http://0.0.0.0:${PORT}/loop/`);
-  console.log(`  API     http://0.0.0.0:${PORT}/api/state`);
-  console.log(`  données ${relative(REPO, DB)} · ${store.all().length} entités\n`);
-});
+/* Un module importé par un test ne doit pas ouvrir de port. */
+const isMain = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (isMain) {
+  const server = createLoopServer();
+  server.listen(PORT, '0.0.0.0', () => {
+    console.log(`\nAIME / NOEMA — boucle minimale`);
+    console.log(`  écran   http://0.0.0.0:${PORT}/loop/`);
+    console.log(`  API     http://0.0.0.0:${PORT}/api/state`);
+    console.log(`  données ${relative(REPO, DB)} · ${store.all().length} entités\n`);
+  });
+}

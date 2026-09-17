@@ -335,11 +335,26 @@ export function partager(store, { id, grantee, purpose, expires_at, scope = 'lec
     throw new Error(`« ${id} » est en pause jusqu'au ${obj.paused_until} : rien n'en sort`);
   }
 
-  /* Une information sensible ne se partage pas sans décision explicite :
-     le plafond de sa catégorie est « privée ». */
-  if (obj.category === 'sensible') {
-    throw new Error(`« ${id} » est classée sensible — son plafond de visibilité est « privée »`);
+  /* La catégorie impose un plafond, et ce plafond vient du schéma — pas
+     d'une liste de cas particuliers codée ici. Une catégorie dont le
+     plafond est « privée » ne se partage pas : cela couvre « sensible »
+     ET « personnelle » d'un même mouvement, au lieu de n'interdire que
+     la première.
+
+     Bug corrigé : `visibility` était écrit « partagée » en dur. Pour une
+     catégorie « projet », dont le plafond est « projet », le partage
+     était donc refusé par le schéma — à raison. Écrire une visibilité
+     supérieure au plafond de sa propre catégorie n'est pas un partage,
+     c'est une escalade. */
+  const category = obj.category ?? 'partagée';
+  const ceiling = CATEGORY_VISIBILITY_CEILING[category];
+  if (ceiling === 'privée') {
+    throw new Error(`« ${id} » est classée « ${category} » — son plafond de visibilité est « privée », elle ne se partage pas`);
   }
+  /* La visibilité effective est la plus haute permise, sans jamais
+     dépasser le plafond : « partagée » si la catégorie le permet,
+     sinon le plafond lui-même. */
+  const visibility = VISIBILITY.indexOf(ceiling) < VISIBILITY.indexOf('partagée') ? ceiling : 'partagée';
 
   const grant = store.create('grant', {
     target_id: id,
@@ -348,8 +363,8 @@ export function partager(store, { id, grantee, purpose, expires_at, scope = 'lec
     scope,
     expires_at,
     revoked_at: null,
-    category: obj.category ?? 'partagée',
-    visibility: 'partagée',
+    category,
+    visibility,
     shared_with: [grantee],
     source: 'human/sharing',
     provenance: provenance(actor, 'confirmed'),
@@ -362,7 +377,10 @@ export function partager(store, { id, grantee, purpose, expires_at, scope = 'lec
   const next = store.put(typeOf(id), {
     ...obj,
     shared_with: [...new Set([...(obj.shared_with || []), grantee])],
-    visibility: obj.visibility === 'privée' || !obj.visibility ? 'partagée' : obj.visibility,
+    /* Même règle que pour le partage : on monte au plafond autorisé,
+       jamais au-dessus. Un objet « privé » ou sans visibilité passe à la
+       visibilité effective calculée, pas à « partagée » d'office. */
+    visibility: obj.visibility === 'privée' || !obj.visibility ? visibility : obj.visibility,
     updated_at: now,
   }, { actor, cause: 'partager' });
 
