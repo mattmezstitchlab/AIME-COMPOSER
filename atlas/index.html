@@ -13,11 +13,12 @@
 </style>
 </head>
 <body>
+<!-- SHELL DU PLAYGROUND — seul propriétaire de la navigation (Composer / Carte / Timeline / Grille). Les expériences s'affichent dans #frame et ne recréent jamais ce shell. Une vue embarquée revient au Playground via tout élément portant [data-playground-return]. -->
 <div class="shell">
 <header class="top">
-<a class="brandLink" href="./index.html" aria-label="AIME-COMPOSER — accueil" title="Accueil"><div class="brand">AIME<i>•</i>COMPOSER <span style="color:#777">/ PLAYGROUND</span></div></a>
+<a class="brandLink" href="./index.html" aria-label="AIME-COMPOSER — accueil du Playground" title="Accueil du Playground"><div class="brand">AIME<i>•</i>COMPOSER <span style="color:#777">/ PLAYGROUND</span></div></a>
 <nav class="nav" aria-label="Navigation du Playground">
-<button id="home" class="active">Accueil</button><button id="composer">Composer</button><button id="card">Carte Universelle</button><button id="timeline">Timeline Universelle</button><button id="grid">Grille Universelle</button>
+<button id="home" class="active" aria-current="page">Accueil</button><button id="composer">Composer</button><button id="card">Carte Universelle</button><button id="timeline">Timeline Universelle</button><button id="grid">Grille Universelle</button>
 </nav>
 </header>
 <main class="stage" id="stage">
@@ -48,9 +49,11 @@
 const stage=document.getElementById('stage'),frame=document.getElementById('frame');
 const buttons={home:document.getElementById('home'),composer:document.getElementById('composer'),card:document.getElementById('card'),timeline:document.getElementById('timeline'),grid:document.getElementById('grid')};
 const sources={composer:'./composer.html',card:'./universal-card.html',timeline:'./timeline.html',grid:'./grid.html'};
-function activate(key){Object.entries(buttons).forEach(([k,b])=>b.classList.toggle('active',k===key));if(key==='home'){frame.removeAttribute('src');stage.classList.remove('in-frame');document.title='AIME-COMPOSER — Accueil';return}frame.src=sources[key];stage.classList.add('in-frame');document.title='AIME-COMPOSER — '+buttons[key].textContent}
-function wireFrameHome(){try{const link=frame.contentDocument?.querySelector('.brandLink');if(!link)return;link.onclick=e=>{e.preventDefault();activate('home');window.scrollTo({top:0,behavior:'instant'});};}catch(_){} }
-frame.addEventListener('load',wireFrameHome);
+function activate(key){Object.entries(buttons).forEach(([k,b])=>{const on=k===key;b.classList.toggle('active',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});if(key==='home'){frame.removeAttribute('src');frame.title='AIME-COMPOSER Playground';stage.classList.remove('in-frame');document.title='AIME-COMPOSER — Accueil';return}frame.src=sources[key];frame.title=buttons[key].textContent;stage.classList.add('in-frame');document.title='AIME-COMPOSER — '+buttons[key].textContent}
+function returnToPlayground(){activate('home');buttons.home.focus()}
+function wireFrameReturn(){try{frame.contentDocument?.querySelectorAll('[data-playground-return]').forEach(el=>{el.onclick=e=>{e.preventDefault();e.stopPropagation();returnToPlayground()}})}catch(_){}}
+frame.addEventListener('load',wireFrameReturn);
+document.querySelector('.top .brandLink').onclick=e=>{e.preventDefault();activate('home')};
 Object.entries(buttons).forEach(([key,b])=>b.addEventListener('click',()=>activate(key)));
 document.querySelectorAll('[data-view]').forEach(el=>el.addEventListener('click',()=>activate(el.dataset.view)));
 document.getElementById('start').onclick=()=>activate('composer');
