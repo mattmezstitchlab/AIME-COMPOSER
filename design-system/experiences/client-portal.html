@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="fr" data-aime-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="a-root" content="../">
+<title>Portail client — AIME</title>
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../styles/foundations.css">
+<link rel="stylesheet" href="../styles/layout.css">
+<link rel="stylesheet" href="../styles/components.css">
+<link rel="stylesheet" href="../styles/aime.css">
+<link rel="stylesheet" href="../styles/noema.css">
+<link rel="stylesheet" href="../styles/patterns.css">
+<link rel="stylesheet" href="../styles/dataviz.css">
+<link rel="stylesheet" href="../styles/doc.css">
+<script src="../js/doc.js" defer></script>
+<script src="../js/aime-ui.js" defer></script>
+</head>
+<body>
+<div class="ds-shell">
+<main class="ds-main l-page">
+
+  <header class="ohead">
+    <nav aria-label="Fil d'ariane"><ol class="a-crumbs"><li><a href="bureau.html">Atelier Nord</a><span class="a-crumbs__sep" aria-hidden="true">/</span></li><li><span aria-current="page">Portail client</span></li></ol></nav>
+    <div class="ohead__title-row">
+      <span class="ohead__mark"><svg class="a-ic a-ic--lg" aria-hidden="true" width="24" height="24"><use data-a-icon="ppl-org"/></svg></span>
+      <div class="ohead__titles"><span class="t-meta">Conservatoire de Lyon · accès restreint</span><h1 class="t-h1">Portail client</h1></div>
+      <span class="l-spacer"></span>
+      <span class="ohead__actions"><button type="button" class="a-btn a-btn--sm">Partager</button></span>
+    </div>
+    <div class="ohead__meta">
+      <span class="ohead__states"><span class="a-badge">3 versions à revoir</span><span class="a-badge a-badge--warning">1 en retard</span></span>
+      <span class="t-meta">permission · read + approve</span>
+    </div>
+  </header>
+
+  <section class="ds-block" aria-labelledby="revoir">
+    <h2 class="t-h2" id="revoir">À revoir</h2>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--col">
+        <div class="approval" data-state="pending">
+          <div class="l-row l-row--between"><span class="t-label">Affiche</span><span class="a-badge">v3</span></div>
+          <p class="t-body-sm u-strong">Affiche saison 2026-2027</p>
+          <p class="t-caption u-muted">Envoyée le 15 septembre. Impression prévue le 03 octobre.</p>
+          <div class="approval__decision"><button type="button" class="a-btn a-btn--sm a-btn--primary">Approuver</button><button type="button" class="a-btn a-btn--sm">Demander une révision</button></div>
+        </div>
+
+        <div class="ds-device">
+          <div class="ds-device__frame" data-w="768">
+            <div class="u-pad l-stack l-stack--tight">
+              <span class="t-meta">Affiche · v3 · A4</span>
+              <div class="umedia" data-format="a4"><span class="umedia__label">aperçu de la version 3</span></div>
+            </div>
+          </div>
+          <span class="ds-device__key">aperçu · 768</span>
+        </div>
+
+        <div class="ba l-measure-lg">
+          <div class="ba__layer u-pad u-surface l-stack l-stack--tight">
+            <span class="t-meta">version 2</span>
+            <span class="t-h3">Titre en réserve blanche</span>
+            <span class="t-body-sm u-muted">Lisibilité insuffisante à trois mètres.</span>
+          </div>
+          <div class="ba__layer ba__layer--after u-pad u-surface l-stack l-stack--tight">
+            <span class="t-meta">version 3</span>
+            <span class="t-h3">Titre en réserve noire</span>
+            <span class="t-body-sm u-muted">Contraste porté à 7,1 pour 1.</span>
+          </div>
+          <div class="ba__handle"></div>
+          <span class="ba__tag ba__tag--before">v2</span>
+          <span class="ba__tag ba__tag--after">v3</span>
+        </div>
+
+        <div class="a-field">
+          <label class="a-field__label" for="cp-comment">Commentaire</label>
+          <textarea class="a-textarea" id="cp-comment" rows="3" placeholder="Votre commentaire porte sur la version 3."></textarea>
+          <p class="a-field__hint">Un commentaire est rattaché à une version précise, jamais au projet en général.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="historique">
+    <h2 class="t-h2" id="historique">Décisions enregistrées</h2>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--col">
+        <div class="approval" data-state="accepted">
+          <div class="l-row l-row--between"><span class="t-label">Contrat</span><span class="nstate" data-state="confirmed"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-confirmed"/></svg>Confirmé</span></div>
+          <p class="t-body-sm u-strong">Contrat de cession — v2.1</p>
+          <div class="approval__decision"><span class="a-avatar a-avatar--sm">AM</span><span>A. Meunier · 2026-08-02</span></div>
+        </div>
+        <div class="approval" data-state="superseded">
+          <div class="l-row l-row--between"><span class="t-label">Affiche</span><span class="nstate" data-state="superseded"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-superseded"/></svg>Superseded</span></div>
+          <p class="t-body-sm u-strong">Affiche — version 2</p>
+          <div class="approval__decision"><span class="t-caption u-muted">Remplacée par la version 3, conservée pour trace.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <nav class="ds-pager" aria-label="Navigation d'écran">
+    <a href="public-site.html"><small>20.9 — précédent</small><span class="t-body u-strong">Site public</span></a>
+    <a href="index.html"><small>20 — retour</small><span class="t-body u-strong">Expériences</span></a>
+  </nav>
+
+</main>
+</div>
+</body>
+</html>

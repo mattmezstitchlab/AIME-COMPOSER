@@ -1,5 +1,35 @@
 # AIME-COMPOSER
 
+## Design System
+
+`design-system/` holds **AIME DESIGN SYSTEM V1** — the universal visual system for
+AIME-COMPOSER and every future NOEMA interface. It is not an application: it is a
+grammar, and every screen is a projection of it.
+
+```text
+TOKENS → FOUNDATIONS → COMPONENTS → PATTERNS → LAYOUTS → EXPERIENCES
+```
+
+```bash
+cd design-system
+npm run build   # generate tokens + icons; refuses any colour that misses its contrast target
+npm run qa      # build + audit the 12 QA families over the shipped system
+npm run verify  # execute the scripts of all 30 screens in a DOM (needs the jsdom devDependency)
+npm run check   # qa then verify
+npm run serve   # serve the repository on http://0.0.0.0:8080/design-system/
+```
+
+Contents: 23 colour primitives and 21 roles × 2 themes behind an enforced WCAG
+contract · 9 typographic roles · a closed 10-step spacing scale · 85 glyphs in 17
+categories, no emoji · 29 fundamental components · the five AIME organs (Universal
+Card, Universal Media, Universal Timeline, Universal Grid, Composer) · the NOEMA
+layer with its six epistemic states · 13 patterns · a data-visualization language ·
+12 automatic Design QA families · 30 shipped screens (19 documentation chapters and
+10 experience screens).
+
+Normative specification: `ARCHITECTURE/AIME-DESIGN-SYSTEM-V1.md`.
+System documentation and live screens: `design-system/index.html`.
+
 ## Visual Atlas
 
 AIME-COMPOSER is the audit and convergence layer above the 64 source projects. It does not merge or replace them.

@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="fr" data-aime-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="a-root" content="../">
+<title>Bureau — AIME</title>
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../styles/foundations.css">
+<link rel="stylesheet" href="../styles/layout.css">
+<link rel="stylesheet" href="../styles/components.css">
+<link rel="stylesheet" href="../styles/aime.css">
+<link rel="stylesheet" href="../styles/noema.css">
+<link rel="stylesheet" href="../styles/patterns.css">
+<link rel="stylesheet" href="../styles/dataviz.css">
+<link rel="stylesheet" href="../styles/doc.css">
+<script src="../js/doc.js" defer></script>
+<script src="../js/aime-ui.js" defer></script>
+</head>
+<body>
+<div class="ds-shell">
+<main class="ds-main l-page">
+
+  <header class="ohead">
+    <div class="ohead__title-row">
+      <span class="ohead__mark"><svg class="a-ic a-ic--lg" aria-hidden="true" width="24" height="24"><use data-a-icon="nav-home"/></svg></span>
+      <div class="ohead__titles"><span class="t-meta">Mardi 17 septembre 2026</span><h1 class="t-h1">Bureau</h1></div>
+      <span class="l-spacer"></span>
+      <span class="ohead__actions"><button type="button" class="a-btn a-btn--sm">Nouveau projet</button><button type="button" class="a-btn a-btn--sm a-btn--primary">Ouvrir le Composer</button></span>
+    </div>
+    <div class="ohead__meta">
+      <span class="ohead__states"><span class="a-badge a-badge--accent">2 décisions en attente</span><span class="a-badge">5 projets actifs</span></span>
+      <span class="t-meta">dernière activité il y a 12 minutes</span>
+    </div>
+  </header>
+
+  <section class="ds-block" aria-labelledby="decisions">
+    <h2 class="t-h2" id="decisions">Ce qui attend une décision</h2>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--col">
+        <article class="noema-card noema-rail" data-certainty="proposed">
+          <div class="noema-card__head">
+            <span class="noema-card__kind"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="noe-proposed"/></svg>Proposal</span>
+            <span class="nstate" data-state="proposed"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-proposed"/></svg>Proposé</span>
+          </div>
+          <p class="noema-card__title">Décaler la répétition générale au 24 septembre</p>
+          <p class="noema-card__body">Deux intervenants sur quatre sont indisponibles le 17. Le 24 libère la salle et réunit le plateau.</p>
+          <div class="noema-card__foot">
+            <button type="button" class="a-btn a-btn--sm a-btn--primary">Valider</button>
+            <button type="button" class="a-btn a-btn--sm">Modifier</button>
+            <button type="button" class="a-btn a-btn--sm a-btn--ghost">Refuser</button>
+            <span class="l-spacer"></span>
+            <button type="button" class="prov" aria-expanded="false"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="prf-evidence"/></svg>Provenance</button>
+          </div>
+        </article>
+        <div class="approval" data-state="pending">
+          <div class="l-row l-row--between"><span class="t-label">Approbation client</span><span class="nstate" data-state="proposed"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="apr-pending"/></svg>En attente</span></div>
+          <p class="t-body-sm u-strong">Affiche — version 3</p>
+          <p class="t-caption u-muted">Envoyée le 15 septembre à A. Meunier. Relance possible à partir du 22.</p>
+          <div class="approval__decision"><button type="button" class="a-btn a-btn--sm">Relancer</button><button type="button" class="a-text-btn">Voir la version</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="projets">
+    <h2 class="t-h2" id="projets">Projets</h2>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--grid">
+        <a class="ucard" href="composer.html"><div class="ucard__id"><span class="ucard__mark" data-type="project"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="prj-project"/></svg></span><span class="ucard__head"><span class="ucard__type">Projet</span><span class="ucard__title">Atelier Nord</span><span class="ucard__sub">Identité · site · imprimés</span></span></div><dl class="ucard__facts"><div class="ucard__fact"><dt>Version</dt><dd class="u-mono">v1.0.4</dd></div><div class="ucard__fact"><dt>Avancement</dt><dd>78 %</dd></div></dl><div class="ucard__foot"><span class="nstate" data-state="confirmed"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-confirmed"/></svg>Confirmé</span><span class="a-badge a-badge--accent">1 proposition</span></div></a>
+        <a class="ucard" href="timeline.html"><div class="ucard__id"><span class="ucard__mark" data-type="project"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="prj-project"/></svg></span><span class="ucard__head"><span class="ucard__type">Projet</span><span class="ucard__title">Saison 2026-2027</span><span class="ucard__sub">Programmation et communication</span></span></div><dl class="ucard__facts"><div class="ucard__fact"><dt>Version</dt><dd class="u-mono">v0.3.1</dd></div><div class="ucard__fact"><dt>Capacité salle</dt><dd class="is-unknown">À confirmer</dd></div></dl><div class="ucard__foot"><span class="nstate" data-state="extracted"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-extracted"/></svg>Extrait</span><span class="a-badge a-badge--warning">donnée manquante</span></div></a>
+        <a class="ucard" href="grid.html"><div class="ucard__id"><span class="ucard__mark" data-type="project"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="prj-project"/></svg></span><span class="ucard__head"><span class="ucard__type">Projet</span><span class="ucard__title">Atelier typographique</span><span class="ucard__sub">Recherche et spécimen</span></span></div><dl class="ucard__facts"><div class="ucard__fact"><dt>Version</dt><dd class="u-mono">v0.1.0</dd></div><div class="ucard__fact"><dt>Formats</dt><dd>A4 · A2</dd></div></dl><div class="ucard__foot"><span class="nstate" data-state="observed"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-observed"/></svg>Observé</span></div></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="activite">
+    <h2 class="t-h2" id="activite">Ce qui vient de se passer</h2>
+    <div class="ds-demo">
+      <div class="ds-demo__stage">
+        <div class="utl l-measure-xl">
+          <div class="utl__list">
+            <article class="utl__item"><span class="utl__marker" data-kind="change" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">14:02</span><span class="utl__title">Titre de la page d'accueil modifié</span><span class="a-badge">v1.0.4</span></div><p class="utl__body">Analyse d'impact sur 4 sections avant validation.</p></article>
+            <article class="utl__item"><span class="utl__marker" data-kind="communication" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">11:38</span><span class="utl__title">Annonce envoyée à trois canaux</span><span class="a-badge a-badge--success">publié</span></div></article>
+            <article class="utl__item" data-state="proposed"><span class="utl__marker" data-kind="proposal" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">09:15</span><span class="utl__title">NOEMA propose de décaler la répétition</span><span class="nstate" data-state="proposed"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-proposed"/></svg>Proposé</span></div></article>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <nav class="ds-pager" aria-label="Navigation d'écran">
+    <a href="playground.html"><small>20.1 — précédent</small><span class="t-body u-strong">Playground</span></a>
+    <a href="composer.html"><small>20.2 — suivant</small><span class="t-body u-strong">Composer</span></a>
+  </nav>
+
+</main>
+</div>
+</body>
+</html>

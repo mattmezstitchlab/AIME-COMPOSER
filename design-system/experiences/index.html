@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="fr" data-aime-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="a-root" content="../">
+<title>Expériences — AIME Design System V1</title>
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../styles/foundations.css">
+<link rel="stylesheet" href="../styles/layout.css">
+<link rel="stylesheet" href="../styles/components.css">
+<link rel="stylesheet" href="../styles/aime.css">
+<link rel="stylesheet" href="../styles/noema.css">
+<link rel="stylesheet" href="../styles/patterns.css">
+<link rel="stylesheet" href="../styles/dataviz.css">
+<link rel="stylesheet" href="../styles/doc.css">
+<script src="../js/doc.js" defer></script>
+<script src="../js/aime-ui.js" defer></script>
+</head>
+<body>
+<div class="ds-shell">
+<main class="ds-main l-page">
+
+  <header class="ds-hero">
+    <div class="ds-eyebrow"><span class="a-badge">20</span><span class="t-meta">Couche 6 — Expériences</span></div>
+    <h1 class="t-display">Dix écrans, un seul produit.</h1>
+    <p class="t-body u-muted">Ces écrans ne sont pas des maquettes libres : chacun est une projection du système, composée uniquement de ses jetons, fondations, composants, patterns et règles de mise en page. Aucune couleur, aucune taille, aucun espacement n'y a été inventé. Le Design QA les traverse au même titre que la documentation.</p>
+  </header>
+
+  <section class="ds-block" aria-labelledby="ecrans">
+    <h2 class="t-h2" id="ecrans">Les écrans</h2>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--grid">
+        <a class="ucard" href="playground.html"><div class="ucard__id"><span class="ucard__mark" data-type="media"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="cmp-layers"/></svg></span><span class="ucard__head"><span class="ucard__type">Terrain d'essai</span><span class="ucard__title">Playground</span></span></div><p class="t-body-sm u-muted">Les composants fondamentaux en situation, hors contexte de démonstration.</p></a>
+        <a class="ucard" href="composer.html"><div class="ucard__id"><span class="ucard__mark" data-type="project"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="cmp-compose"/></svg></span><span class="ucard__head"><span class="ucard__type">Composition</span><span class="ucard__title">Composer</span></span></div><p class="t-body-sm u-muted">Palette, canvas, inspecteur et Timeline ancrée : l'écran de travail complet.</p></a>
+        <a class="ucard" href="universal-card.html"><div class="ucard__id"><span class="ucard__mark" data-type="person"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="mem-card"/></svg></span><span class="ucard__head"><span class="ucard__type">Mémoire</span><span class="ucard__title">Carte Universelle</span></span></div><p class="t-body-sm u-muted">Parcourir les objets du projet et leurs relations.</p></a>
+        <a class="ucard" href="timeline.html"><div class="ucard__id"><span class="ucard__mark" data-type="event"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="time-timeline"/></svg></span><span class="ucard__head"><span class="ucard__type">Projection</span><span class="ucard__title">Timeline</span></span></div><p class="t-body-sm u-muted">Le projet dans le temps, du plan à l'historique.</p></a>
+        <a class="ucard" href="grid.html"><div class="ucard__id"><span class="ucard__mark" data-type="document"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="grd-grid"/></svg></span><span class="ucard__head"><span class="ucard__type">Placement</span><span class="ucard__title">Grille</span></span></div><p class="t-body-sm u-muted">Un format d'impression, ses repères et sa zone sûre.</p></a>
+        <a class="ucard" href="bureau.html"><div class="ucard__id"><span class="ucard__mark" data-type="project"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="nav-home"/></svg></span><span class="ucard__head"><span class="ucard__type">Accueil</span><span class="ucard__title">Bureau</span></span></div><p class="t-body-sm u-muted">Où l'on arrive : ce qui attend une décision, ce qui vient de se passer.</p></a>
+        <a class="ucard" href="media-library.html"><div class="ucard__id"><span class="ucard__mark" data-type="media"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="med-library"/></svg></span><span class="ucard__head"><span class="ucard__type">Ressources</span><span class="ucard__title">Médiathèque</span></span></div><p class="t-body-sm u-muted">Les assets une seule fois, et tous leurs usages.</p></a>
+        <a class="ucard" href="noema.html"><div class="ucard__id"><span class="ucard__mark" data-type="relation"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="noe-mark"/></svg></span><span class="ucard__head"><span class="ucard__type">Couche NOEMA</span><span class="ucard__title">Console NOEMA</span></span></div><p class="t-body-sm u-muted">Ce que NOEMA observe, propose et ignore.</p></a>
+        <a class="ucard" href="public-site.html"><div class="ucard__id"><span class="ucard__mark" data-type="place"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="doc-document"/></svg></span><span class="ucard__head"><span class="ucard__type">Publication</span><span class="ucard__title">Site public</span></span></div><p class="t-body-sm u-muted">La même matière, projetée vers un lecteur extérieur.</p></a>
+        <a class="ucard" href="client-portal.html"><div class="ucard__id"><span class="ucard__mark" data-type="organization"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="ppl-org"/></svg></span><span class="ucard__head"><span class="ucard__type">Partage</span><span class="ucard__title">Portail client</span></span></div><p class="t-body-sm u-muted">Revoir, commenter, approuver — sans voir la cuisine.</p></a>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Critère</span><span class="t-caption">Un visiteur qui ouvre ces dix écrans dans le désordre doit reconnaître immédiatement un seul produit.</span></p>
+    </div>
+  </section>
+
+  <nav class="ds-pager" aria-label="Navigation de chapitre">
+    <a href="../qa.html"><small>19 — précédent</small><span class="t-body u-strong">Design QA</span></a>
+    <a href="playground.html"><small>20.1 — suivant</small><span class="t-body u-strong">Playground</span></a>
+  </nav>
+
+</main>
+</div>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="fr" data-aime-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="a-root" content="../">
+<title>Timeline — AIME</title>
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../styles/foundations.css">
+<link rel="stylesheet" href="../styles/layout.css">
+<link rel="stylesheet" href="../styles/components.css">
+<link rel="stylesheet" href="../styles/aime.css">
+<link rel="stylesheet" href="../styles/noema.css">
+<link rel="stylesheet" href="../styles/patterns.css">
+<link rel="stylesheet" href="../styles/dataviz.css">
+<link rel="stylesheet" href="../styles/doc.css">
+<script src="../js/doc.js" defer></script>
+<script src="../js/aime-ui.js" defer></script>
+</head>
+<body>
+<div class="ds-shell">
+<main class="ds-main l-page">
+
+  <header class="ohead">
+    <nav aria-label="Fil d'ariane"><ol class="a-crumbs"><li><a href="bureau.html">Atelier Nord</a><span class="a-crumbs__sep" aria-hidden="true">/</span></li><li><span aria-current="page">Timeline</span></li></ol></nav>
+    <div class="ohead__title-row">
+      <span class="ohead__mark"><svg class="a-ic a-ic--lg" aria-hidden="true" width="24" height="24"><use data-a-icon="time-timeline"/></svg></span>
+      <div class="ohead__titles"><span class="t-meta">Mode direct · semaine 38</span><h1 class="t-h1">Timeline</h1></div>
+      <span class="l-spacer"></span>
+      <span class="ohead__actions"><button type="button" class="a-btn a-btn--sm">Aujourd'hui</button><button type="button" class="a-btn a-btn--sm a-btn--primary">Nouvel événement</button></span>
+    </div>
+  </header>
+
+  <div class="ds-demo">
+    <div class="ds-demo__stage ds-demo__stage--col">
+      <div class="utl l-measure-xl">
+        <div class="utl__head">
+          <div class="utl__modes" role="group" aria-label="Mode de la Timeline">
+            <button type="button" class="a-pill a-pill--button">Lecture</button>
+            <button type="button" class="a-pill a-pill--button">Plan</button>
+            <button type="button" class="a-pill a-pill--button">Composition</button>
+            <button type="button" class="a-pill a-pill--button" aria-current="true">Direct</button>
+            <button type="button" class="a-pill a-pill--button">Historique</button>
+          </div>
+          <span class="t-meta">jour · 17 septembre 2026</span>
+        </div>
+
+        <div class="utl__chapter">Fait</div>
+        <div class="utl__list">
+          <article class="utl__item"><span class="utl__marker" data-kind="communication" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">11:38</span><span class="utl__title">Annonce envoyée à trois canaux</span><span class="a-badge a-badge--success">publié</span></div><div class="utl__refs"><button type="button" class="prov" aria-expanded="false"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="prf-evidence"/></svg>preuve</button></div></article>
+          <article class="utl__item"><span class="utl__marker" data-kind="change" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">14:02</span><span class="utl__title">Titre de la page d'accueil modifié</span><span class="a-badge">v1.0.4</span></div><p class="utl__body">Avant : « Votre projet, votre site ». Après : « Composer le monde ».</p></article>
+        </div>
+
+        <div class="utl__now"><span class="t-label">Maintenant · 16:41</span></div>
+
+        <div class="utl__chapter">À venir</div>
+        <div class="utl__list">
+          <article class="utl__item is-selected"><span class="utl__marker" data-kind="task" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">18:00</span><span class="utl__title">Relance du client sur l'affiche v3</span><span class="a-badge a-badge--warning">en retard</span></div><div class="utl__refs"><button type="button" class="a-btn a-btn--sm a-btn--primary">Marquer fait</button></div></article>
+          <article class="utl__item" data-state="proposed"><span class="utl__marker" data-kind="proposal" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">24 sept.</span><span class="utl__title">Répétition générale</span><span class="nstate" data-state="proposed"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-proposed"/></svg>Proposé</span></div><p class="utl__body">Proposée par NOEMA à partir des disponibilités observées. Rien n'est engagé.</p><div class="utl__refs"><button type="button" class="a-btn a-btn--sm a-btn--primary">Valider</button><button type="button" class="a-btn a-btn--sm a-btn--ghost">Refuser</button></div></article>
+          <article class="utl__item"><span class="utl__marker" data-kind="event" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">03 oct.</span><span class="utl__title">Concert — Salle des Fêtes</span><span class="a-badge a-badge--accent">J-16</span></div><p class="utl__body">Capacité du lieu inconnue : la communication ne peut pas être composée.</p></article>
+          <article class="utl__item"><span class="utl__marker" data-kind="proof" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">30 sept.</span><span class="utl__title">Échéance des droits de l'asset 0087</span><span class="a-badge a-badge--error">bloquant</span></div></article>
+        </div>
+      </div>
+    </div>
+    <p class="ds-demo__caption"><span class="t-label">Règle</span><span class="t-caption">Déplacer un événement ici modifie l'événement canonique : la Timeline ne crée jamais de copie concurrente.</span></p>
+  </div>
+
+  <nav class="ds-pager" aria-label="Navigation d'écran">
+    <a href="universal-card.html"><small>20.3 — précédent</small><span class="t-body u-strong">Carte Universelle</span></a>
+    <a href="grid.html"><small>20.5 — suivant</small><span class="t-body u-strong">Grille</span></a>
+  </nav>
+
+</main>
+</div>
+</body>
+</html>

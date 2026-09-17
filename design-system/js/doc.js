@@ -57,7 +57,8 @@
 
   const root = document.querySelector('meta[name="a-root"]')?.content || './';
   const page = location.pathname.split('/').pop() || 'index.html';
-  const isExp = page === 'index.html' && location.pathname.includes('/experiences/');
+  // Tout écran d'expérience pointe sur la même entrée de sommaire.
+  const isExp = location.pathname.includes('/experiences/');
   const current = isExp ? 'experiences/index.html' : page;
 
   const icon = (id, cls = 'a-ic a-ic--sm') =>

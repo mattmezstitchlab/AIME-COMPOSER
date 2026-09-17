@@ -101,25 +101,25 @@ Afficher 87 % de certitude serait une fausse précision.
 
 ## 6. État d'avancement
 
-**Livré dans cette branche** — le système et sa documentation :
+**Livré dans cette branche** — le système complet, sa documentation et ses écrans :
 
 - Tokens : 23 primitives, 21 rôles × 2 thèmes, 4 états × 5 déclinaisons, 9 rôles
   typographiques, échelle d'espace fermée, 4 rayons, 6 durées, layout et breakpoints.
 - Iconographie : 85 pictogrammes, 17 catégories, contrat de grille unique.
 - Couches CSS 2 à 5 : 29 composants fondamentaux, 5 organes AIME, couche NOEMA,
   13 patterns, langage de data visualisation, moteur de layout responsive.
-- Design QA : 12 familles statiques, plus une vérification DOM des 19 écrans.
-- 19 écrans de documentation, du chapitre 00 au chapitre 19 : Accueil · Foundations ·
-  Couleur · Typographie · Espace & grille · Iconographie · Composants · Composants
-  AIME · Composants NOEMA · Carte · Timeline · Grille · Composer · Responsive ·
-  Accessibilité · Motion · Data visualisation · Patterns · Design QA.
-
-**Encore ouvert** :
-
-- Les 10 écrans d'expérience (`experiences/`) : Playground, Composer, Carte,
-  Timeline, Grille, Bureau, Médiathèque, NOEMA, site public, portail client.
+- Design QA : 12 familles statiques, plus une vérification DOM des 30 écrans.
+- 19 chapitres de documentation, du chapitre 00 au chapitre 19.
+- 10 écrans d'expérience (`experiences/`) : Playground, Composer, Carte Universelle,
+  Timeline, Grille, Bureau, Médiathèque, NOEMA, site public, portail client — plus
+  leur index. Tous composés uniquement avec le système.
 - `ARCHITECTURE/AIME-DESIGN-SYSTEM-V1.md`, la spécification normative.
-- Les volets géométriques du QA, qui demandent un navigateur réel.
 
-Le socle est terminé et vérifié : les écrans d'expérience sont de la composition sur
-un système déjà contraint, pas de la conception.
+**Ce qui reste ouvert** :
+
+- Les volets géométriques du QA — débordement réel et taille des cibles — demandent
+  un navigateur réel. `npm run verify` le signale explicitement au lieu de les
+  faire passer pour vérifiés.
+- Le branchement du moteur EAA sur `tokens.json` : le contrat est publié et
+  lisible par machine, le moteur lui-même est décrit dans
+  `ARCHITECTURE/NOEMA-ACCESSIBILITY-ENGINE-EAA-V1.md`.
