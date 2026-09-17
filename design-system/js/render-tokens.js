@@ -135,3 +135,46 @@ if (el('icons')) {
 if (el('inventory')) {
   el('inventory').textContent = `${ICONS.count} icônes · ${T.typography.roles.length} rôles typographiques · ${T.space.scale.length} étapes d'espacement · ${Object.keys(T.radius).length} rayons`;
 }
+
+/* ── Rapport de Design QA — lu depuis le fichier généré ────────
+   La page ne recopie aucun résultat : elle affiche ce que le dernier
+   `npm run qa` a réellement produit. Une documentation qui ment sur
+   l'état du système est pire qu'une absence de documentation. */
+if (el('qa-report')) {
+  const R = await (await fetch(`${root}tokens/QA-REPORT.json`)).json();
+  const stamp = new Date(R.at).toLocaleString('fr-FR', { dateStyle: 'long', timeStyle: 'short' });
+  const verdict = R.pass
+    ? `<p class="t-body"><span class="a-badge a-badge--success">validé</span> ${R.checks.length} familles conformes · ${R.contrast.pass}/${R.contrast.total} paires de contraste</p>`
+    : `<p class="t-body"><span class="a-badge a-badge--error">refusé</span> ${R.issues} écart(s) au système</p>`;
+  el('qa-report').innerHTML = `
+    <div class="l-stack l-stack--tight">
+      ${verdict}
+      <p class="t-caption u-muted">Périmètre : ${R.scope.css} feuilles CSS · ${R.scope.pages} écrans HTML · ${R.scope.icons} icônes · rapport du ${esc(stamp)}</p>
+    </div>
+    <div class="ds-table-wrap"><table class="ds-table">
+      <thead><tr><th scope="col">Famille</th><th scope="col">Résultat</th><th scope="col">Écarts</th></tr></thead>
+      <tbody>${R.checks
+          .map(
+            (c) => `<tr>
+              <td class="u-mono">${esc(c.family)}</td>
+              <td>${c.result === 'pass'
+                  ? '<span class="a-badge a-badge--success">conforme</span>'
+                  : '<span class="a-badge a-badge--error">refusé</span>'}</td>
+              <td class="u-mono">${c.count}</td>
+            </tr>`,
+          )
+          .join('')}</tbody>
+    </table></div>
+    <div class="ds-table-wrap"><table class="ds-table">
+      <caption>Paire la plus faible du contrat — les ${R.contrast.total} paires sont dans <span class="u-mono">tokens/CONTRAST-REPORT.md</span></caption>
+      <thead><tr><th scope="col">Thème</th><th scope="col">Premier plan</th><th scope="col">Fond</th><th scope="col">Plancher</th><th scope="col">Obtenu</th><th scope="col">Raison</th></tr></thead>
+      <tbody><tr>
+        <td>${esc(R.contrast.worst.theme)}</td>
+        <td class="u-mono">${esc(R.contrast.worst.fg)}</td>
+        <td class="u-mono">${esc(R.contrast.worst.bg)}</td>
+        <td class="u-mono">${R.contrast.worst.min.toFixed(2)}:1</td>
+        <td class="u-mono">${R.contrast.worst.ratio.toFixed(2)}:1</td>
+        <td>${esc(R.contrast.worst.why)}</td>
+      </tr></tbody>
+    </table></div>`;
+}

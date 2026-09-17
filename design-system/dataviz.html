@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="fr" data-aime-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="a-root" content="./">
+<title>Visualisation — AIME Design System V1</title>
+<link rel="stylesheet" href="tokens/tokens.css">
+<link rel="stylesheet" href="styles/foundations.css">
+<link rel="stylesheet" href="styles/layout.css">
+<link rel="stylesheet" href="styles/components.css">
+<link rel="stylesheet" href="styles/aime.css">
+<link rel="stylesheet" href="styles/noema.css">
+<link rel="stylesheet" href="styles/patterns.css">
+<link rel="stylesheet" href="styles/dataviz.css">
+<link rel="stylesheet" href="styles/doc.css">
+<script src="js/doc.js" defer></script>
+<script src="js/aime-ui.js" defer></script>
+</head>
+<body>
+<div class="ds-shell">
+<main class="ds-main l-page">
+
+  <header class="ds-hero">
+    <div class="ds-eyebrow"><span class="a-badge">17</span><span class="t-meta">Couche 4c — Visualisation</span></div>
+    <h1 class="t-display">Lire, pas impressionner.</h1>
+    <p class="t-body u-muted">Les visualisations AIME montrent des relations, des états, des progressions et des preuves. Pas de graphique financier générique, pas de camembert décoratif, pas de palette de douze couleurs. Chaque tracé utilise les mêmes arêtes, les mêmes états et la même typographie que le reste du système.</p>
+  </header>
+
+  <section class="ds-block" aria-labelledby="relations">
+    <h2 class="t-h2" id="relations">Relations</h2>
+    <div class="ds-rule">
+      <p class="ds-rule__title">Règle</p>
+      <p>Traits droits ou coudés, jamais une soupe de courbes. Un nœud proposé reste pointillé. Un lien proposé reste tireté : la lecture du doute est identique à celle des cartes et de la Timeline.</p>
+    </div>
+    <div class="ds-demo">
+      <div class="ds-demo__stage">
+        <div class="viz-graph l-measure-lg">
+          <svg viewBox="0 0 640 280" role="img" aria-label="Graphe des relations du projet Atelier Nord">
+            <path class="viz-graph__edge" d="M120 60 L 300 140"/>
+            <path class="viz-graph__edge" d="M120 220 L 300 140"/>
+            <path class="viz-graph__edge" data-certainty="proposed" d="M340 140 L 520 60"/>
+            <path class="viz-graph__edge" d="M340 140 L 520 220"/>
+            <rect class="viz-graph__node" x="24" y="36" width="192" height="48" rx="8"/>
+            <text class="viz-graph__label" x="40" y="58">Camille Vasseur</text>
+            <text class="viz-graph__sub" x="40" y="74">personne</text>
+            <rect class="viz-graph__node" x="24" y="196" width="192" height="48" rx="8"/>
+            <text class="viz-graph__label" x="40" y="218">Contrat de cession</text>
+            <text class="viz-graph__sub" x="40" y="234">document</text>
+            <rect class="viz-graph__node is-active" x="244" y="116" width="192" height="48" rx="8"/>
+            <text class="viz-graph__label" x="260" y="138">Atelier Nord</text>
+            <text class="viz-graph__sub" x="260" y="154">projet · v1.0.4</text>
+            <rect class="viz-graph__node" data-kind="proposal" x="424" y="36" width="192" height="48" rx="8"/>
+            <text class="viz-graph__label" x="440" y="58">Salle des Fêtes</text>
+            <text class="viz-graph__sub" x="440" y="74">lieu · proposé</text>
+            <rect class="viz-graph__node" x="424" y="196" width="192" height="48" rx="8"/>
+            <text class="viz-graph__label" x="440" y="218">Concert du 24</text>
+            <text class="viz-graph__sub" x="440" y="234">événement</text>
+          </svg>
+        </div>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Lecture</span><span class="t-caption">Le nœud actif porte l'arête d'accent. Le lieu proposé porte l'arête pointillée et son lien tireté.</span></p>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="progression">
+    <h2 class="t-h2" id="progression">Progression</h2>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--col">
+        <div class="viz l-measure-lg">
+          <div class="viz__head"><span class="t-label">Avancement par lot</span><span class="t-meta">6 lots</span></div>
+          <div class="viz-bars">
+            <div class="viz-bars__row"><span class="viz-bars__label">Identité</span><span class="viz-bars__track"><span class="viz-bars__fill" style="--a-value:100"></span></span><span class="viz-bars__value">100</span></div>
+            <div class="viz-bars__row" data-role="success"><span class="viz-bars__label">Contrats</span><span class="viz-bars__track"><span class="viz-bars__fill" style="--a-value:78"></span></span><span class="viz-bars__value">78</span></div>
+            <div class="viz-bars__row" data-role="warning"><span class="viz-bars__label">Impression</span><span class="viz-bars__track"><span class="viz-bars__fill" style="--a-value:46"></span></span><span class="viz-bars__value">46</span></div>
+            <div class="viz-bars__row" data-certainty="proposed"><span class="viz-bars__label">Annonce</span><span class="viz-bars__track"><span class="viz-bars__fill" style="--a-value:32"></span></span><span class="viz-bars__value">32</span></div>
+          </div>
+          <div class="viz__legend"><span class="t-caption u-muted">Le hachuré signale une progression proposée, non validée.</span></div>
+        </div>
+        <div class="viz l-measure-lg">
+          <div class="viz__head"><span class="t-label">Objets créés par semaine</span><span class="t-meta">8 semaines</span></div>
+          <div class="viz-cols">
+            <div class="viz-cols__col"><span class="viz-cols__bar" style="--a-value:30"></span><span class="viz-cols__key">s31</span></div>
+            <div class="viz-cols__col"><span class="viz-cols__bar" style="--a-value:48"></span><span class="viz-cols__key">s32</span></div>
+            <div class="viz-cols__col" data-role="accent"><span class="viz-cols__bar" style="--a-value:92"></span><span class="viz-cols__key">s33</span></div>
+            <div class="viz-cols__col"><span class="viz-cols__bar" style="--a-value:64"></span><span class="viz-cols__key">s34</span></div>
+            <div class="viz-cols__col"><span class="viz-cols__bar" style="--a-value:40"></span><span class="viz-cols__key">s35</span></div>
+            <div class="viz-cols__col"><span class="viz-cols__bar" style="--a-value:72"></span><span class="viz-cols__key">s36</span></div>
+            <div class="viz-cols__col"><span class="viz-cols__bar" style="--a-value:56"></span><span class="viz-cols__key">s37</span></div>
+            <div class="viz-cols__col" data-certainty="proposed"><span class="viz-cols__bar" style="--a-value:24"></span><span class="viz-cols__key">s38</span></div>
+          </div>
+          <div class="viz__foot"><span class="t-caption u-muted">Jamais plus de douze colonnes : au-delà, on change d'échelle de temps.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="etats">
+    <h2 class="t-h2" id="etats">États et densité</h2>
+    <p class="t-body u-muted">Une matrice d'états remplace un tableau de soixante lignes. Quatre niveaux suffisent : vide, faible, moyen, fort — plus l'accent pour l'élément sélectionné. Au-delà de quatre niveaux, l'œil ne distingue plus rien et la densité devient du bruit.</p>
+    <div class="ds-demo">
+      <div class="ds-demo__stage">
+        <div class="viz-matrix l-measure-xs" style="--a-cols:12" role="img" aria-label="Matrice d'activité : douze semaines sur huit projets">
+          <span class="viz-matrix__cell" data-level="2"></span><span class="viz-matrix__cell" data-level="1"></span><span class="viz-matrix__cell" data-level="3"></span><span class="viz-matrix__cell"></span><span class="viz-matrix__cell" data-level="1"></span><span class="viz-matrix__cell" data-level="2"></span><span class="viz-matrix__cell" data-level="3"></span><span class="viz-matrix__cell" data-level="1"></span><span class="viz-matrix__cell"></span><span class="viz-matrix__cell" data-level="2"></span><span class="viz-matrix__cell" data-level="focus"></span><span class="viz-matrix__cell" data-level="1"></span>
+          <span class="viz-matrix__cell" data-level="1"></span><span class="viz-matrix__cell" data-level="3"></span><span class="viz-matrix__cell" data-level="2"></span><span class="viz-matrix__cell" data-level="1"></span><span class="viz-matrix__cell"></span><span class="viz-matrix__cell" data-level="2"></span><span class="viz-matrix__cell" data-level="1"></span><span class="viz-matrix__cell" data-level="3"></span><span class="viz-matrix__cell" data-level="2"></span><span class="viz-matrix__cell" data-level="1"></span><span class="viz-matrix__cell"></span><span class="viz-matrix__cell" data-level="2"></span>
+          <span class="viz-matrix__cell"></span><span class="viz-matrix__cell" data-level="1"></span><span class="viz-matrix__cell" data-level="2"></span><span class="viz-matrix__cell" data-level="3"></span><span class="viz-matrix__cell" data-level="2"></span><span class="viz-matrix__cell" data-level="1"></span><span class="viz-matrix__cell"></span><span class="viz-matrix__cell" data-level="2"></span><span class="viz-matrix__cell" data-level="3"></span><span class="viz-matrix__cell" data-level="1"></span><span class="viz-matrix__cell" data-level="2"></span><span class="viz-matrix__cell"></span>
+          <span class="viz-matrix__cell" data-level="3"></span><span class="viz-matrix__cell" data-level="2"></span><span class="viz-matrix__cell" data-level="1"></span><span class="viz-matrix__cell"></span><span class="viz-matrix__cell" data-level="3"></span><span class="viz-matrix__cell" data-level="2"></span><span class="viz-matrix__cell" data-level="1"></span><span class="viz-matrix__cell"></span><span class="viz-matrix__cell" data-level="2"></span><span class="viz-matrix__cell" data-level="3"></span><span class="viz-matrix__cell" data-level="1"></span><span class="viz-matrix__cell" data-level="2"></span>
+        </div>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Règle</span><span class="t-caption">La matrice ne se lit jamais seule : sa légende et son axe sont obligatoires. Une densité sans échelle est une décoration.</span></p>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="preuve">
+    <h2 class="t-h2" id="preuve">Chaîne de preuve</h2>
+    <p class="t-body u-muted">Une visualisation AIME expose toujours d'où elle vient. La chaîne de preuve relie une affirmation à sa source, à son état et à sa date — c'est la forme visuelle du composant provenance.</p>
+    <div class="ds-demo">
+      <div class="ds-demo__stage">
+        <div class="viz-proof l-measure-lg">
+          <div class="viz-proof__step" data-state="observed"><span class="viz-proof__dot" aria-hidden="true"></span><span class="viz-proof__body"><span class="t-body-sm u-strong">Observation</span><span class="t-caption">deux indisponibilités déclarées — 02 et 09 septembre</span></span></div>
+          <div class="viz-proof__step" data-state="extracted"><span class="viz-proof__dot" aria-hidden="true"></span><span class="viz-proof__body"><span class="t-body-sm u-strong">Extraction</span><span class="t-caption">calendrier de production, source citable</span></span></div>
+          <div class="viz-proof__step" data-state="inferred"><span class="viz-proof__dot" aria-hidden="true"></span><span class="viz-proof__body"><span class="t-body-sm u-strong">Déduction</span><span class="t-caption">le 24 septembre réunit le plateau — non confirmé par le lieu</span></span></div>
+          <div class="viz-proof__step" data-state="proposed"><span class="viz-proof__dot" aria-hidden="true"></span><span class="viz-proof__body"><span class="t-body-sm u-strong">Proposition</span><span class="t-caption">décaler la répétition générale au 24 septembre</span></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="tendance">
+    <h2 class="t-h2" id="tendance">Tendance minimale</h2>
+    <p class="t-body u-muted">Le sparkline donne une direction, pas une analyse. Il accompagne une valeur, il ne la remplace jamais : la valeur lisible reste affichée à côté.</p>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--col">
+        <div class="l-row l-measure-md">
+          <span class="t-h2">128</span>
+          <svg class="viz-spark l-measure-sm" viewBox="0 0 200 32" role="img" aria-label="Tendance des objets actifs sur huit semaines, en hausse"><path data-role="accent" d="M2 26 L 30 22 L 58 24 L 86 14 L 114 16 L 142 8 L 170 10 L 198 4"/></svg>
+          <span class="a-badge a-badge--success">+18</span>
+        </div>
+        <p class="t-caption u-muted">Valeur, direction, variation. Trois informations, aucune grille, aucun axe décoratif.</p>
+      </div>
+    </div>
+  </section>
+
+  <nav class="ds-pager" aria-label="Navigation de chapitre">
+    <a href="motion.html"><small>16 — précédent</small><span class="t-body u-strong">Motion</span></a>
+    <a href="patterns.html"><small>18 — suivant</small><span class="t-body u-strong">Patterns</span></a>
+  </nav>
+
+</main>
+</div>
+</body>
+</html>

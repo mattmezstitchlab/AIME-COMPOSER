@@ -27,11 +27,21 @@ projection du système, jamais l'inverse.
 cd design-system
 npm run build   # génère tokens + icônes, refuse toute couleur non conforme
 npm run qa      # build + audit des 12 familles sur le système livré
+npm run verify  # exécute réellement les scripts des 19 écrans dans un DOM
+npm run check   # qa puis verify — la vérification complète
 npm run serve   # sert le dépôt sur http://0.0.0.0:8080/design-system/
 ```
 
-Aucune dépendance à l'exécution. `jsdom` n'est déclaré que comme option de test :
-l'audit travaille sur le texte source, il ne requiert pas de DOM.
+Aucune dépendance à l'exécution : build, QA et serveur n'utilisent que le moteur
+JavaScript. `jsdom` n'est requis que par `npm run verify`, qui exécute les scripts
+des écrans dans un DOM.
+
+`npm run verify` vérifie ce que l'analyse de texte ne peut pas voir : `js/doc.js`
+injecte le chrome et résout chaque icône, `js/aime-ui.js` se branche sans erreur,
+les modules `js/render-tokens.js` remplissent leurs conteneurs, `auditLive()`
+s'exécute sur le document vivant. **Limite assumée** : jsdom n'a pas de moteur de
+mise en page, donc les volets géométriques d'`auditLive` — débordement réel et
+taille des cibles — ne sont pas vérifiés. Ils demandent un navigateur réel.
 
 ## 3. Contenu
 
@@ -47,6 +57,7 @@ l'audit travaille sur le texte source, il ne requiert pas de DOM.
 | `styles/` | Couches 2 à 5 : foundations · layout · components · aime · noema · patterns · dataviz · doc |
 | `js/qa.js` | Design QA. Pur texte, donc exécutable à l'identique en Node et dans le navigateur |
 | `qa/run-qa.mjs` | Exécuteur : `npm run qa` |
+| `qa/verify-dom.mjs` | Exécuteur : `npm run verify` — exécution réelle des scripts des écrans |
 | `qa/serve.mjs` | Serveur statique, sans dépendance |
 
 ## 4. Ce qui est garanti, et par quoi
@@ -90,24 +101,25 @@ Afficher 87 % de certitude serait une fausse précision.
 
 ## 6. État d'avancement
 
-**Livré dans cette branche** — fondations complètes du système :
+**Livré dans cette branche** — le système et sa documentation :
 
 - Tokens : 23 primitives, 21 rôles × 2 thèmes, 4 états × 5 déclinaisons, 9 rôles
   typographiques, échelle d'espace fermée, 4 rayons, 6 durées, layout et breakpoints.
 - Iconographie : 85 pictogrammes, 17 catégories, contrat de grille unique.
 - Couches CSS 2 à 5 : 29 composants fondamentaux, 5 organes AIME, couche NOEMA,
-  8 patterns, langage de data visualisation, moteur de layout responsive.
-- Design QA : 12 familles, exécutable en Node et dans le navigateur.
-- 7 écrans de documentation : Accueil · Foundations · Couleur · Typographie ·
-  Espace & grille · Iconographie · Composants.
+  13 patterns, langage de data visualisation, moteur de layout responsive.
+- Design QA : 12 familles statiques, plus une vérification DOM des 19 écrans.
+- 19 écrans de documentation, du chapitre 00 au chapitre 19 : Accueil · Foundations ·
+  Couleur · Typographie · Espace & grille · Iconographie · Composants · Composants
+  AIME · Composants NOEMA · Carte · Timeline · Grille · Composer · Responsive ·
+  Accessibilité · Motion · Data visualisation · Patterns · Design QA.
 
-**Encore ouvert** — les chapitres suivants restent à écrire sur ce socle :
+**Encore ouvert** :
 
-- Documentation : organes AIME, couche NOEMA, Carte / Timeline / Grille universelles,
-  Composer, Responsive, Accessibilité, Motion, Data visualisation, Patterns, Design QA.
-- Les 10 écrans d'expérience (Playground, Composer, Carte, Timeline, Grille, Bureau,
-  Médiathèque, NOEMA, site public, portail client).
+- Les 10 écrans d'expérience (`experiences/`) : Playground, Composer, Carte,
+  Timeline, Grille, Bureau, Médiathèque, NOEMA, site public, portail client.
 - `ARCHITECTURE/AIME-DESIGN-SYSTEM-V1.md`, la spécification normative.
+- Les volets géométriques du QA, qui demandent un navigateur réel.
 
-Le socle (tokens, fondations, composants, QA) est terminé et vérifié : les chapitres
-restants sont de la composition sur un système déjà contraint, pas de la conception.
+Le socle est terminé et vérifié : les écrans d'expérience sont de la composition sur
+un système déjà contraint, pas de la conception.

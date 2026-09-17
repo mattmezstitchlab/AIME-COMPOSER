@@ -74,7 +74,7 @@
   color: var(--aime-color-text-subtle);
 }
 .ucard__fact dd { margin: 0; font-size: var(--aime-text-body-small-size); overflow-wrap: anywhere; }
-.ucard__fact dd.is-unknown { color: var(--aime-color-text-subtle); font-style: italic; }
+/* .is-unknown est un état sémantique général : voir foundations.css §2.7. */
 
 .ucard__foot { display: flex; align-items: center; justify-content: space-between; gap: var(--aime-space-3); flex-wrap: wrap; }
 .ucard__media { border-radius: var(--aime-radius-medium); overflow: hidden; border: var(--aime-border-subtle); }

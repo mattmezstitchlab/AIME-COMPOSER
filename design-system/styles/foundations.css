@@ -215,3 +215,6 @@ hr { border: 0; border-top: var(--aime-border-subtle); margin: 0; }
 .u-warning { color: var(--aime-color-warning-text); }
 .u-error { color: var(--aime-color-error-text); }
 .u-info { color: var(--aime-color-info-text); }
+/* Valeur absente : affichée comme absente, jamais comblée par une donnée
+   de démonstration. Utilisable dans toute liste de faits. */
+.is-unknown { color: var(--aime-color-text-subtle); font-style: italic; }

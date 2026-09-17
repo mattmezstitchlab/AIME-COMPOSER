@@ -7,7 +7,9 @@
   "scripts": {
     "build": "node src/build.mjs",
     "qa": "node src/build.mjs && node qa/run-qa.mjs",
-    "serve": "node qa/serve.mjs"
+    "serve": "node qa/serve.mjs",
+    "verify": "node qa/verify-dom.mjs",
+    "check": "npm run qa && npm run verify"
   },
   "devDependencies": {
     "jsdom": "^25.0.1"

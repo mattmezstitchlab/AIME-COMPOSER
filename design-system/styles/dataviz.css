@@ -64,7 +64,7 @@
 .viz-graph__sub { fill: var(--aime-color-text-subtle); font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size); letter-spacing: var(--aime-text-meta-ls); text-transform: uppercase; }
 
 /* Matrice d'états — la densité sans le bruit */
-.viz-matrix { display: grid; gap: var(--aime-space-1); }
+.viz-matrix { display: grid; gap: var(--aime-space-1); grid-template-columns: repeat(var(--a-cols, 8), minmax(0, 1fr)); }
 .viz-matrix__cell {
   aspect-ratio: 1; border-radius: var(--aime-radius-small);
   background: var(--aime-color-surface-overlay);
@@ -79,8 +79,15 @@
 .viz-proof__step { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--aime-space-3); padding-block: var(--aime-space-3); border-top: var(--aime-border-subtle); }
 .viz-proof__step:first-child { border-top: 0; }
 .viz-proof__dot { position: relative; width: 12px; height: 12px; margin-block-start: var(--aime-space-1); border: var(--aime-border-width-strong) solid var(--aime-color-border-strong); border-radius: var(--aime-radius-pill); background: var(--aime-color-background); }
-.viz-proof__step[data-state='confirmed'] .viz-proof__dot { background: var(--aime-color-success-border); border-color: var(--aime-color-success-border); }
-.viz-proof__step[data-state='proposed'] .viz-proof__dot { border-style: dashed; border-color: var(--aime-color-accent); }
+/* Les six états épistémiques, lus depuis les jetons d'état. Un maillon
+   observé, extrait, déduit, proposé, confirmé ou remplacé se distingue
+   par la forme de son arête — pas seulement par sa couleur. */
+.viz-proof__step[data-state='observed'] .viz-proof__dot   { border-color: var(--aime-state-observed-bd); border-style: dotted; }
+.viz-proof__step[data-state='extracted'] .viz-proof__dot  { border-color: var(--aime-state-extracted-bd); border-style: dashed; }
+.viz-proof__step[data-state='inferred'] .viz-proof__dot   { border-color: var(--aime-state-inferred-bd); border-style: dashed; }
+.viz-proof__step[data-state='proposed'] .viz-proof__dot   { border-color: var(--aime-state-proposed-bd); border-style: dashed; }
+.viz-proof__step[data-state='confirmed'] .viz-proof__dot  { border-color: var(--aime-state-confirmed-bd); background: var(--aime-state-confirmed-bd); }
+.viz-proof__step[data-state='superseded'] .viz-proof__dot { border-color: var(--aime-state-superseded-bd); background: var(--aime-state-superseded-bd); opacity: .6; }
 .viz-proof__step[data-state='missing'] .viz-proof__dot { border-color: var(--aime-color-warning-border); }
 .viz-proof__body { display: grid; gap: var(--aime-space-1); }
 
