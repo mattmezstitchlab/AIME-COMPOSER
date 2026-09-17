@@ -74,6 +74,20 @@
       <span class="t-caption u-muted" id="m-shown"></span>
     </div>
 
+    <div class="l-row l-row--between" id="m-selbar" hidden>
+      <span class="l-row">
+        <span class="a-badge a-badge--accent" id="m-selcount">0</span>
+        <span class="t-body-sm u-muted">média(s) sélectionné(s) — à transmettre à un agent ou à récupérer</span>
+      </span>
+      <span class="l-row l-row--nowrap">
+        <button type="button" class="a-btn a-btn--sm" id="m-copy-links"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-clipboard"/></svg>Copier les liens</button>
+        <button type="button" class="a-btn a-btn--sm" id="m-copy-brief"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="prj-brief"/></svg>Copier le brief agent</button>
+        <button type="button" class="a-btn a-btn--sm a-btn--ghost" id="m-dl-sh"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="act-export"/></svg>Script (.sh)</button>
+        <button type="button" class="a-btn a-btn--sm a-btn--ghost" id="m-sel-visible">Tout cocher (visibles)</button>
+        <button type="button" class="a-btn a-btn--sm a-btn--ghost" id="m-sel-clear"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-close"/></svg>Effacer</button>
+      </span>
+    </div>
+
     <div class="ds-demo">
       <div class="ds-demo__stage ds-demo__stage--grid" id="m-grid">
         <p class="t-body-sm u-muted">Chargement du catalogue…</p>

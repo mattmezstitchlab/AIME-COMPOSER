@@ -53,6 +53,10 @@
       group: 'Expériences',
       items: [{ n: '20', href: 'experiences/index.html', label: 'Écrans réels' }],
     },
+    {
+      group: 'Export',
+      items: [{ n: '21', href: 'direction.html', label: 'Direction artistique' }],
+    },
   ];
 
   const root = document.querySelector('meta[name="a-root"]')?.content || './';

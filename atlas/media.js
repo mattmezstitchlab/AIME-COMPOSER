@@ -1,14 +1,16 @@
 /**
- * MÉDIATHÈQUE — câblage du catalogue.
+ * MÉDIATHÈQUE — câblage du catalogue, de la sélection et de l'export.
  *
  * La page lit atlas/media.json, généré par atlas/build-media.mjs depuis les
- * arbres git des dépôts : aucune donnée n'est recopiée à la main dans cette
- * interface. Trois règles de bonne conduite :
+ * arbres git des dépôts : aucune donnée n'est recopiée à la main ici.
+ * Règles de conduite :
  *   · une image montre son fichier réel (CDN jsDelivr, repli raw) — si le
  *     fichier ne se charge pas, la tuile de type l'avoue, elle ne triche pas ;
  *   · une vidéo n'est jamais lue dans la page : tuile + lien vers la source ;
- *   · sans catalogue lisible, la page dit comment le régénérer au lieu de
- *     faire semblant d'être vide.
+ *   · la sélection sert à TRANSMETTRE : liens copiés, brief agent structuré,
+ *     ou script .sh de récupération — la décision d'intégrer reste à l'agent,
+ *     la validation reste humaine ;
+ *   · sans catalogue lisible, la page dit comment le régénérer.
  *
  * Script classique (defer), comme home.js : la vérification DOM exécute les
  * scripts classiques avant de contrôler les icônes.
@@ -45,6 +47,65 @@
     applyTheme();
   });
 
+  /* ── Utilitaires : presse-papiers, fichier, notification ─────── */
+  const toast = (title, tone = 'success') => window.AIME?.toast?.({ title, tone });
+
+  async function copyText(text, label) {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast(label);
+      return true;
+    } catch {
+      /* Repli ancien : zone temporaire + execCommand. */
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      let ok = false;
+      try { ok = document.execCommand('copy'); } catch { /* refusé */ }
+      ta.remove();
+      toast(ok ? label : 'La copie a été refusée — sélectionnez le texte manuellement', ok ? 'success' : 'error');
+      return ok;
+    }
+  }
+
+  function saveBlob(name, text, type = 'text/plain') {
+    const url = URL.createObjectURL(new Blob([text], { type }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  }
+
+  async function downloadFile(it) {
+    const url = it.url || it.url_raw;
+    if (!url) { window.open(it.source, '_blank', 'noreferrer'); return; }
+    try {
+      const r = await fetch(url);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const blob = await r.blob();
+      const u = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = u;
+      a.download = it.name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(u), 4000);
+      toast(`« ${it.name} » téléchargé`);
+    } catch {
+      /* Le fichier refuse d'être aspiré (CORS, couche CDN down) : on ouvre
+         la source, on ne simule pas un téléchargement. */
+      window.open(it.source, '_blank', 'noreferrer');
+      toast('Ouverture de la source — le fichier refuse le téléchargement direct', 'error');
+    }
+  }
+
   /* ── Catalogue ───────────────────────────────────────────────── */
   const KIND = {
     image: { label: 'Image', icon: 'med-image' },
@@ -54,6 +115,7 @@
   };
   const grid = $('#m-grid');
   const state = { q: '', kind: '', repo: '' };
+  const selected = new Set();
   let items = [];
 
   const humanSize = (n) => {
@@ -79,7 +141,8 @@
 
   const card = (it) => {
     const k = KIND[it.kind] || KIND.image;
-    return `<article class="ucard">
+    const on = selected.has(it.id);
+    return `<article class="ucard${on ? ' is-selected' : ''}" data-id="${esc(it.id)}">
       <div class="ucard__media">${thumb(it)}</div>
       <div class="ucard__id"><span class="ucard__mark" data-type="media">${ic(k.icon, 'a-ic')}</span>
         <span class="ucard__head"><span class="ucard__type">${esc(k.label)}</span><span class="ucard__title" title="${esc(it.path)}">${esc(it.name)}</span></span></div>
@@ -88,8 +151,10 @@
         <div class="ucard__fact"><dt>Taille</dt><dd class="u-mono">${humanSize(it.size)}</dd></div>
       </dl>
       <div class="ucard__foot">
+        <label class="a-check"><input type="checkbox" data-m-select="${esc(it.id)}"${on ? ' checked' : ''}><span class="a-check__box">${ic('act-check', 'a-ic a-ic--state')}</span><span class="t-caption">choisir</span></label>
         <span class="a-badge">${esc(it.ext)}</span>
         <span class="l-spacer"></span>
+        ${it.url || it.url_raw ? `<button type="button" class="a-text-btn" data-m-dl="${esc(it.id)}" aria-label="Télécharger ${esc(it.name)}">${ic('act-export')}<span class="t-caption">télécharger</span></button>` : ''}
         <a class="a-text-btn" href="${esc(it.source)}" target="_blank" rel="noreferrer"><span class="t-caption">source</span>${ic('nav-external')}</a>
       </div>
     </article>`;
@@ -114,10 +179,133 @@
       : `<p class="t-body-sm u-muted">Aucun média ne correspond à ce filtre.</p>`;
     resolveIcons(grid);
     const shownEl = $('#m-shown');
-    if (shownEl) {
-      shownEl.textContent = `${shown.length} média(s) affiché(s) · ${repos.size} dépôt(s)`;
-    }
+    if (shownEl) shownEl.textContent = `${shown.length} média(s) affiché(s) · ${repos.size} dépôt(s)`;
+    renderSelection();
   }
+
+  /* ── Sélection → transmission ────────────────────────────────── */
+  const chosen = () => items.filter((it) => selected.has(it.id));
+
+  function renderSelection() {
+    const n = selected.size;
+    const bar = $('#m-selbar');
+    if (bar) bar.hidden = n === 0;
+    const c = $('#m-selcount');
+    if (c) c.textContent = String(n);
+    grid?.querySelectorAll('.ucard[data-id]')?.forEach((el) => {
+      el.classList.toggle('is-selected', selected.has(el.dataset.id));
+    });
+  }
+
+  const bestUrl = (it) => it.url || it.url_raw || it.source;
+
+  function linksText() {
+    return chosen().map((it) => bestUrl(it)).join('\n');
+  }
+
+  function briefText() {
+    const list = chosen();
+    const when = new Date().toISOString().slice(0, 10);
+    const manifest = list.map((it) => ({
+      nom: it.name,
+      type: it.kind,
+      extension: it.ext,
+      taille_octets: it.size,
+      depot: it.repo,
+      chemin: it.path,
+      url_cdn: it.url,
+      url_repli: it.url_raw,
+      source: it.source,
+    }));
+    return [
+      `# Brief médias — sélection Médiathèque AIME-COMPOSER`,
+      ``,
+      `Généré le ${when} · ${list.length} média(s) · provenance : arbres git vérifiés (atlas/build-media.mjs)`,
+      ``,
+      `## Consigne pour l'agent`,
+      `1. Intégrer ces médias dans le projet cible en conservant noms de fichiers et provenance.`,
+      `2. Pour chaque entrée : utiliser url_cdn, puis url_repli en cas d'échec ; signaler tout fichier inaccessible au lieu de le remplacer silencieusement.`,
+      `3. Ne copier aucun média dans un dépôt sans validation humaine — la décision reste tracée.`,
+      `4. Les vidéos ne sont pas lues côté médiathèque : vérifier durée et poids avant intégration.`,
+      ``,
+      '```json',
+      JSON.stringify(manifest, null, 2),
+      '```',
+    ].join('\n');
+  }
+
+  function shText() {
+    const list = chosen();
+    const lines = [
+      '#!/usr/bin/env bash',
+      `# Récupération de ${list.length} média(s) — sélection Médiathèque AIME-COMPOSER`,
+      '# Chaque fichier d\u2019abord via le CDN, puis via le repli raw ; tout échec est signalé, rien n\u2019est caché.',
+      'set -u',
+      'mkdir -p media-selection && cd media-selection',
+      '',
+    ];
+    for (const it of list) {
+      const urls = [it.url, it.url_raw].filter(Boolean);
+      if (!urls.length) {
+        lines.push(`echo "SANS-URL ${it.name} — dépôt privé : ${it.source}"`);
+        continue;
+      }
+      lines.push(`curl -sfL -o "${it.name}" "${urls[0]}" \\`);
+      const last = urls[urls.length - 1];
+      lines.push(urls.length > 1
+        ? `  || curl -sfL -o "${it.name}" "${last}" || echo "ÉCHEC ${it.name}"`
+        : `  || echo "ÉCHEC ${it.name}"`);
+    }
+    lines.push('', 'echo "terminé — vérifiez les ÉCHEC éventuels ci-dessus"');
+    return lines.join('\n');
+  }
+
+  /* ── Événements ──────────────────────────────────────────────── */
+  grid?.addEventListener('change', (e) => {
+    const box = e.target.closest('[data-m-select]');
+    if (!box) return;
+    if (box.checked) selected.add(box.dataset.mSelect);
+    else selected.delete(box.dataset.mSelect);
+    renderSelection();
+  });
+
+  document.addEventListener('click', (e) => {
+    const dl = e.target.closest('[data-m-dl]');
+    if (dl) {
+      const it = items.find((x) => x.id === dl.dataset.mDl);
+      if (it) downloadFile(it);
+      return;
+    }
+    const pill = e.target.closest('[data-m-kind]');
+    if (pill) {
+      document.querySelectorAll('[data-m-kind]').forEach((p) => {
+        if (p === pill) p.setAttribute('aria-current', 'true');
+        else p.removeAttribute('aria-current');
+      });
+      state.kind = pill.dataset.mKind;
+      render();
+    }
+  });
+
+  $('#m-copy-links')?.addEventListener('click', () => {
+    copyText(linksText(), `${selected.size} lien(s) copié(s) — collez-les à votre agent`);
+  });
+  $('#m-copy-brief')?.addEventListener('click', () => {
+    copyText(briefText(), 'Brief agent copié — consigne + manifeste JSON');
+  });
+  $('#m-dl-sh')?.addEventListener('click', () => {
+    saveBlob('mediatheque-selection.sh', shText());
+    toast(`Script de récupération (${selected.size} média(s)) téléchargé`);
+  });
+  $('#m-sel-visible')?.addEventListener('click', () => {
+    for (const it of items.filter(matches)) selected.add(it.id);
+    render();
+    toast(`${selected.size} média(s) sélectionné(s)`);
+  });
+  $('#m-sel-clear')?.addEventListener('click', () => {
+    selected.clear();
+    render();
+  });
 
   /* Une image qui ne se charge pas avoue : deuxième couche (raw), puis
      tuile de type — jamais un carré brisé présenté comme un visuel. */
@@ -138,23 +326,12 @@
     resolveIcons(media);
   }, true);
 
-  /* ── Filtres ─────────────────────────────────────────────────── */
   $('#m-q')?.addEventListener('input', (e) => {
     state.q = e.target.value.trim().toLowerCase();
     render();
   });
   $('#m-repo')?.addEventListener('change', (e) => {
     state.repo = e.target.value;
-    render();
-  });
-  document.addEventListener('click', (e) => {
-    const pill = e.target.closest('[data-m-kind]');
-    if (!pill) return;
-    document.querySelectorAll('[data-m-kind]').forEach((p) => {
-      if (p === pill) p.setAttribute('aria-current', 'true');
-      else p.removeAttribute('aria-current');
-    });
-    state.kind = pill.dataset.mKind;
     render();
   });
 

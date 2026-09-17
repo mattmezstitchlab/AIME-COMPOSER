@@ -26,7 +26,7 @@ TOKENS → FOUNDATIONS → COMPONENTS → PATTERNS → LAYOUTS → EXPERIENCES
 cd design-system
 npm run build   # generate tokens + icons; refuses any colour that misses its contrast target
 npm run qa      # build + audit the 12 QA families over the shipped system
-npm run verify  # execute the scripts of all 33 audited screens in a DOM (needs the jsdom devDependency)
+npm run verify  # execute the scripts of all 34 audited screens in a DOM (needs the jsdom devDependency)
 npm run check   # qa then verify
 npm run serve   # serve the repository on http://0.0.0.0:8080/design-system/
 ```
@@ -36,9 +36,15 @@ contract · 9 typographic roles · a closed 10-step spacing scale · 86 glyphs i
 categories, no emoji · 29 fundamental components · the five AIME organs (Universal
 Card, Universal Timeline, Universal Grid, Composer, Universal Media) · the NOEMA
 layer with its six epistemic states · 13 patterns · a data-visualization language ·
-12 automatic Design QA families · 33 audited screens (19 documentation chapters,
-11 experience screens, the NOEMA loop screen, the Atlas media library, and the
-repository homepage).
+12 automatic Design QA families · 34 audited screens (19 documentation chapters,
+the art-direction brief page, 11 experience screens, the NOEMA loop screen, the
+Atlas media library, and the repository homepage).
+
+`design-system/direction.html` picks an artistic direction **inside** the system
+(theme, accent step in the fuchsia ramp, density, motion, radius level), previews
+it live through token overrides, and exports either an agent-ready brief
+(choices + application rules + CSS) or a drop-in `tokens.custom.css` — applying
+it to a project stays a human decision, re-measured by the diagnostic.
 
 Normative specification: `ARCHITECTURE/AIME-DESIGN-SYSTEM-V1.md`.
 System documentation and live screens: `design-system/index.html`.
@@ -86,7 +92,10 @@ The page reads `atlas/media.json` and shows each image's real file through a CDN
 (jsDelivr, raw fallback); a video is never played in-page (tile + source link);
 an unavailable file admits it with its type tile instead of a broken frame.
 Search, type filters (images / videos / vectors / audio) and per-repository
-filtering are all client-side.
+filtering are all client-side. Every card can be **downloaded** or **checked**;
+the selection toolbar copies plain links, builds a structured **agent brief**
+(instructions + JSON manifest with CDN and fallback URLs), or downloads a `.sh`
+recovery script — transmitting stays an agent's job, validating stays human.
 
 The mechanisms this library converges (media registries, resolution layers,
 per-project storages) are audited in `AUDIT/MEDIA-ATLAS-01.md`.
