@@ -49,6 +49,8 @@ const stage=document.getElementById('stage'),frame=document.getElementById('fram
 const buttons={home:document.getElementById('home'),composer:document.getElementById('composer'),card:document.getElementById('card'),timeline:document.getElementById('timeline'),grid:document.getElementById('grid')};
 const sources={composer:'./composer.html',card:'./universal-card.html',timeline:'./timeline.html',grid:'./grid.html'};
 function activate(key){Object.entries(buttons).forEach(([k,b])=>b.classList.toggle('active',k===key));if(key==='home'){frame.removeAttribute('src');stage.classList.remove('in-frame');document.title='AIME-COMPOSER — Accueil';return}frame.src=sources[key];stage.classList.add('in-frame');document.title='AIME-COMPOSER — '+buttons[key].textContent}
+function wireFrameHome(){try{const link=frame.contentDocument?.querySelector('.brandLink');if(!link)return;link.onclick=e=>{e.preventDefault();activate('home');window.scrollTo({top:0,behavior:'instant'});};}catch(_){} }
+frame.addEventListener('load',wireFrameHome);
 Object.entries(buttons).forEach(([key,b])=>b.addEventListener('click',()=>activate(key)));
 document.querySelectorAll('[data-view]').forEach(el=>el.addEventListener('click',()=>activate(el.dataset.view)));
 document.getElementById('start').onclick=()=>activate('composer');
