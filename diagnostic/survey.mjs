@@ -23,7 +23,10 @@ import { fetchRepo } from './diagnose.mjs';
 const OWNER = process.env.AIME_OWNER || 'mattmezstitchlab';
 
 const args = process.argv.slice(2);
-const all = (name) => args.filter((a, i) => a === `--${name}`).map((_, i) => args[args.indexOf(a, i) + 1]);
+/* Une seule fonction de lecture d'arguments : la variante « all » que
+   j'avais écrite d'abord indexait mal le tableau et renvoyait n'importe
+   quoi. Elle n'était appelée par personne — du code mort qui aurait fini
+   par être cru. */
 const flags = (name) => args.reduce((acc, a, i) => (a === `--${name}` ? [...acc, args[i + 1]] : acc), []);
 
 /* ── Cibles ────────────────────────────────────────────────────── */
