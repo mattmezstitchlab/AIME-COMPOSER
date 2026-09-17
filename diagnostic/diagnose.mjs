@@ -34,10 +34,23 @@ export function fetchRepo(owner, repo, { depth = 1, refresh = true } = {}) {
      l'outil n'était utilisable qu'une fois par dépôt. */
   if (existsSync(dest)) {
     if (!refresh) return dest;
+
+    /* Un dépôt vide n'a aucune ref. Sans ces gardes, `fetch` sortait en 1
+       et `rev-parse HEAD` levait, et le rapport annonçait « inaccessible »
+       pour des dépôts qui existent et sont simplement vides — une
+       accusation fausse, et exactement le genre d'erreur qu'un client
+       remarque. Un dépôt vide doit rester « aucun écran à juger ».
+       Vérifié : `git ls-remote` sort en 0 et ne rend aucune ligne. */
+    const refs = execFileSync('git', ['-C', dest, 'ls-remote', '--heads', 'origin'], { encoding: 'utf8', env, stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    if (!refs) return dest;
+
     /* Rejouer l'état courant plutôt que re-télécharger : plus rapide, et
        cela garantit qu'on juge bien la tête du dépôt. */
     execFileSync('git', ['-C', dest, 'fetch', '--depth', String(depth), 'origin'], { stdio: 'ignore', env });
-    const branch = execFileSync('git', ['-C', dest, 'rev-parse', '--abbrev-ref', 'HEAD'], { encoding: 'utf8', env }).trim();
+
+    const branch = execFileSync('git', ['-C', dest, 'rev-parse', '--abbrev-ref', 'HEAD'], { encoding: 'utf8', env, stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    if (!branch || branch === 'HEAD') return dest;
+
     execFileSync('git', ['-C', dest, 'reset', '--hard', `origin/${branch}`], { stdio: 'ignore', env });
     return dest;
   }

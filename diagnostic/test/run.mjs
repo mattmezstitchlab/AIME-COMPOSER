@@ -16,9 +16,19 @@
 import { collect, densityOf, exclusions, IGNORED_DIRS } from '../src/collect.mjs';
 import { diagnose, recommend, PROJECT_FAMILIES, REFERENCE_ONLY } from '../src/diagnose.mjs';
 import { reference } from '../src/reference.mjs';
-import { mkdtempSync, writeFileSync, mkdirSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { fetchRepo } from '../diagnose.mjs';
+import { mkdtempSync, writeFileSync, mkdirSync, readFileSync, readdirSync, statSync, rmSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+/* Un couple propriétaire/dépôt réservé aux tests hors ligne : il ne
+   correspond à rien sur GitHub, donc un test ne peut pas cloner par
+   erreur un vrai dépôt en croyant travailler sur une fixture. */
+const TEST_OWNER = 'test-owner-local';
+const TEST_REPO = 'test-repo-vide';
+const HERE = dirname(fileURLToPath(import.meta.url));
 
 let pass = 0;
 const failures = [];
@@ -273,6 +283,41 @@ test('deux runs produisent le même rapport', () => {
   const b = diagnose(collect(dir), REF);
   eq(a.ecarts, b.ecarts, 'le nombre d\'écarts varie d\'un run à l\'autre');
   eq(a.worst_pages, b.worst_pages, 'le classement varie d\'un run à l\'autre');
+});
+
+/* ══ RÉCUPÉRATION D'UN DÉPÔT ════════════════════════════════════ */
+console.log('\nRÉCUPÉRATION');
+
+test('un dépôt vide est « aucun écran », pas « inaccessible »', () => {
+  /* Régression gardée. fetchRepo() relance un clone existant avec
+     `git fetch` puis `rev-parse HEAD`. Sur un dépôt vide — et le compte
+     en compte trois, vérifiés — `fetch` sort en 1 parce qu'il n'y a
+     aucune ref, et le rapport annonçait « inaccessible » pour des dépôts
+     qui existent et sont simplement vides. Une accusation fausse.
+
+     Testé hors ligne : le « remote » est un dépôt nu local, donc ce test
+     ne dépend ni du réseau ni de l'état de .work/. */
+  const bare = mkdtempSync(join(tmpdir(), 'bare-'));
+  execFileSync('git', ['init', '--bare', '--quiet', bare]);
+
+  const dest = join(HERE, '..', '.work', `${TEST_OWNER}--${TEST_REPO}`);
+  rmSync(dest, { recursive: true, force: true });
+  mkdirSync(dest, { recursive: true });
+  execFileSync('git', ['clone', '--quiet', bare, dest], { stdio: ['ignore', 'ignore', 'ignore'] });
+
+  try {
+    const got = fetchRepo(TEST_OWNER, TEST_REPO);
+    eq(got, dest, 'fetchRepo n\'a pas rendu le clone existant');
+
+    /* La propriété qui compte pour le rapport : un dépôt vide doit
+       aboutir à « aucun écran à juger », et non à une erreur. */
+    const d = diagnose(collect(dest), REF);
+    eq(d.ok, false, 'un dépôt vide a été diagnostiqué comme un projet');
+    ok(/aucun écran/i.test(d.reason), `raison inattendue : ${d.reason}`);
+  } finally {
+    rmSync(dest, { recursive: true, force: true });
+    rmSync(bare, { recursive: true, force: true });
+  }
 });
 
 /* ── Bilan ─────────────────────────────────────────────────────── */

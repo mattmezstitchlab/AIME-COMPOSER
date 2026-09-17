@@ -84,11 +84,16 @@ console.log(`\n${line}`);
 console.log('  DIAGNOSTIC COMPARÉ — AIME Design System');
 console.log(line);
 console.log('  Moins il y a d\'écarts par écran, plus le projet est proche du système.\n');
-console.log(`  ${'PROJET'.padEnd(34)} ${'ÉCR.'.padStart(5)} ${'ÉCARTS'.padStart(7)} ${'/ÉCRAN'.padStart(7)}  PRINCIPAUX ÉCARTS`);
-console.log(`  ${'─'.repeat(92)}`);
+console.log(`  ${'PROJET'.padEnd(32)} ${'ÉCR.'.padStart(5)} ${'ÉCARTS'.padStart(7)} ${'/ÉCRAN'.padStart(7)} ${'ADOPTÉ'.padStart(7)}  PRINCIPAUX ÉCARTS`);
+console.log(`  ${'─'.repeat(94)}`);
 
 for (const r of judged) {
-  console.log(`  ${r.label.slice(0, 34).padEnd(34)} ${String(r.pages).padStart(5)} ${String(r.ecarts).padStart(7)} ${String(r.density).padStart(7)}  ${r.worst}`);
+  /* Le taux d'adoption est publié avec la même honnêteté que le reste :
+     0 % n'est pas une faute, c'est le point de départ. Et un projet à
+     30 % du vocabulaire n'est pas « à 30 % conforme » — l'adoption ne
+     mesure que ce qui est déjà écrit avec les mots du système. */
+  const adopt = `${Math.round(r.adoption * 100)} %`;
+  console.log(`  ${r.label.slice(0, 32).padEnd(32)} ${String(r.pages).padStart(5)} ${String(r.ecarts).padStart(7)} ${String(r.density).padStart(7)} ${adopt.padStart(7)}  ${r.worst}`);
 }
 
 if (unjudged.length) {
