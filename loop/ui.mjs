@@ -234,6 +234,7 @@ function render(d) {
     : '<p class="t-body-sm u-muted">Aucune décision prise pour l’instant.</p>';
 
   fillSubjects(d);
+  loadTimeline();
   resolveIcons(document);
 }
 
@@ -349,6 +350,85 @@ document.addEventListener('click', (e) => {
     post('/api/execute', { action_id: exec.dataset.execute, actor: 'a.meunier' }).then((d) => {
       if (d?.result) window.AIME?.toast?.({ title: 'Exécutée', body: d.result.detail, tone: 'success' });
     });
+  }
+});
+
+/* ── Timeline universelle ───────────────────────────────────────
+   L'écran demande la projection au serveur et l'affiche. Il ne recalcule
+   ni les capacités ni les retards : c'est le moteur qui les décide.
+   ────────────────────────────────────────────────────────────── */
+async function loadTimeline() {
+  const out = document.querySelector('#t-out');
+  const mode = document.querySelector('#t-mode').value;
+  const granularity = document.querySelector('#t-gran').value;
+  try {
+    const r = await fetch(`/api/timeline?mode=${encodeURIComponent(mode)}&granularity=${encodeURIComponent(granularity)}`);
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`);
+
+    const caps = d.capabilities?.length ? d.capabilities.join(' · ') : 'aucune — lecture seule';
+    const live = d.live ? `<p class="t-caption u-muted">maintenant ${esc(new Date(d.live.now).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }))}
+        · prochain <span class="u-mono">${esc(d.live.next || '—')}</span>
+        · ${d.live.late.length} en retard</p>` : '';
+
+    out.innerHTML = `
+      <p class="t-caption u-muted">mode <span class="u-mono">${esc(d.mode)}</span> · granularité <span class="u-mono">${esc(d.granularity)}</span>
+        · capacités actives <span class="u-mono">${esc(caps)}</span>
+        · source de vérité <span class="u-mono">${esc(d.source_of_truth)}</span></p>
+      ${live}
+      ${d.buckets.map((b) => `<div class="u-pad u-surface">
+        <p class="t-caption u-strong u-mono">${esc(b.period)}</p>
+        <div class="l-stack">${b.ids.map((id) => {
+          const it = d.items.find((x) => x.id === id);
+          if (!it) return '';
+          return `<div class="l-row l-row--between">
+            <span class="l-row">${ic('time-calendar')}
+              <span><span class="t-body-sm u-strong">${esc(it.title)}</span>
+              <br><span class="t-caption u-mono">${esc(it.start || 'sans date')} · ${esc(it.type)} · ${esc(it.id)}</span></span>
+            </span>
+            <span class="l-row">
+              ${it.late ? '<span class="a-badge a-badge--error">en retard</span>' : ''}
+              ${it.editable && it.capabilities.includes('MOVE') ? `<button type="button" class="a-btn a-btn--sm" data-tmove="${esc(it.id)}">+1 jour</button>` : ''}
+              ${it.capabilities.includes('COMPLETE') && it.status !== 'published' ? `<button type="button" class="a-btn a-btn--sm a-btn--ghost" data-tcomplete="${esc(it.id)}">Achever</button>` : ''}
+            </span></div>`;
+        }).join('')}</div></div>`).join('') || '<p class="t-body-sm u-muted">Aucun événement dans ce projet.</p>'}`;
+    resolveIcons(out);
+  } catch (e) {
+    out.innerHTML = `<div class="a-state a-state--error">
+      <span class="a-state__icon">${ic('com-alert', 'a-ic a-ic--lg')}</span>
+      <p class="t-h3">La projection n'a pas pu être calculée</p>
+      <p class="t-body-sm u-muted">${esc(e.message)}</p></div>`;
+    resolveIcons(out);
+  }
+}
+
+for (const sel of ['#t-mode', '#t-gran']) {
+  document.querySelector(sel).addEventListener('change', loadTimeline);
+}
+
+document.addEventListener('click', async (e) => {
+  const mv = e.target.closest('[data-tmove]');
+  if (mv) {
+    const st = await (await fetch('/api/state')).json();
+    const ev = (st.entities || []).find((x) => x.id === mv.dataset.tmove);
+    if (!ev) return;
+    const next = new Date(new Date(ev.start_at).getTime() + 864e5).toISOString().slice(0, 10);
+    const r = await fetch('/api/timeline/move', { method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ item_id: ev.id, start: next, actor: 'a.meunier', mode: document.querySelector('#t-mode').value }) });
+    const d = await r.json();
+    if (!r.ok) { window.AIME?.toast?.({ title: 'Refusé', body: d.error, tone: 'error' }); return; }
+    if (d.state) render(d.state);
+    loadTimeline();
+    return;
+  }
+  const cp = e.target.closest('[data-tcomplete]');
+  if (cp) {
+    const r = await fetch('/api/timeline/complete', { method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ item_id: cp.dataset.tcomplete, actor: 'a.meunier', mode: document.querySelector('#t-mode').value }) });
+    const d = await r.json();
+    if (!r.ok) { window.AIME?.toast?.({ title: 'Refusé', body: d.error, tone: 'error' }); return; }
+    if (d.state) render(d.state);
+    loadTimeline();
   }
 });
 

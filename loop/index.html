@@ -102,6 +102,34 @@
     </div>
   </section>
 
+  <section class="ds-block" aria-labelledby="timeline">
+    <h2 class="t-h2" id="timeline">Timeline universelle</h2>
+    <p class="t-body-sm u-muted">Une projection du projet, jamais une seconde source de vérité. Un seul moteur, six modes : ce qui change d'un mode à l'autre, ce sont les capacités actives — pas les données. Déplacer un événement modifie l'événement canonique, jamais une copie.</p>
+    <div class="l-row">
+      <div class="a-field">
+        <label class="a-field__label" for="t-mode">Mode</label>
+        <select class="a-select" id="t-mode">
+          <option value="PLAN">PLAN — organisation</option>
+          <option value="READ">READ — lecture</option>
+          <option value="COMPOSE">COMPOSE — montage</option>
+          <option value="REVIEW">REVIEW — annotation</option>
+          <option value="LIVE">LIVE — jour J</option>
+          <option value="HISTORY">HISTORY — versions</option>
+        </select>
+      </div>
+      <div class="a-field">
+        <label class="a-field__label" for="t-gran">Granularité</label>
+        <select class="a-select" id="t-gran">
+          <option>ANNÉE</option><option>MOIS</option><option>SEMAINE</option>
+          <option selected>JOUR</option><option>HEURE</option><option>MINUTE</option><option>SECONDE</option>
+        </select>
+      </div>
+    </div>
+    <div class="l-stack" id="t-out">
+      <p class="t-body-sm u-muted">Chargement…</p>
+    </div>
+  </section>
+
   <section class="ds-block" aria-labelledby="memoire">
     <h2 class="t-h2" id="memoire">Votre mémoire — les huit droits</h2>
     <p class="t-body-sm u-muted">La mémoire appartient à l'humain. Choisissez un sujet : ce que le système en sait, pourquoi il le croit, et ce que vous pouvez en faire. Chaque droit exercé est attribué et tracé — un droit anonyme n'est pas vérifiable.</p>

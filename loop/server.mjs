@@ -19,6 +19,10 @@
  *   POST /api/memory/limiter   catégorie et plafond de visibilité
  *   POST /api/memory/partager  accord d'accès borné
  *   POST /api/memory/revoquer  retrait d'un accès accordé
+ *   GET  /api/timeline         projection du flux canonique (?mode=&granularity=&project_id=)
+ *   GET  /api/timeline/moteur  modes, capacités, granularités
+ *   POST /api/timeline/move    déplace l'événement canonique (jamais une copie)
+ *   POST /api/timeline/complete  achève un événement
  *   POST /api/reset            repart du monde de démonstration
  *
  * Trois règles côté serveur, les mêmes que dans les modules :
@@ -38,6 +42,7 @@ import { draft, authorize, execute, posture } from './src/action.mjs';
 import {
   voir, comprendre, corriger, supprimer, pauser, limiter, partager, revoquer, droits,
 } from './src/governance.mjs';
+import { project, move, complete, moteur } from './src/timeline.mjs';
 import { seed } from './seed.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -161,6 +166,41 @@ const server = createServer(async (req, res) => {
          sans acteur. Le serveur refuse avant d'appeler le module, pour
          que le refus soit identique quel que soit le droit.
          ──────────────────────────────────────────────────────── */
+      /* ── Timeline universelle ────────────────────────────────
+         Une projection, jamais une seconde source de vérité : GET
+         n'écrit rien, et move() frappe l'événement canonique.
+         ──────────────────────────────────────────────────────── */
+      if (path === '/api/timeline' && req.method === 'GET') {
+        const mode = url.searchParams.get('mode') || 'PLAN';
+        const granularity = url.searchParams.get('granularity') || 'JOUR';
+        const project_id = url.searchParams.get('project_id') || null;
+        return json(res, 200, project(store, { mode, granularity, project_id }));
+      }
+
+      if (path === '/api/timeline/moteur' && req.method === 'GET') {
+        return json(res, 200, moteur());
+      }
+
+      if (path === '/api/timeline/move' && req.method === 'POST') {
+        const body = await readBody(req);
+        /* Le mode est vérifié côté serveur : une interface qui autoriserait
+           un déplacement en READ ne pourrait pas le faire passer. */
+        if (!body.actor) return json(res, 400, { error: 'un déplacement sans acteur est refusé' });
+        if (!body.item_id) return json(res, 400, { error: 'item_id obligatoire' });
+        const out = move(store, body);
+        store.save();
+        return json(res, 200, { ...out, state: snapshot() });
+      }
+
+      if (path === '/api/timeline/complete' && req.method === 'POST') {
+        const body = await readBody(req);
+        if (!body.actor) return json(res, 400, { error: 'un achèvement sans acteur est refusé' });
+        if (!body.item_id) return json(res, 400, { error: 'item_id obligatoire' });
+        const out = complete(store, body);
+        store.save();
+        return json(res, 200, { ...out, state: snapshot() });
+      }
+
       if (path === '/api/rights' && req.method === 'GET') {
         return json(res, 200, droits());
       }

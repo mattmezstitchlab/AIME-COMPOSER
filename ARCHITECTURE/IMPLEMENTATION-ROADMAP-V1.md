@@ -4,9 +4,9 @@ Status: **PARTIALLY IMPLEMENTED — Phase 0 delivered, Phases 1–8 not started*
 
 | Phase | Statut | Preuve |
 |---|---|---|
-| 0 — Contract and safety | **IMPLÉMENTÉE** | `loop/` · 73 tests · les deux preuves de sortie vérifiées |
+| 0 — Contract and safety | **IMPLÉMENTÉE** | `loop/` · 91 tests · les deux preuves de sortie vérifiées |
 | 1 — Memory spine | proposée | — |
-| 2 — Universal Timeline | proposée | — |
+| 2 — Universal Timeline | **partiellement** | `loop/src/timeline.mjs` · moteur, modes, capacités, granularités |
 | 3 — Universal Bureau | proposée | — |
 | 4 — Composer | proposée | — |
 | 5 — Client collaboration | proposée | — |
@@ -314,13 +314,22 @@ Once this loop is real, the rest of NOEMA becomes an expansion of the same archi
 | INTENTION | réel | `loop/src/intention.mjs` |
 | MEMORY | réel | `loop/src/store.mjs` + `governance.mjs` (les huit droits) |
 | PROJECT | partiel | `project_id` transverse, présent dans le monde de démonstration |
-| **TIMELINE** | **absent** | aucun moteur ; c'est le seul maillon manquant |
+| TIMELINE | réel | `loop/src/timeline.mjs` — un moteur, six modes, projection sans écriture |
 | PROPOSAL | réel | `noema.mjs` `propose()` — état `proposed`, statut `open` |
 | VALIDATION | réel | `noema.mjs` `decide()` — seul chemin vers un fait |
 | ACTION | réel | `loop/src/action.mjs` — autorisation et exécution distinctes |
 | PROOF | réel | preuve sur décision, autorisation et exécution |
 
-Nine of ten links exist and are tested. TIMELINE is the remaining gap:
-the loop can observe, propose, validate, act and prove, but it cannot
-yet reason across time. Everything above is verified by
-`cd loop && npm test` — 73 tests, 0 failures.
+The loop is closed: all ten links exist and are tested. Verified by
+`cd loop && npm test` — 91 tests, 0 failures.
+
+The Timeline is a **projection, never a second source of truth**.
+`project()` writes nothing — asserted by a test that checks both the
+entity count and the journal length across all six modes. `move()`
+mutates the canonical event and refuses to touch anything the Timeline
+does not project. One engine, six modes: what changes between them is
+the active capability set, not the data model.
+
+What remains partial: PROJECT has no engine of its own beyond the
+transverse `project_id`, and Phase 0 still lacks environment separation,
+secrets policy and export/recovery.

@@ -19,6 +19,7 @@ import { validate, EPISTEMIC_KEYS, CONFIDENCE_LEVELS, fromDataModelConfidence, i
 import { interpret, submit } from '../src/intention.mjs';
 import { draft, authorize, execute, posture } from '../src/action.mjs';
 import { voir, comprendre, corriger, supprimer, pauser, limiter, partager, revoquer, isPaused, droits, activeGrants } from '../src/governance.mjs';
+import { project, move, complete, moteur, MODES, MODE_CAPABILITIES, GRANULARITIES } from '../src/timeline.mjs';
 
 let pass = 0;
 const failures = [];
@@ -893,6 +894,193 @@ test('chaque droit exercé laisse une trace attribuée', () => {
   for (const j of s.journal.filter((x) => x.op.startsWith('right:'))) {
     eq(j.actor, 'a.meunier', `trace de droit sans acteur : ${j.op}`);
   }
+});
+
+/* ── TIMELINE : une projection, jamais une seconde vérité ──────── */
+console.log('\nTIMELINE UNIVERSELLE');
+
+test('un seul moteur, six modes, et pas une Timeline par métier', () => {
+  eq(MODES, ['READ', 'PLAN', 'COMPOSE', 'REVIEW', 'LIVE', 'HISTORY'], 'les modes ne correspondent pas à la spécification §2');
+  for (const m of MODES) ok(Array.isArray(MODE_CAPABILITIES[m]), `le mode « ${m} » n\u2019a pas de jeu de capacités`);
+  eq(MODE_CAPABILITIES.HISTORY.length, 0, 'l\u2019histoire est modifiable');
+  ok(!MODE_CAPABILITIES.READ.includes('MOVE'), 'READ autorise un déplacement structurel');
+  ok(MODE_CAPABILITIES.COMPOSE.includes('RESIZE') && MODE_CAPABILITIES.COMPOSE.includes('SPLIT'),
+    'COMPOSE n\u2019a pas le capability set de Timeline Theater');
+  eq(moteur().source_of_truth, 'event', 'la Timeline se déclare source de vérité');
+  eq(moteur().writes_on_project, false, 'la projection prétend écrire');
+});
+
+test('project() n\u2019écrit rien', () => {
+  const s = seedWorld();
+  const before = s.all().length;
+  const journal = s.journal.length;
+  for (const mode of MODES) project(s, { mode, now: NOW });
+  eq(s.all().length, before, 'la projection a créé des entités');
+  eq(s.journal.length, journal, 'la projection a écrit dans le journal');
+});
+
+test('le mode et la granularité sont validés', () => {
+  const s = seedWorld();
+  throws(() => project(s, { mode: 'FÊTE' }), 'un mode inconnu est passé');
+  throws(() => project(s, { granularity: 'QUINZAINE' }), 'une granularité inconnue est passée');
+  eq(GRANULARITIES, ['ANNÉE', 'MOIS', 'SEMAINE', 'JOUR', 'HEURE', 'MINUTE', 'SECONDE'], 'granularités hors spécification §5');
+});
+
+test('la projection cite les événements canoniques, sans les copier', () => {
+  const s = seedWorld();
+  const v = project(s, { mode: 'PLAN', now: NOW });
+  ok(v.items.length >= 1, 'le monde de démonstration ne projette aucun événement');
+  eq(v.items.length, s.byType('event').length, 'la projection ne couvre pas tous les événements canoniques');
+  for (const it of v.items) {
+    eq(it.entity_ref, it.id, 'l\u2019élément ne renvoie pas à l\u2019entité canonique');
+    ok(s.get(it.entity_ref), `l\u2019élément ${it.id} ne correspond à aucune entité`);
+    ok('capabilities' in it && 'editable' in it, 'le contrat TimelineItem est incomplet');
+  }
+  eq(v.source_of_truth, 'event', 'la projection ne cite pas sa source');
+});
+
+test('les capacités viennent du mode, pas de l\u2019élément', () => {
+  const s = seedWorld();
+  const plan = project(s, { mode: 'PLAN', now: NOW });
+  const read = project(s, { mode: 'READ', now: NOW });
+  ok(plan.items.every((i) => i.capabilities.includes('MOVE')), 'PLAN n\u2019active pas MOVE');
+  ok(read.items.every((i) => !i.capabilities.includes('MOVE')), 'READ active MOVE');
+  ok(read.items.every((i) => i.editable === false), 'un élément est éditable en lecture seule');
+});
+
+test('la granularité change la représentation, pas les données', () => {
+  const s = seedWorld();
+  const parJour = project(s, { granularity: 'JOUR', now: NOW });
+  const parMois = project(s, { granularity: 'MOIS', now: NOW });
+  eq(parJour.items.map((i) => i.id), parMois.items.map((i) => i.id), 'le zoom a changé les données');
+  ok(parMois.buckets.length <= parJour.buckets.length, 'agréger par mois n\u2019a pas réduit les groupes');
+  const totalJour = parJour.buckets.reduce((n, b) => n + b.ids.length, 0);
+  const totalMois = parMois.buckets.reduce((n, b) => n + b.ids.length, 0);
+  eq(totalJour, totalMois, 'le zoom a perdu des éléments');
+});
+
+test('LIVE calcule maintenant, prochain et retard', () => {
+  const s = seedWorld();
+  const v = project(s, { mode: 'LIVE', now: '2026-09-30T12:00:00Z' });
+  ok(v.live, 'LIVE ne produit pas d\u2019état opérationnel');
+  ok(Array.isArray(v.live.late), 'LIVE ne signale pas les retards');
+  ok(v.live.late.length >= 1, 'aucun retard détecté alors qu\u2019un événement est passé');
+  eq(project(s, { mode: 'PLAN', now: NOW }).live, null, 'un mode non LIVE produit un état opérationnel');
+});
+
+test('HISTORY projette le journal et n\u2019est pas modifiable', () => {
+  const s = seedWorld();
+  propose(s, { now: NOW });
+  const v = project(s, { mode: 'HISTORY', now: NOW });
+  ok(v.items.some((i) => i.source === 'journal'), 'HISTORY ne projette pas le journal');
+  ok(v.items.every((i) => i.editable === false), 'un élément d\u2019histoire est éditable');
+  ok(v.items.every((i) => i.capabilities.length === 0), 'un élément d\u2019histoire a des capacités');
+});
+
+test('un événement sans date ne peut pas exister : le schéma l\u2019interdit', () => {
+  const s = seedWorld();
+  /* Je croyais devoir gérer l'événement non daté. Le schéma est plus
+     strict que ma projection : `start_at` est un champ propre obligatoire.
+     L'inconnu ne se persiste pas, donc il n'y a rien à combler. */
+  throws(() => s.create('event', {
+    type: 'rehearsal', start_at: null, description: 'Sans date',
+    participants: [], source: 'saisie', provenance: provenance('saisie', 'observed'),
+    created_by: 'a.meunier', created_at: NOW,
+  }), 'un événement sans date a été persisté');
+
+  const v = project(s, { mode: 'PLAN', now: NOW });
+  eq(v.unpositioned.length, 0, 'des éléments non positionnés existent alors que le schéma les interdit');
+  ok(v.items.every((i) => i.positioned), 'un élément projeté n\u2019est pas positionné');
+});
+
+test('MOVE frappe l\u2019événement canonique, pas une copie', () => {
+  const s = seedWorld();
+  const eventsAvant = s.byType('event').length;
+  const totalAvant = s.all().length;
+  const decAvant = s.byType('decision').length;
+  const evt = s.byType('event')[0];
+  const r = move(s, { item_id: evt.id, start: '2026-09-20', actor: 'a.meunier', mode: 'PLAN', now: NOW });
+  const totalApres = s.all().length;
+  ok(r.moved, 'le déplacement n\u2019a pas eu lieu');
+  /* Le déplacement crée une décision — c'est voulu, c'est la trace.
+     L'invariant est qu'il ne crée pas d'événement concurrent. */
+  eq(s.byType('event').length, eventsAvant, 'le déplacement a créé une copie concurrente de l\u2019événement');
+  eq(totalApres - totalAvant, 1, 'le déplacement a créé autre chose que sa décision');
+  eq(s.byType('decision').length, decAvant + 1, 'la trace du déplacement est manquante');
+  eq(s.get(evt.id).start_at, '2026-09-20', 'l\u2019événement canonique n\u2019a pas bougé');
+  eq(r.before.start_at, evt.start_at, 'l\u2019ancienne position n\u2019est pas conservée');
+  const dec = s.get(r.decision.id);
+  eq(dec.actor, 'a.meunier', 'le déplacement n\u2019est pas attribué');
+  eq(dec.reversible, true, 'un déplacement n\u2019est pas marqué réversible');
+});
+
+test('un mode sans MOVE refuse le déplacement', () => {
+  const s = seedWorld();
+  const evt = s.byType('event')[0];
+  for (const mode of ['READ', 'REVIEW', 'HISTORY', 'LIVE']) {
+    throws(() => move(s, { item_id: evt.id, start: '2026-09-20', actor: 'a.meunier', mode, now: NOW }),
+      `le mode « ${mode} » a autorisé un déplacement`);
+  }
+  eq(s.get(evt.id).start_at, evt.start_at, 'un déplacement refusé a tout de même modifié l\u2019événement');
+});
+
+test('déplacer sans acteur est refusé', () => {
+  const s = seedWorld();
+  const evt = s.byType('event')[0];
+  throws(() => move(s, { item_id: evt.id, start: '2026-09-20', mode: 'PLAN', now: NOW }),
+    'un déplacement anonyme est passé');
+});
+
+test('un événement ne finit pas avant de commencer', () => {
+  const s = seedWorld();
+  const evt = s.byType('event')[0];
+  throws(() => move(s, { item_id: evt.id, start: '2026-09-20', end: '2026-09-19', actor: 'a.meunier', mode: 'PLAN', now: NOW }),
+    'un intervalle inversé est passé');
+  throws(() => move(s, { item_id: evt.id, start: 'demain', actor: 'a.meunier', mode: 'PLAN', now: NOW }),
+    'une date non ISO est passée');
+});
+
+test('la Timeline ne déplace que ce qu\u2019elle projette', () => {
+  const s = seedWorld();
+  const who = s.byType('person')[0].id;
+  throws(() => move(s, { item_id: who, start: '2026-09-20', actor: 'a.meunier', mode: 'PLAN', now: NOW }),
+    'la Timeline a déplacé une personne');
+});
+
+test('un événement en pause ne se déplace pas', () => {
+  const s = seedWorld();
+  const evt = s.byType('event')[0];
+  pauser(s, { subject_id: evt.id, until: '2026-12-31T00:00:00Z', actor: 'a.meunier', now: NOW });
+  throws(() => move(s, { item_id: evt.id, start: '2026-09-20', actor: 'a.meunier', mode: 'PLAN', now: NOW }),
+    'un événement en pause a été déplacé');
+});
+
+test('déplacer vers la même position ne fabrique pas de décision', () => {
+  const s = seedWorld();
+  const evt = s.byType('event')[0];
+  const avant = s.byType('decision').length;
+  const r = move(s, { item_id: evt.id, start: evt.start_at, actor: 'a.meunier', mode: 'PLAN', now: NOW });
+  eq(r.moved, false, 'un déplacement identique a été enregistré');
+  eq(s.byType('decision').length, avant, 'une décision inutile a été créée');
+});
+
+test('COMPLETE n\u2019est actif qu\u2019en PLAN et LIVE', () => {
+  const s = seedWorld();
+  const evt = s.byType('event')[0];
+  for (const mode of ['READ', 'COMPOSE', 'REVIEW', 'HISTORY']) {
+    throws(() => complete(s, { item_id: evt.id, actor: 'a.meunier', mode, now: NOW }),
+      `le mode « ${mode} » a autorisé COMPLETE`);
+  }
+  const r = complete(s, { item_id: evt.id, actor: 'a.meunier', mode: 'LIVE', now: NOW });
+  ok(r.completed, 'l\u2019achèvement en LIVE a échoué');
+  eq(s.get(evt.id).status, 'published', 'l\u2019événement canonique n\u2019est pas achevé');
+});
+
+test('le mode initial proposé dépend du contexte', () => {
+  const auto = moteur().automatic_modes;
+  eq(auto['montage vidéo'], ['COMPOSE'], 'un montage vidéo ne propose pas COMPOSE');
+  eq(auto.portfolio, ['READ', 'HISTORY'], 'un portfolio ne propose pas READ / HISTORY');
+  eq(auto.mariage, ['PLAN', 'LIVE'], 'un mariage ne propose pas PLAN / LIVE');
 });
 
 /* ── Bilan ─────────────────────────────────────────────────────── */
