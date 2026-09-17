@@ -45,17 +45,27 @@ export function reference() {
  * diagnostic punissait donc précisément le comportement qu'il est
  * censé récompenser.
  *
- * Le QA du Design System procède de même : il passe `styles/` en
- * `cssFiles`. Un projet jugé ici est jugé dans les mêmes conditions
- * que les écrans du système, sinon la comparaison n'a pas de sens.
+ * Le QA du Design System procède de même : `qa/run-qa.mjs` parcourt
+ * `styles/` et passe **les huit** feuilles en `cssFiles`. Un projet jugé
+ * ici doit l'être dans les mêmes conditions, sinon la comparaison n'a
+ * pas de sens.
  *
- * `doc.css` est exclue : c'est le chrome de la documentation du
- * système, pas une couche qu'un projet est censé charger.
+ * `doc.css` est incluse, et son exclusion était une erreur que la mesure
+ * a révélée : c'est la seule feuille qui définit le vocabulaire `ds-*`
+ * (`ds-shell`, `ds-demo`, `ds-device`…). Sans elle, ces classes
+ * remontaient comme « utilisées mais jamais définies » — 19 faux écarts
+ * sur les onze écrans de `design-system/experiences/`, alors même que le
+ * QA du système les déclare conformes. J'avais justifié l'exclusion en
+ * disant qu'un projet n'est pas censé charger ce chrome : c'est vrai,
+ * mais CONSISTENCY ne prescrit pas ce qu'il faut charger, elle vérifie
+ * si ce qui est employé existe quelque part dans le système. Rendre
+ * l'assertion fausse pour rester cohérent avec une intention, c'est
+ * exactement ce qu'un diagnostic ne doit pas faire.
  */
 export function systemStylesheets() {
   const dir = join(DS, 'styles');
   return readdirSync(dir)
-    .filter((f) => f.endsWith('.css') && f !== 'doc.css')
+    .filter((f) => f.endsWith('.css'))
     .sort()
     .map((f) => ({ name: f, text: readFileSync(join(dir, f), 'utf8'), system: true }));
 }

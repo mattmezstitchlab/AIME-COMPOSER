@@ -15,7 +15,7 @@
  */
 import { collect, densityOf, exclusions, IGNORED_DIRS } from '../src/collect.mjs';
 import { diagnose, recommend, PROJECT_FAMILIES, REFERENCE_ONLY } from '../src/diagnose.mjs';
-import { reference } from '../src/reference.mjs';
+import { reference, systemStylesheets, DESIGN_SYSTEM } from '../src/reference.mjs';
 import { fetchRepo } from '../diagnose.mjs';
 import { mkdtempSync, writeFileSync, mkdirSync, readFileSync, readdirSync, statSync, rmSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
@@ -275,6 +275,40 @@ test('la référence est lue du Design System, pas recopiée', () => {
   ok(r.tokenCss.text.includes('--aime-color'), 'tokens.css ne semble pas être celui du système');
   ok(r.tokensJson.deviceProfiles, 'tokens.json n\'a pas deviceProfiles');
   ok(r.sprite.includes('<symbol id='), 'le sprite ne contient aucun symbole');
+});
+
+test('le vocabulaire fourni au moteur couvre toutes les feuilles du système', () => {
+  /* Régression gardée. `systemStylesheets()` excluait `doc.css` au motif
+     qu'un projet n'est pas censé charger le chrome de la documentation.
+     Mais `doc.css` est la seule feuille qui définit le vocabulaire `ds-*`
+     (`ds-shell`, `ds-demo`, `ds-device`…), et CONSISTENCY ne prescrit pas
+     ce qu'il faut charger : elle vérifie si ce qui est employé existe
+     quelque part dans le système. L'exclusion rendait l'assertion fausse
+     — 19 classes signalées « utilisées mais jamais définies » alors
+     qu'elles le sont.
+
+     `qa/run-qa.mjs` parcourt `styles/` et passe les huit feuilles. Le
+     diagnostic doit passer les mêmes, sinon il ne juge pas dans les
+     mêmes conditions que les écrans qui sortent. */
+  const feuilles = systemStylesheets().map((f) => f.name).sort();
+  const attendues = readdirSync(join(DESIGN_SYSTEM, 'styles'))
+    .filter((f) => f.endsWith('.css'))
+    .sort();
+  eq(feuilles, attendues, 'le diagnostic ne fournit pas toutes les feuilles du système');
+  ok(feuilles.includes('doc.css'), 'doc.css manque : le vocabulaire ds-* serait signalé indéfini');
+});
+
+test('le diagnostic juge les écrans du système conformes, comme le système se juge', () => {
+  /* La propriété qui compte, et celle qui a révélé le défaut : les onze
+     écrans de `design-system/experiences/` sont déclarés conformes aux
+     douze familles par `npm run check`. Si le diagnostic leur trouve des
+     écarts, c'est le diagnostic qui se trompe — et un outil qui accuse
+     le système qu'il est censé faire respecter ne peut pas être montré
+     à un client. */
+  const dir = join(DESIGN_SYSTEM, 'experiences');
+  const d = diagnose(collect(dir), REF);
+  eq(d.ecarts, 0,
+    `le diagnostic trouve ${d.ecarts} écart(s) sur les écrans du système : ${d.families.filter((f) => f.count).map((f) => `${f.family} ${f.count}`).join(', ')}`);
 });
 
 test('deux runs produisent le même rapport', () => {
