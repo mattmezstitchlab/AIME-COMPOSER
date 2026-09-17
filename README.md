@@ -50,6 +50,10 @@ affected, and an order of repair — never an invented score out of 100.
 so counting it would bill a third-party project for our debts. It measures and names.
 It repairs nothing — repairing stays a human decision.
 
+Measured across the account — 18 projects with screens, 80 screens, 8 398 issues —
+in `AUDIT/DIAGNOSTIC-SURVEY-V1.md`. That report is generated from the measurement,
+not written by hand: no total in it was copied.
+
 Details: `diagnostic/README.md`.
 
 ## Visual Atlas
