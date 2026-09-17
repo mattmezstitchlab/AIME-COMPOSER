@@ -1,0 +1,12 @@
+{
+  "name": "aime-diagnostic",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Diagnostic d'un projet externe par le Design System AIME. Mesure et nomme les écarts ; ne répare rien.",
+  "scripts": {
+    "test": "node test/run.mjs",
+    "diagnose": "node diagnose.mjs",
+    "survey": "node survey.mjs"
+  }
+}

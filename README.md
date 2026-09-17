@@ -30,6 +30,28 @@ layer with its six epistemic states · 13 patterns · a data-visualization langu
 Normative specification: `ARCHITECTURE/AIME-DESIGN-SYSTEM-V1.md`.
 System documentation and live screens: `design-system/index.html`.
 
+## Diagnostic
+
+`diagnostic/` applies the system's own judge to **any** project — a local folder or
+a GitHub repository — without ever writing to it.
+
+```bash
+node diagnostic/diagnose.mjs ../a-project             # a local folder
+node diagnostic/diagnose.mjs --owner O --repo R       # a GitHub repository
+node diagnostic/survey.mjs                            # every repo of the account, ranked
+```
+
+It is the same engine that audits the 31 screens of the system, not a copy, so a
+project is judged under the same conditions as the screens that ship. The report
+publishes a **density** (issues per screen), the families involved, the screens most
+affected, and an order of repair — never an invented score out of 100.
+
+`CONTRAST` is excluded: it measures the system's own primitives across both themes,
+so counting it would bill a third-party project for our debts. It measures and names.
+It repairs nothing — repairing stays a human decision.
+
+Details: `diagnostic/README.md`.
+
 ## Visual Atlas
 
 AIME-COMPOSER is the audit and convergence layer above the 64 source projects. It does not merge or replace them.
