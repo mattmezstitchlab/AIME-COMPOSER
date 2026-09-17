@@ -354,6 +354,99 @@ test('un dépôt vide est « aucun écran », pas « inaccessible »', () => {
   }
 });
 
+/* ══ UNIVERSEL V2 — moteur détecté, comptes exacts, pont officiel ══ */
+console.log('\nUNIVERSEL V2');
+
+import { profileProject } from '../src/profile.mjs';
+import { extractProject } from '../src/extract.mjs';
+import { baselineDiff, diagnose as diagnoseV2 } from '../src/diagnose.mjs';
+import { reportJson } from '../diagnose.mjs';
+
+const FIX = (name) => join(HERE, 'fixtures', name);
+
+test('le profil détecte le moteur sans l\'exécuter, et sépare écrans / fragments', () => {
+  const d = diagnoseV2(collect(FIX('react')), REF);
+  eq(d.profile.engines, ['React'], 'moteur détecté faux');
+  eq(d.screens.total, 1, 'écran de route mal compté');
+  eq(d.fragments.total, 1, 'fragment mal compté');
+});
+
+test('comptes EXACTS par famille sur le projet fautif planté', () => {
+  const d = diagnoseV2(collect(FIX('react')), REF);
+  const byFamily = Object.fromEntries(d.families.map((f) => [f.family, [f.count, f.screens, f.fragments]]));
+  /* Plantés : p-5(20px, écran) — padding:10 (fragment) ; text-white (écran) —
+     style color:#ff3b30 (fragment) ; 3 déclarations inline (fragment) ; emoji (fragment). */
+  eq(byFamily.SPACING, [2, 1, 1], 'SPACING');
+  eq(byFamily.COLOR, [2, 1, 1], 'COLOR');
+  eq(byFamily.CONSISTENCY, [3, 0, 3], 'CONSISTENCY');
+  eq(byFamily.ICONOGRAPHY, [1, 0, 1], 'ICONOGRAPHY');
+  eq(byFamily.HIERARCHY, [0, 0, 0], 'HIERARCHY doit rester à 0 (un <h1> par écran présent)');
+  eq(d.screens.ecarts, 2, 'écarts écrans');
+  eq(d.screens.density, 2, 'densité par écran');
+  eq(d.fragments.ecarts, 6, 'écarts fragments');
+});
+
+test('anti-faux-positifs : un projet n\'utilisant que le pont officiel → 0 écart', () => {
+  const d = diagnoseV2(collect(FIX('bridge')), REF);
+  eq(d.profile.bridged, true, 'pont non reconnu');
+  const trio = Object.fromEntries(d.families.map((f) => [f.family, f.count]));
+  eq(trio.COLOR, 0, 'COLOR non nul sur le pont');
+  eq(trio.SPACING, 0, 'SPACING non nul sur le pont');
+  eq(trio.TYPOGRAPHY, 0, 'TYPOGRAPHY non nul sur le pont');
+  eq(d.ecarts, 0, `le total devrait être nul, mesuré : ${d.ecarts} (${d.families.filter((f) => f.count).map((f) => `${f.family}:${f.count}`).join(' ')})`);
+});
+
+test('repli garanti : moteur inconnu → scan HTML/CSS historique, sans échec', () => {
+  const dir = makeProject();
+  const d = diagnoseV2(collect(dir), REF);
+  eq(d.profile.engines, [], 'un moteur inventé sur du HTML pur');
+  eq(d.profile.unknown, true, 'le repli n\'est pas déclaré');
+  ok(d.ok, 'le repli a cassé le diagnostic');
+});
+
+test('déterminisme : le JSON publié est identique d\'un run à l\'autre', () => {
+  const a = JSON.stringify(reportJson('react', diagnoseV2(collect(FIX('react')), REF)));
+  const b = JSON.stringify(reportJson('react', diagnoseV2(collect(FIX('react')), REF)));
+  eq(a, b, 'le rapport JSON varie d\'un run à l\'autre');
+});
+
+test('baseline : le diff nomme les écarts nouveaux et corrigés', () => {
+  const prev = { signatures: ['SPACING|a.jsx|1|p-5', 'COLOR|a.jsx|2|#fff'] };
+  const cur = { signatures: ['SPACING|a.jsx|1|p-5', 'MOTION|b.jsx|3|300ms'] };
+  const diff = baselineDiff(cur, prev);
+  eq(diff.added_count, 1, 'nouveaux écarts mal comptés');
+  eq(diff.fixed_count, 1, 'écarts corrigés mal comptés');
+  eq(diff.net, 0, 'solde net faux');
+});
+
+test('non-écriture sur un projet à moteur aussi', () => {
+  const dir = FIX('react');
+  const avant = readdirSync(dir, { recursive: true }).sort().join('|');
+  diagnoseV2(collect(dir), REF);
+  eq(readdirSync(dir, { recursive: true }).sort().join('|'), avant, 'le diagnostic a modifié le projet React');
+});
+
+test('extraction : le non-résolu est compté, jamais deviné', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'aime-jsx-dyn-'));
+  writeFileSync(join(dir, 'package.json'), '{"dependencies":{"react":"^18"}}');
+  mkdirSync(join(dir, 'src'));
+  writeFileSync(join(dir, 'src', 'App.jsx'),
+    'export default function App(){ return <h1 className={`p-2 ${d ? \'m-4\' : \'m-2\'}`}>T</h1>; }');
+  const d = diagnoseV2(collect(dir), REF);
+  ok(d.unresolved >= 1, `dynamique non comptée : ${d.unresolved}`);
+  /* Les parties littérales restent jugées ; p-2 = 8px, m-4 = 16px : dans l'échelle. */
+  eq(d.families.filter((f) => f.family === 'SPACING')[0].count, 0, 'une partie littérale a été mal jugée');
+});
+
+test('l\'extraction ne produit aucune requête ni exécution — preuve : dépendance fantôme ignorée', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'aime-jsx-sec-'));
+  writeFileSync(join(dir, 'package.json'), '{"dependencies":{"react":"^18"},"scripts":{"postinstall":"evildone"}}');
+  mkdirSync(join(dir, 'src'));
+  writeFileSync(join(dir, 'src', 'App.jsx'), 'export default function App(){ return <h1>T</h1>; }');
+  const d = diagnoseV2(collect(dir), REF);
+  ok(d.ok && d.screens.total === 1, 'l\'écran n\'a pas été jugé');
+});
+
 /* ── Bilan ─────────────────────────────────────────────────────── */
 console.log(`\n${failures.length ? '✗' : '✓'} ${pass} test(s) réussi(s) · ${failures.length} échec(s)\n`);
 if (failures.length) process.exit(1);
