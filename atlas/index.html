@@ -1,1 +1,58 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AIME-COMPOSER — Playground</title><style>:root{--bg:#080808;--line:#292929;--text:#f5f3ee;--muted:#8e8c87;--accent:#ff2f9e}*{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font:13px/1.45 Inter,system-ui,sans-serif}*{scrollbar-width:thin;scrollbar-color:#000 #171717}*::-webkit-scrollbar{width:10px;height:10px}*::-webkit-scrollbar-track{background:#171717}*::-webkit-scrollbar-thumb{background:#000;border-radius:8px;border:2px solid #171717}.shell{height:100%;display:grid;grid-template-rows:70px 1fr}.top{display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--line)}.brand{font-size:18px;font-weight:850;letter-spacing:-.04em}.brand i{color:var(--accent);font-style:normal}.nav{display:flex;gap:8px;overflow:auto}.nav button{border:1px solid var(--line);background:#111;color:#eee;border-radius:999px;padding:9px 13px;cursor:pointer;white-space:nowrap}.nav button.active{background:var(--accent);border-color:var(--accent)}iframe{display:block;width:100%;height:100%;border:0}.hint{position:absolute;left:24px;bottom:18px;color:var(--muted);font-size:10px;pointer-events:none}.stage{position:relative;min-height:0}</style></head><body><div class="shell"><header class="top"><div class="brand">AIME<i>•</i>COMPOSER <span style="color:#777">/ PLAYGROUND</span></div><nav class="nav"><button id="composer" class="active">Composer</button><button id="card">Carte Universelle</button><button id="timeline">Timeline Universelle</button><button id="grid">Grille Universelle</button></nav></header><main class="stage"><iframe id="frame" src="./composer.html" title="AIME Playground"></iframe><div class="hint">PROTOTYPE · données locales uniquement · aucune source auditée modifiée</div></main></div><script>const f=document.getElementById('frame'),c=document.getElementById('composer'),u=document.getElementById('card'),t=document.getElementById('timeline'),g=document.getElementById('grid');function set(a,b){[c,u,t,g].forEach(x=>x.classList.toggle('active',x===a));f.src=b}function wireChildHome(){try{const link=f.contentDocument?.querySelector('.brandLink');if(!link||link.dataset.parentWired==='true')return;link.dataset.parentWired='true';link.addEventListener('click',e=>{e.preventDefault();window.location.href='./index.html'});}catch(_){}}f.addEventListener('load',wireChildHome);c.onclick=()=>set(c,'./composer.html');u.onclick=()=>set(u,'./universal-card.html');t.onclick=()=>set(t,'./timeline.html');g.onclick=()=>set(g,'./grid.html');wireChildHome();</script></body></html>
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AIME-COMPOSER — Accueil</title>
+<style>
+:root{--bg:#080808;--line:#292929;--text:#f5f3ee;--muted:#8e8c87;--accent:#ff2f9e}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font:13px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,a{font:inherit}button{cursor:pointer}a{color:inherit}
+.shell{height:100%;display:grid;grid-template-rows:70px 1fr}.top{display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--line);background:rgba(8,8,8,.97);z-index:10}.brandLink{color:inherit;text-decoration:none;display:inline-flex;align-items:center;border-radius:8px}.brandLink:focus-visible{outline:2px solid var(--accent);outline-offset:5px}.brand{font-size:18px;font-weight:850;letter-spacing:-.04em}.brand i{color:var(--accent);font-style:normal}.nav{display:flex;gap:8px;overflow:auto}.nav button{border:1px solid var(--line);background:#111;color:#eee;border-radius:999px;padding:9px 13px;white-space:nowrap}.nav button.active{background:var(--accent);border-color:var(--accent)}
+.stage{position:relative;min-height:0;overflow:hidden}.home{height:100%;overflow:auto}.homeInner{max-width:1180px;margin:0 auto;padding:clamp(52px,8vw,110px) 28px 70px}.eyebrow{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent)}h1{font-size:clamp(54px,9vw,128px);line-height:.86;letter-spacing:-.075em;margin:18px 0 26px;max-width:1000px}h1 span{color:#777}.intro{max-width:650px;color:#aaa;font-size:18px;line-height:1.55;margin:0}.homeActions{display:flex;gap:10px;flex-wrap:wrap;margin-top:30px}.primary,.secondary{border-radius:999px;padding:11px 17px}.primary{border:1px solid var(--accent);background:var(--accent);color:#fff;font-weight:750}.secondary{border:1px solid var(--line);background:#111;color:#eee}.section{margin-top:90px}.sectionLabel{font-size:9px;text-transform:uppercase;letter-spacing:.18em;color:var(--muted);margin-bottom:14px}.modules{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.module{border:1px solid var(--line);background:linear-gradient(145deg,#111,#0b0b0b);border-radius:20px;padding:20px;text-align:left;color:inherit;min-height:190px;transition:.18s}.module:hover{border-color:#555;transform:translateY(-2px)}.module strong{display:block;font-size:21px;letter-spacing:-.045em;margin:35px 0 8px}.module p{color:#777;margin:0;font-size:11px;line-height:1.5}.module small{font-size:9px;text-transform:uppercase;letter-spacing:.13em;color:var(--accent)}.principles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.principle{border-top:1px solid var(--line);padding-top:14px}.principle b{font-size:14px}.principle p{color:#777;font-size:11px;max-width:300px}.hint{position:absolute;left:24px;bottom:18px;color:var(--muted);font-size:10px;pointer-events:none}.frame{display:none;width:100%;height:100%;border:0;background:var(--bg)}.stage.in-frame .home{display:none}.stage.in-frame .frame{display:block}.stage.in-frame .hint{display:none}
+@media(max-width:900px){.modules{grid-template-columns:repeat(2,1fr)}.principles{grid-template-columns:1fr 1fr}}@media(max-width:650px){.top{padding:0 12px}.brand{font-size:16px}.nav{max-width:60vw}.homeInner{padding:55px 20px 60px}.modules,.principles{grid-template-columns:1fr}h1{font-size:58px}.intro{font-size:16px}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header class="top">
+<a class="brandLink" href="./index.html" aria-label="AIME-COMPOSER — accueil" title="Accueil"><div class="brand">AIME<i>•</i>COMPOSER <span style="color:#777">/ PLAYGROUND</span></div></a>
+<nav class="nav" aria-label="Navigation du Playground">
+<button id="home" class="active">Accueil</button><button id="composer">Composer</button><button id="card">Carte Universelle</button><button id="timeline">Timeline Universelle</button><button id="grid">Grille Universelle</button>
+</nav>
+</header>
+<main class="stage" id="stage">
+<section class="home" id="homeView">
+<div class="homeInner">
+<div class="eyebrow">AIME-COMPOSER · PLAYGROUND</div>
+<h1>Composer le monde.<br><span>Une brique à la fois.</span></h1>
+<p class="intro">Un espace expérimental pour réunir les primitives universelles d’AIME, comprendre leurs relations et préparer leur convergence dans une expérience créative cohérente.</p>
+<div class="homeActions"><button class="primary" id="start">Ouvrir le Composer</button><button class="secondary" id="explore">Explorer les briques</button></div>
+<div class="section"><div class="sectionLabel">Les quatre espaces</div><div class="modules">
+<button class="module" data-view="composer"><small>01 · Créer</small><strong>Composer</strong><p>Assembler des briques, déplacer les nœuds, créer des connexions et préparer une composition.</p></button>
+<button class="module" data-view="card"><small>02 · Comprendre</small><strong>Carte Universelle</strong><p>Explorer la mémoire d’une personne, d’un projet ou d’une entité sans créer de modèle parallèle.</p></button>
+<button class="module" data-view="timeline"><small>03 · Orchestrer</small><strong>Timeline</strong><p>Voir le projet dans le temps : événements, moments, progression et contexte.</p></button>
+<button class="module" data-view="grid"><small>04 · Mesurer</small><strong>Grille</strong><p>Organiser l’espace, les proportions, les formats et les contraintes de composition.</p></button>
+</div></div>
+<div class="section"><div class="sectionLabel">Principes</div><div class="principles">
+<div class="principle"><b>Une seule source de vérité.</b><p>Les vues projettent les mêmes objets au lieu de créer des systèmes concurrents.</p></div>
+<div class="principle"><b>La proposition n’est pas la décision.</b><p>NOEMA propose ; l’humain valide avant les décisions engageantes.</p></div>
+<div class="principle"><b>Prototype honnête.</b><p>Les expériences locales restent explicitement distinguées des connexions réelles.</p></div>
+</div></div>
+</div>
+</section>
+<iframe class="frame" id="frame" title="AIME-COMPOSER Playground"></iframe>
+<div class="hint" id="hint">ACCUEIL · choisissez un espace pour commencer</div>
+</main>
+</div>
+<script>
+const stage=document.getElementById('stage'),frame=document.getElementById('frame');
+const buttons={home:document.getElementById('home'),composer:document.getElementById('composer'),card:document.getElementById('card'),timeline:document.getElementById('timeline'),grid:document.getElementById('grid')};
+const sources={composer:'./composer.html',card:'./universal-card.html',timeline:'./timeline.html',grid:'./grid.html'};
+function activate(key){Object.entries(buttons).forEach(([k,b])=>b.classList.toggle('active',k===key));if(key==='home'){frame.removeAttribute('src');stage.classList.remove('in-frame');document.title='AIME-COMPOSER — Accueil';return}frame.src=sources[key];stage.classList.add('in-frame');document.title='AIME-COMPOSER — '+buttons[key].textContent}
+Object.entries(buttons).forEach(([key,b])=>b.addEventListener('click',()=>activate(key)));
+document.querySelectorAll('[data-view]').forEach(el=>el.addEventListener('click',()=>activate(el.dataset.view)));
+document.getElementById('start').onclick=()=>activate('composer');
+document.getElementById('explore').onclick=()=>document.querySelector('.modules').scrollIntoView({behavior:'smooth',block:'center'});
+</script>
+</body>
+</html>
