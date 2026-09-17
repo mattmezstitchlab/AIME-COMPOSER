@@ -44,10 +44,33 @@
     <p>Chaque objet persisté a un propriétaire, une source et une provenance. NOEMA observe et propose — elle n'écrit jamais un fait. Une proposition devient un fait uniquement par une décision humaine attribuée, qui laisse une preuve. Sous le seuil de confiance, NOEMA se tait : les propositions retenues sont affichées comme retenues, jamais appliquées.</p>
   </div>
 
+  <section class="ds-block" aria-labelledby="intention">
+    <h2 class="t-h2" id="intention">Ce que vous dites à NOEMA</h2>
+    <p class="t-body-sm u-muted">Une phrase dans vos mots, pas un formulaire. NOEMA en tire des candidats et vous les montre — elle n'enregistre rien tant que vous n'avez pas validé. Ce qu'elle ne comprend pas vous est dit, jamais deviné.</p>
+    <div class="a-field">
+      <label class="a-field__label" for="i-text">Votre intention</label>
+      <textarea class="a-textarea" id="i-text" placeholder="Camille Vasseur est saxophoniste ; il faut la capacité de la salle ; envoyer l'annonce pour le 24 septembre"></textarea>
+      <span class="a-field__hint" id="i-hint">Extraction par motifs : ce n'est pas une compréhension du langage, et la confiance reste basse tant que vous n'avez pas validé.</span>
+    </div>
+    <div class="l-row">
+      <button type="button" class="a-btn a-btn--sm" id="i-read">Lire sans écrire</button>
+      <button type="button" class="a-btn a-btn--sm a-btn--primary" id="i-submit">Proposer à la validation</button>
+    </div>
+    <div class="l-stack" id="intention-out" aria-live="polite"></div>
+  </section>
+
   <section class="ds-block" aria-labelledby="propositions">
     <h2 class="t-h2" id="propositions">Ce que NOEMA propose</h2>
     <div class="l-stack" id="proposals">
       <p class="t-body-sm u-muted">Chargement…</p>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="actions">
+    <h2 class="t-h2" id="actions">Actions — ce qui sortirait de la machine</h2>
+    <p class="t-body-sm u-muted">Valider une demande d'action ne l'exécute pas : elle entre en attente d'autorisation. Périmètre, risque et réversibilité viennent du registre, jamais de la demande. Autoriser et exécuter sont deux actes distincts, tous deux attribués.</p>
+    <div class="l-stack" id="actions">
+      <p class="t-body-sm u-muted">Aucune action préparée.</p>
     </div>
   </section>
 

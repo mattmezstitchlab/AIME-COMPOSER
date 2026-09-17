@@ -15,7 +15,9 @@
  */
 import { createStore, provenance } from '../src/store.mjs';
 import { observe, propose, decide, confidenceOf, worthProposing, PROPOSAL_THRESHOLD } from '../src/noema.mjs';
-import { validate, EPISTEMIC_KEYS, CONFIDENCE_LEVELS, fromDataModelConfidence, isEstablished } from '../src/schema.mjs';
+import { validate, EPISTEMIC_KEYS, CONFIDENCE_LEVELS, fromDataModelConfidence, isEstablished, ACTION_VERBS } from '../src/schema.mjs';
+import { interpret, submit } from '../src/intention.mjs';
+import { draft, authorize, execute, posture } from '../src/action.mjs';
 
 let pass = 0;
 const failures = [];
@@ -425,6 +427,255 @@ test('tout objet du journal a un acteur', () => {
     ok(j.actor, `entrée de journal sans acteur : ${JSON.stringify(j)}`);
     ok(j.at, `entrée de journal sans horodatage : ${JSON.stringify(j)}`);
   }
+});
+
+/* ── INTENTION : l'entrée de la boucle ─────────────────────────── */
+console.log('\nINTENTION');
+
+const PHRASE = 'Camille Vasseur est saxophoniste ; il faut la capacité de la salle ; envoyer l\u2019annonce pour le 24 septembre';
+
+test('interpret() ne lit rien dans le store et n\u2019écrit rien', () => {
+  const s = seedWorld();
+  const before = s.all().length;
+  const r = interpret(PHRASE);
+  ok(r.candidates.length >= 4, `attendu au moins 4 candidats, reçu ${r.candidates.length}`);
+  eq(s.all().length, before, 'interpret() a écrit dans le monde');
+});
+
+test('aucun candidat n\u2019est marqué confirmé', () => {
+  for (const c of interpret(PHRASE).candidates) {
+    eq(c.confidence, 'low', `« ${c.title} » porte une confiance trop haute`);
+    for (const e of c.evidence) eq(e.state, 'inferred', `évidence « ${e.state} » — une phrase seule n\u2019est pas une évidence ancrée`);
+  }
+});
+
+test('l\u2019apostrophe typographique est reconnue', () => {
+  const r = interpret('envoyer l\u2019annonce');
+  ok(r.candidates.some((c) => c.kind === 'action_request'), 'l\u2019apostrophe \u2019 n\u2019a pas été reconnue');
+});
+
+test('un chiffre dans la phrase ne bloque pas la lecture', () => {
+  const r = interpret('envoyer l\u2019annonce pour le 24 septembre');
+  const kinds = r.candidates.map((c) => c.kind);
+  ok(kinds.includes('action_request') && kinds.includes('date'), `lecture incomplète : ${kinds.join(', ')}`);
+});
+
+test('submit() ne crée que des propositions ouvertes', () => {
+  const s = seedWorld();
+  const before = { person: s.byType('person').length, total: s.all().length };
+  const { written } = submit(s, PHRASE, { actor: 'noema', now: NOW });
+  ok(written.length >= 4, `attendu au moins 4 propositions, reçu ${written.length}`);
+  for (const p of written) {
+    ok(p.id.startsWith('prop-'), `submit() a créé autre chose qu\u2019une proposition : ${p.id}`);
+    eq(p.status, 'open', 'une proposition d\u2019intention n\u2019est pas ouverte');
+    eq(p.provenance.state, 'inferred', 'une intention humaine n\u2019est pas un fait');
+    eq(p.target_id, null, 'une création ne doit pas s\u2019accrocher à un objet au hasard');
+  }
+  eq(s.byType('person').length, before.person, 'submit() a créé une personne sans validation humaine');
+  eq(s.all().length - before.total, written.length, 'submit() a écrit autre chose que ses propositions');
+});
+
+test('ce qui n\u2019est pas compris est déclaré, pas deviné', () => {
+  const r = interpret('xyzzy plugh frobnicate');
+  eq(r.candidates.length, 0, 'un verbiage inconnu a produit des candidats');
+  ok(r.unparsed.length > 0, 'ce qui n\u2019est pas lu doit être déclaré comme non lu');
+});
+
+test('une proposition sans cible n\u2019est admise que pour une création', () => {
+  const base = {
+    id: 'prop-9999', requested_change: { kind: 'note', title: 'x' }, author: 'noema',
+    evidence: [{ state: 'inferred', ref: 'r' }], source: 's', target_id: null, status: 'open',
+    provenance: provenance('o', 'inferred'), created_by: 'a', created_at: NOW,
+  };
+  ok(validate('proposal', base).length > 0, 'une proposition sans cible et sans type de création est passée');
+  ok(validate('proposal', { ...base, requested_change: { kind: 'person', title: 'x' } }).length === 0,
+    'une création déclarée sans cible a été refusée');
+});
+
+/* ── ACTION : la sortie de la boucle ───────────────────────────── */
+console.log('\nACTION');
+
+test('le coût d\u2019une action vient du registre, pas de l\u2019appelant', () => {
+  const errs = validate('action', {
+    id: 'act-0001', verb: 'send', scope: 'external', risk: 'low', reversible: false,
+    permission_required: 'external_communication', source: 's',
+    provenance: provenance('o', 'inferred'), created_by: 'a', created_at: NOW,
+  });
+  ok(errs.some((e) => e.includes('risk')), 'se déclarer moins risqué que son verbe est passé');
+});
+
+test('un verbe inconnu est refusé, jamais approximé', () => {
+  const s = seedWorld();
+  const r = draft(s, { verb: 'transférer', object: 'le contrat' });
+  eq(r.ok, false, 'un verbe hors registre a été accepté');
+  eq(s.byType('action').length, 0, 'un verbe refusé a tout de même créé une action');
+});
+
+test('une action naît en attente d\u2019autorisation, jamais exécutée', () => {
+  const s = seedWorld();
+  const { action } = draft(s, { verb: 'envoyer', object: 'l\u2019annonce' });
+  eq(action.status, 'pending_authorization', 'une action neuve n\u2019attend pas l\u2019autorisation');
+  eq(action.authorized_by, null, 'une action neuve se déclare déjà autorisée');
+  eq(action.scope, ACTION_VERBS.send.scope, 'le périmètre ne vient pas du registre');
+});
+
+test('exécuter sans autorisation est refusé et journalisé', () => {
+  const s = seedWorld();
+  const { action } = draft(s, { verb: 'envoyer', object: 'l\u2019annonce' });
+  throws(() => execute(s, { action_id: action.id, actor: 'a.meunier', now: NOW }),
+    'une action non autorisée a été exécutée');
+  eq(s.get(action.id).status, 'pending_authorization', 'l\u2019action a changé d\u2019état malgré le refus');
+  ok(s.journal.some((j) => j.op === 'refusal'), 'le refus n\u2019a pas été journalisé');
+});
+
+test('une autorisation sans acteur est refusée', () => {
+  const s = seedWorld();
+  const { action } = draft(s, { verb: 'envoyer', object: 'l\u2019annonce' });
+  throws(() => authorize(s, { action_id: action.id, actor: '', grant: true, now: NOW }),
+    'une autorisation anonyme est passée');
+});
+
+test('l\u2019autorisation n\u2019est pas transférable', () => {
+  const s = seedWorld();
+  const { action } = draft(s, { verb: 'envoyer', object: 'l\u2019annonce' });
+  authorize(s, { action_id: action.id, actor: 'a.meunier', grant: true, now: NOW });
+  throws(() => execute(s, { action_id: action.id, actor: 'autre.personne', now: NOW }),
+    'quelqu\u2019un d\u2019autre a pu exécuter une action autorisée par autrui');
+});
+
+test('une action autorisée puis exécutée laisse une preuve d\u2019exécution', () => {
+  const s = seedWorld();
+  const { action } = draft(s, { verb: 'envoyer', object: 'l\u2019annonce' });
+  const { proof: authProof } = authorize(s, { action_id: action.id, actor: 'a.meunier', grant: true, reason: 'concert confirmé', now: NOW });
+  eq(authProof.proof_type, 'validation', 'l\u2019autorisation ne produit pas de preuve');
+
+  const { action: done, result } = execute(s, { action_id: action.id, actor: 'a.meunier', now: NOW });
+  eq(done.status, 'executed', 'l\u2019action autorisée n\u2019a pas été exécutée');
+  ok(done.executed_at, 'une action exécutée sans horodatage');
+  ok(result.detail.includes('simulé'), 'l\u2019exécution prétend sortir de la machine');
+  ok(s.byType('proof').some((p) => p.proof_type === 'execution'), 'aucune preuve d\u2019exécution');
+});
+
+test('exécuter deux fois la même action est refusé', () => {
+  const s = seedWorld();
+  const { action } = draft(s, { verb: 'envoyer', object: 'l\u2019annonce' });
+  authorize(s, { action_id: action.id, actor: 'a.meunier', grant: true, now: NOW });
+  execute(s, { action_id: action.id, actor: 'a.meunier', now: NOW });
+  throws(() => execute(s, { action_id: action.id, actor: 'a.meunier', now: NOW }),
+    'une action a pu être exécutée deux fois');
+});
+
+test('NOEMA déclare ne pas pouvoir agir seule', () => {
+  const p = posture();
+  eq(p.can_suggest, true, 'NOEMA devrait pouvoir suggérer');
+  eq(p.can_execute_alone, false, 'NOEMA se déclare capable d\u2019agir seule');
+  ok(p.verbs.every((v) => v.permission), 'un verbe sans permission requise');
+  ok(p.verbs.filter((v) => v.scope === 'external').every((v) => v.risk === 'high'),
+    'une action externe n\u2019est pas classée à risque élevé');
+});
+
+/* ── MATÉRIALISATION : la validation change le monde ───────────── */
+console.log('\nMATÉRIALISATION');
+
+/** Soumet une phrase et renvoie la proposition d'un type donné. */
+function intentionPour(s, phrase, kind) {
+  const { written } = submit(s, phrase, { actor: 'noema', now: NOW });
+  const p = written.find((x) => x.requested_change.kind === kind);
+  if (!p) throw new Error(`aucune proposition « ${kind} » produite par « ${phrase} »`);
+  return p;
+}
+
+test('valider une intention crée la personne', () => {
+  const s = seedWorld();
+  const p = intentionPour(s, 'Iris Fontaine est clarinettiste', 'person');
+  const before = s.byType('person').length;
+  const { materialization } = decide(s, { proposal_id: p.id, decision: 'accepted', actor: 'a.meunier', now: NOW });
+  ok(materialization?.materialized, `rien n'a été créé : ${materialization?.reason}`);
+  eq(s.byType('person').length, before + 1, 'la personne n\u2019a pas été mémorisée');
+  const created = s.get(materialization.id);
+  eq(created.display_name, 'Iris Fontaine', 'mauvais nom mémorisé');
+  eq(created.provenance.state, 'confirmed', 'un objet validé n\u2019est pas confirmé');
+  eq(s.get(p.id).materialized_id, materialization.id, 'la proposition ne retient pas ce qu\u2019elle a produit');
+});
+
+test('rejeter une intention ne crée rien', () => {
+  const s = seedWorld();
+  const p = intentionPour(s, 'Iris Fontaine est clarinettiste', 'person');
+  const before = s.byType('person').length;
+  const { materialization } = decide(s, { proposal_id: p.id, decision: 'rejected', actor: 'a.meunier', now: NOW });
+  eq(materialization, null, 'une intention rejetée a été matérialisée');
+  eq(s.byType('person').length, before, 'une intention rejetée a créé une personne');
+});
+
+test('une personne déjà mémorisée n\u2019est pas dupliquée', () => {
+  const s = seedWorld();
+  const p = intentionPour(s, 'Camille Vasseur est saxophoniste', 'person');
+  const before = s.byType('person').length;
+  const { materialization } = decide(s, { proposal_id: p.id, decision: 'accepted', actor: 'a.meunier', now: NOW });
+  eq(materialization.materialized, false, 'un doublon a été créé');
+  eq(s.byType('person').length, before, 'le nombre de personnes a changé');
+  ok(/existe déjà/.test(materialization.reason), `raison illisible : ${materialization.reason}`);
+});
+
+test('une relation vers une personne inconnue n\u2019est pas inventée', () => {
+  const s = seedWorld();
+  const p = intentionPour(s, 'Camille travaille avec Zénon Inconnu', 'relation');
+  const before = s.byType('relation').length;
+  const { materialization } = decide(s, { proposal_id: p.id, decision: 'accepted', actor: 'a.meunier', now: NOW });
+  eq(materialization.materialized, false, 'une relation vers un inconnu a été créée');
+  eq(s.byType('relation').length, before, 'une relation fantôme est apparue');
+  ok(/pas encore mémorisé/.test(materialization.reason), `raison illisible : ${materialization.reason}`);
+});
+
+test('une relation entre deux personnes connues est créée', () => {
+  const s = seedWorld();
+  const p = intentionPour(s, 'Camille travaille avec Nour', 'relation');
+  const { materialization } = decide(s, { proposal_id: p.id, decision: 'accepted', actor: 'a.meunier', now: NOW });
+  ok(materialization.materialized, `relation non créée : ${materialization.reason}`);
+  const rel = s.get(materialization.id);
+  eq(rel.relation_type, 'collaborates_with', 'mauvais type de relation');
+  ok(rel.from_id !== rel.to_id, 'relation d\u2019une personne avec elle-même');
+});
+
+test('un inconnu est enregistré comme inconnu, jamais comblé', () => {
+  const s = seedWorld();
+  const p = intentionPour(s, 'il faut la capacité de la salle', 'unknown');
+  const { materialization } = decide(s, { proposal_id: p.id, decision: 'accepted', actor: 'a.meunier', now: NOW });
+  ok(materialization.materialized, `l\u2019inconnu n\u2019a pas été enregistré : ${materialization.reason}`);
+  const obj = s.get(materialization.id);
+  eq(obj.type, 'unknown', 'l\u2019inconnu a été enregistré sous un autre type');
+  eq(obj.content.filled, false, 'l\u2019inconnu a été comblé');
+  ok(obj.content.missing, 'l\u2019objet ne dit pas ce qui manque');
+});
+
+test('valider une demande d\u2019action ne l\u2019exécute pas', () => {
+  const s = seedWorld();
+  const p = intentionPour(s, 'envoyer l\u2019annonce du concert', 'action_request');
+  const { materialization } = decide(s, { proposal_id: p.id, decision: 'accepted', actor: 'a.meunier', now: NOW });
+  ok(materialization.materialized, `aucune action préparée : ${materialization.reason}`);
+  const act = s.get(materialization.id);
+  eq(act.status, 'pending_authorization', 'valider une intention a exécuté l\u2019action');
+  eq(act.authorized_by, null, 'l\u2019action se déclare autorisée sans personne');
+  eq(act.executed_at, null, 'l\u2019action a été exécutée');
+});
+
+test('une date seule ne crée aucun événement', () => {
+  const s = seedWorld();
+  const p = intentionPour(s, 'répétition le 24 septembre', 'date');
+  const before = s.byType('event').length;
+  const { materialization } = decide(s, { proposal_id: p.id, decision: 'accepted', actor: 'a.meunier', now: NOW });
+  eq(materialization.materialized, false, 'un événement a été créé à partir d\u2019une date seule');
+  eq(s.byType('event').length, before, 'un événement fantôme est apparu');
+  ok(s.get(p.id).materialization_note, 'l\u2019échec n\u2019est pas écrit sur la proposition');
+});
+
+test('un échec de matérialisation n\u2019annule pas la décision humaine', () => {
+  const s = seedWorld();
+  const p = intentionPour(s, 'répétition le 24 septembre', 'date');
+  const { decision: dec, proof } = decide(s, { proposal_id: p.id, decision: 'accepted', actor: 'a.meunier', now: NOW });
+  eq(dec.decision, 'accepted', 'la décision a été défaite');
+  eq(s.get(p.id).status, 'accepted', 'la proposition n\u2019est plus acceptée');
+  ok(proof.proof_type === 'validation', 'aucune preuve de la décision');
 });
 
 /* ── Bilan ─────────────────────────────────────────────────────── */

@@ -32,6 +32,7 @@ export const ID_PREFIX = {
   proposal: 'prop',
   decision: 'dec',
   proof: 'prf',
+  action: 'act',
 };
 
 /** Champs transverses, d'après DATA-MODEL-V1 §3. */
@@ -51,9 +52,14 @@ export const ENTITY_FIELDS = {
   asset: ['kind', 'rights_until', 'usage_count'],
   document: ['title', 'version_id'],
   version: ['target_id', 'number', 'approved_by'],
-  proposal: ['target_id', 'requested_change', 'author', 'evidence', 'resulting_id'],
+  proposal: ['target_id', 'requested_change', 'author', 'evidence', 'resulting_id',
+             'materialized_id', 'materialization_note'],
   decision: ['target_id', 'decision', 'actor', 'reason', 'before', 'after', 'reversible'],
   proof: ['target_id', 'proof_type', 'evidence_ref', 'captured_at', 'validation_state'],
+  /* Une action est le seul objet capable d'avoir un effet hors du système.
+     Périmètre, risque, réversibilité et permission y sont obligatoires. */
+  action: ['verb', 'label', 'object', 'scope', 'risk', 'reversible',
+           'permission_required', 'authorized_by', 'executed_at'],
 };
 
 export const ENTITY_TYPES = Object.keys(ENTITY_FIELDS);
@@ -72,6 +78,30 @@ export const LIFECYCLE = [
  * appliquée par la machine : elle attend un humain.
  */
 export const PROPOSAL_STATUS = ['open', 'accepted', 'rejected', 'deferred', 'superseded'];
+
+/**
+ * Statut spécifique d'une action. L'ordre est un verrou : `executed` ne
+ * s'atteint qu'après `authorized`. Une action n'a pas d'état intermédiaire
+ * qui permette de contourner l'autorisation.
+ */
+export const ACTION_STATUS = ['pending_authorization', 'authorized', 'refused', 'executed'];
+
+/**
+ * Types de changement qui créent un objet nouveau. Ce sont les seuls pour
+ * lesquels une proposition peut légitimement n'avoir aucune cible.
+ */
+export const CREATION_KINDS = ['person', 'relation', 'date', 'unknown', 'action_request'];
+
+/** Verbes d'action reconnus, avec ce que chacun coûte. */
+export const ACTION_VERBS = {
+  send:    { label: 'Envoyer un message',       scope: 'external', risk: 'high',   reversible: false, permission: 'external_communication' },
+  publish: { label: 'Publier un contenu',       scope: 'external', risk: 'high',   reversible: true,  permission: 'external_communication' },
+  share:   { label: 'Partager une information', scope: 'external', risk: 'high',   reversible: true,  permission: 'sharing' },
+  book:    { label: 'Réserver une ressource',   scope: 'external', risk: 'high',   reversible: true,  permission: 'external_communication' },
+  cancel:  { label: 'Annuler un engagement',    scope: 'external', risk: 'high',   reversible: false, permission: 'external_communication' },
+  notify:  { label: 'Notifier une personne',    scope: 'internal', risk: 'medium', reversible: false, permission: 'notification' },
+  archive: { label: 'Archiver un objet',        scope: 'internal', risk: 'low',    reversible: true,  permission: 'memory_correction' },
+};
 
 /* ── Vocabulaire épistémique : réexport, jamais copie ──────────── */
 export { EPISTEMIC_KEYS, EPISTEMIC_STATES, CONFIDENCE_LEVELS, DATA_MODEL_CONFIDENCE_MAP };
@@ -147,7 +177,9 @@ export function validate(type, obj) {
 
   /* Statut */
   if (obj.status !== undefined) {
-    const allowed = type === 'proposal' ? PROPOSAL_STATUS : LIFECYCLE;
+    const allowed = type === 'proposal' ? PROPOSAL_STATUS
+                  : type === 'action' ? ACTION_STATUS
+                  : LIFECYCLE;
     if (!allowed.includes(obj.status)) {
       errors.push(`${type}.status — « ${obj.status} » hors du cycle (${allowed.join(', ')})`);
     }
@@ -159,10 +191,42 @@ export function validate(type, obj) {
   }
 
   /* Règles métier */
+  if (type === 'action') {
+    /* Le registre est la seule source du coût d'une action : un appel ne
+       peut pas se déclarer moins risqué que ce que son verbe implique. */
+    const spec = ACTION_VERBS[obj.verb];
+    if (!spec) {
+      errors.push(`action.verb — « ${obj.verb} » hors du registre (${Object.keys(ACTION_VERBS).join(', ')})`);
+    } else {
+      for (const [k, v] of [['scope', spec.scope], ['risk', spec.risk],
+                            ['reversible', spec.reversible], ['permission_required', spec.permission]]) {
+        if (obj[k] !== undefined && obj[k] !== v) {
+          errors.push(`action.${k} — « ${obj[k]} » contredit le registre (« ${v} ») : le coût d'une action n'est pas négociable`);
+        }
+      }
+    }
+    if (obj.status === 'executed' && !obj.executed_at) {
+      errors.push('action.executed_at — une action exécutée sans horodatage est intraçable');
+    }
+  }
   if (type === 'relation') {
     if (obj.from_id === obj.to_id) errors.push('relation.from_id — une entité ne peut pas être en relation avec elle-même');
     if (!RELATION_TYPES.includes(obj.relation_type)) {
       errors.push(`relation.relation_type — « ${obj.relation_type} » hors vocabulaire`);
+    }
+  }
+  if (type === 'proposal') {
+    /* Une proposition vise un objet existant — sauf lorsqu'elle propose de
+       créer quelque chose de nouveau, auquel cas il n'y a pas de cible et
+       `target_id` vaut null. C'est la seule raison admise : un target_id
+       absent par oubli reste une erreur. */
+    const kind = obj.requested_change?.kind;
+    if (obj.target_id === null || obj.target_id === undefined) {
+      if (!CREATION_KINDS.includes(kind)) {
+        errors.push(`proposal.target_id — aucune cible, et « ${kind} » n'est pas un type de création (${CREATION_KINDS.join(', ')})`);
+      }
+    } else if (typeof obj.target_id !== 'string' || !obj.target_id) {
+      errors.push('proposal.target_id — identifiant canonique attendu, ou null pour une création');
     }
   }
   if (type === 'proposal') {
@@ -202,9 +266,10 @@ const REQUIRED_FIELDS = {
   project: ['title', 'owner_id'],
   relation: ['from_id', 'relation_type', 'to_id'],
   event: ['type', 'start_at'],
-  proposal: ['target_id', 'requested_change', 'author'],
+  proposal: ['requested_change', 'author'],
   decision: ['target_id', 'decision', 'actor'],
   proof: ['target_id', 'proof_type'],
+  action: ['verb', 'scope', 'risk', 'permission_required'],
 };
 
 /** Types de relation, d'après DATA-MODEL-V1 §2 (PERSON / ORGANIZATION). */

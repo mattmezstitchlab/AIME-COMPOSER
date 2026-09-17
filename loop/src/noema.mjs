@@ -17,6 +17,7 @@
  *      rien. Une interface NOEMA vide n'est pas une interface cassée.
  */
 import { EPISTEMIC_KEYS } from './schema.mjs';
+import { materialize } from './intention.mjs';
 
 /* ── Confiance ─────────────────────────────────────────────────── */
 
@@ -394,7 +395,28 @@ export function decide(store, { proposal_id, decision, actor, reason = '', now =
     created_by: actor,
   }, { actor, cause: 'decision' });
 
-  return { decision: dec, proposal: store.get(proposal_id), proof };
+  /* ── Matérialisation ────────────────────────────────────────
+     Une proposition acceptée doit produire quelque chose de réel, sinon
+     la validation ne change rien au monde. C'est le seul endroit où une
+     intention devient un objet — et une demande d'action y entre en
+     attente d'autorisation, jamais en exécution.
+
+     Un échec de matérialisation n'annule pas la décision : la décision
+     humaine est un fait, quoi qu'il en coûte ensuite. L'échec est écrit
+     sur la proposition, visible, jamais avalé.
+     ─────────────────────────────────────────────────────────── */
+  let mat = null;
+  if (decision === 'accepted' && proposal.requested_change?.fields) {
+    mat = materialize(store, proposal, { actor, now });
+    store.put('proposal', {
+      ...store.get(proposal_id),
+      materialized_id: mat.materialized ? mat.id : null,
+      materialization_note: mat.reason,
+      updated_at: now,
+    }, { actor, cause: 'intention' });
+  }
+
+  return { decision: dec, proposal: store.get(proposal_id), proof, materialization: mat };
 }
 
 export { EPISTEMIC_KEYS };

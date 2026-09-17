@@ -7,6 +7,9 @@
  *   GET  /api/state            le monde : entités, journal, observation en cours
  *   POST /api/observe          NOEMA observe et écrit ses propositions
  *   POST /api/decide           un humain tranche { proposal_id, decision, actor, reason }
+ *   POST /api/intend           une phrase humaine → propositions (jamais des faits)
+ *   POST /api/authorize        un humain autorise ou refuse une action
+ *   POST /api/execute          exécute une action autorisée (simulé, tracé)
  *   POST /api/reset            repart du monde de démonstration
  *
  * Trois règles côté serveur, les mêmes que dans les modules :
@@ -21,6 +24,8 @@ import { join, dirname, extname, resolve, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createStore } from './src/store.mjs';
 import { observe, propose, decide } from './src/noema.mjs';
+import { interpret, submit } from './src/intention.mjs';
+import { draft, authorize, execute, posture } from './src/action.mjs';
 import { seed } from './seed.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -100,6 +105,43 @@ const server = createServer(async (req, res) => {
         const out = decide(store, body);
         store.save();
         return json(res, 200, { ...out, state: snapshot() });
+      }
+
+      if (path === '/api/intend' && req.method === 'POST') {
+        const body = await readBody(req);
+        if (!body.text || !String(body.text).trim()) {
+          return json(res, 400, { error: 'aucune intention à lire : « text » est vide' });
+        }
+        /* `dry_run` permet à l'écran de montrer ce que NOEMA a compris
+           AVANT d'écrire quoi que ce soit. C'est le principe GARDIENNE :
+           on propose d'abord, on n'enregistre qu'ensuite. */
+        if (body.dry_run) return json(res, 200, { ...interpret(body.text), written: [], state: snapshot() });
+        const out = submit(store, body.text, { actor: body.actor || 'noema' });
+        store.save();
+        return json(res, 200, { ...out, state: snapshot() });
+      }
+
+      if (path === '/api/authorize' && req.method === 'POST') {
+        const body = await readBody(req);
+        /* Même règle que /api/decide : pas d'acteur, pas d'autorisation. */
+        if (!body.actor) return json(res, 400, { error: 'une autorisation sans acteur est refusée' });
+        if (!body.action_id) return json(res, 400, { error: 'action_id obligatoire' });
+        const out = authorize(store, body);
+        store.save();
+        return json(res, 200, { ...out, state: snapshot() });
+      }
+
+      if (path === '/api/execute' && req.method === 'POST') {
+        const body = await readBody(req);
+        if (!body.actor) return json(res, 400, { error: 'une exécution sans acteur est refusée' });
+        if (!body.action_id) return json(res, 400, { error: 'action_id obligatoire' });
+        const out = execute(store, body);
+        store.save();
+        return json(res, 200, { ...out, state: snapshot() });
+      }
+
+      if (path === '/api/posture' && req.method === 'GET') {
+        return json(res, 200, posture());
       }
 
       if (path === '/api/reset' && req.method === 'POST') {
