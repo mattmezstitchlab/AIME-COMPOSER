@@ -19,7 +19,7 @@ Aucune écriture dans le projet examiné — c'est un test, pas une promesse.
 
 ## Ce qui est mesuré
 
-Le moteur est `design-system/js/qa.js` : **celui qui juge les 31 écrans du
+Le moteur est `design-system/js/qa.js` : **celui qui juge les 32 écrans du
 système**, pas une copie. Un projet est jugé dans les mêmes conditions
 qu'eux, et les feuilles de style du système sont fournies comme
 vocabulaire, pour que « utiliser `t-h1` » ne soit pas compté comme une
@@ -65,7 +65,7 @@ Un exemple produit : `AUDIT/DIAGNOSTIC-SURVEY-V1.md`.
 
 - La collecte est statique : du HTML rendu par JavaScript n'est pas vu.
 - **Aucune mise en page réelle n'est jugée.** `ALIGNMENT` et
-  `OVERFLOW` sont des heuristiques ; les 31 écrans du système sont
+  `OVERFLOW` sont des heuristiques ; les 32 écrans du système sont
   vérifiés au rendu par `qa/verify-dom.mjs`, ce que ce diagnostic ne
   fait pas pour un projet tiers.
 - Chaque dépôt distant est cloné peu profond **sur sa branche par défaut** :

@@ -14,7 +14,7 @@ TOKENS → FOUNDATIONS → COMPONENTS → PATTERNS → LAYOUTS → EXPERIENCES
 cd design-system
 npm run build   # generate tokens + icons; refuses any colour that misses its contrast target
 npm run qa      # build + audit the 12 QA families over the shipped system
-npm run verify  # execute the scripts of all 31 audited screens in a DOM (needs the jsdom devDependency)
+npm run verify  # execute the scripts of all 32 audited screens in a DOM (needs the jsdom devDependency)
 npm run check   # qa then verify
 npm run serve   # serve the repository on http://0.0.0.0:8080/design-system/
 ```
@@ -24,8 +24,8 @@ contract · 9 typographic roles · a closed 10-step spacing scale · 85 glyphs i
 categories, no emoji · 29 fundamental components · the five AIME organs (Universal
 Card, Universal Media, Universal Timeline, Universal Grid, Composer) · the NOEMA
 layer with its six epistemic states · 13 patterns · a data-visualization language ·
-12 automatic Design QA families · 31 audited screens (19 documentation chapters and
-10 experience screens).
+12 automatic Design QA families · 32 audited screens (19 documentation chapters,
+11 experience screens, the NOEMA loop screen, and the repository homepage).
 
 Normative specification: `ARCHITECTURE/AIME-DESIGN-SYSTEM-V1.md`.
 System documentation and live screens: `design-system/index.html`.

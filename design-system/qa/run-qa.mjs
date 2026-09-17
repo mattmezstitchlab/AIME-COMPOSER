@@ -38,9 +38,18 @@ const cssFiles = walk(join(ROOT, 'styles'))
        écran qui finira par inventer un style. */
 const LOOP = join(ROOT, '..', 'loop');
 const roots = [ROOT, ...(existsSync(LOOP) ? [LOOP] : [])];
+const REPO = join(ROOT, '..');
 const pages = roots
   .flatMap((r) => walk(r))
   .filter((p) => p.endsWith('.html') && !p.includes('node_modules'))
+  /* La page d'accueil du dépôt est ajoutée fichier par fichier, et non en
+     faisant de la racine un dossier parcouru : la racine contient aussi
+     `atlas/` — écrit avant le système, non conforme — et
+     `diagnostic/.work/`, des clones jetables de dépôts tiers. Les aspirer
+     noierait le rapport du système sous des écarts qui ne sont pas les
+     siens. Un écran exempté d'audit finit par inventer un style ; un
+     périmètre trop large, lui, rend le rapport illisible. */
+  .concat(existsSync(join(REPO, 'index.html')) ? [join(REPO, 'index.html')] : [])
   .sort()
   .map((p) => ({ name: relative(join(ROOT, '..'), p), html: readFileSync(p, 'utf8') }));
 

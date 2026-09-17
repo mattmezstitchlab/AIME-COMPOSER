@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="fr" data-aime-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="a-root" content="design-system/">
+<title>AIME-COMPOSER — Accueil</title>
+<link rel="stylesheet" href="design-system/tokens/tokens.css">
+<link rel="stylesheet" href="design-system/styles/foundations.css">
+<link rel="stylesheet" href="design-system/styles/layout.css">
+<link rel="stylesheet" href="design-system/styles/components.css">
+<link rel="stylesheet" href="design-system/styles/aime.css">
+<link rel="stylesheet" href="design-system/styles/noema.css">
+<link rel="stylesheet" href="design-system/styles/patterns.css">
+<link rel="stylesheet" href="design-system/styles/dataviz.css">
+<link rel="stylesheet" href="design-system/styles/doc.css">
+<script src="design-system/js/doc.js" defer></script>
+<script src="design-system/js/aime-ui.js" defer></script>
+</head>
+<body>
+<noscript><p class="t-body-sm">Cet écran utilise JavaScript pour la navigation. <a class="a-text-btn" href="index.html">Recharger la page</a>.</p></noscript>
+<div class="ds-shell">
+<main class="ds-main l-page">
+
+  <header class="ds-hero">
+    <div class="ds-eyebrow">
+      <span class="noema-mark"><svg class="a-ic a-ic--sm noema-mark__glyph" aria-hidden="true" width="16" height="16"><use data-a-icon="noe-mark"/></svg><span class="noema-mark__word">AIME-COMPOSER</span></span>
+      <span class="a-badge a-badge--accent">V1</span>
+      <span class="a-badge">Proposé</span>
+    </div>
+    <h1 class="t-display">La couche qui audite et fait converger.</h1>
+    <p class="t-body u-muted">AIME-COMPOSER n'est pas une application de plus : c'est la couche de mesure et de convergence au-dessus des projets existants. Elle ne les fusionne pas et ne les remplace pas. Elle dit ce qui s'écarte du système, et propose — la validation reste humaine.</p>
+    <div class="l-row">
+      <a class="a-btn a-btn--primary" href="design-system/index.html"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-document"/></svg>Ouvrir le Design System</a>
+      <a class="a-btn" href="loop/"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="cmp-compose"/></svg>Ouvrir la boucle NOEMA</a>
+      <a class="a-text-btn" href="atlas/">Voir l'Atlas visuel</a>
+    </div>
+  </header>
+
+  <section class="ds-block" aria-labelledby="surfaces">
+    <h2 class="t-h2" id="surfaces">Trois surfaces, un seul système</h2>
+    <p class="t-body u-muted">Chacune est une projection du Design System, jamais un système parallèle. Aucune n'invente une valeur : elle la reçoit.</p>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--col" role="list" aria-label="Les trois surfaces du dépôt">
+        <div class="l-row l-row--between" role="listitem">
+          <span class="l-row"><span class="a-badge">01</span><span class="t-body u-strong">Design System</span></span>
+          <a class="a-text-btn" href="design-system/index.html"><span class="t-caption">design-system/</span><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-arrow-right"/></svg></a>
+        </div>
+        <div class="l-row l-row--between" role="listitem">
+          <span class="l-row"><span class="a-badge">02</span><span class="t-body u-strong">Boucle NOEMA</span></span>
+          <a class="a-text-btn" href="loop/"><span class="t-caption">loop/</span><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-arrow-right"/></svg></a>
+        </div>
+        <div class="l-row l-row--between" role="listitem">
+          <span class="l-row"><span class="a-badge">03</span><span class="t-body u-strong">Atlas visuel</span></span>
+          <a class="a-text-btn" href="atlas/"><span class="t-caption">atlas/</span><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-arrow-right"/></svg></a>
+        </div>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Lecture</span><span class="t-caption">Le Design System est la grammaire ; la boucle et l'Atlas sont des écrans qui la parlent.</span></p>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="design-system">
+    <h2 class="t-h2" id="design-system">Le Design System</h2>
+    <p class="t-body u-muted">Une grammaire à six couches : tokens, fondations, composants, patterns, layouts, expériences. Chaque couche ne consomme que celle du dessous. Un écran est une projection du système — jamais l'inverse.</p>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--col" role="list" aria-label="Ce que contient le Design System">
+        <div class="l-row l-row--between" role="listitem"><span class="t-body">Couleurs primitives et rôles</span><span class="t-caption u-muted">23 primitives · 21 rôles × 2 thèmes</span></div>
+        <div class="l-row l-row--between" role="listitem"><span class="t-body">Rôles typographiques</span><span class="t-caption u-muted">9 rôles · ratio 1.25</span></div>
+        <div class="l-row l-row--between" role="listitem"><span class="t-body">Échelle d'espacement</span><span class="t-caption u-muted">10 étapes fermées</span></div>
+        <div class="l-row l-row--between" role="listitem"><span class="t-body">Pictogrammes</span><span class="t-caption u-muted">85 glyphes · 17 catégories · aucun emoji</span></div>
+        <div class="l-row l-row--between" role="listitem"><span class="t-body">Familles Design QA</span><span class="t-caption u-muted">12 familles automatiques</span></div>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Contrat</span><span class="t-caption">Aucune couleur n'entre dans le système sans atteindre sa cible de contraste. Le build refuse.</span></p>
+    </div>
+    <div class="l-row">
+      <a class="a-btn a-btn--sm" href="design-system/foundations.html"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="grd-grid"/></svg>Fondations</a>
+      <a class="a-btn a-btn--sm" href="design-system/components.html"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="cmp-compose"/></svg>Composants</a>
+      <a class="a-btn a-btn--sm" href="design-system/experiences/index.html"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-external"/></svg>Écrans réels</a>
+      <a class="a-btn a-btn--sm a-btn--ghost" href="design-system/qa.html"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="prf-shield"/></svg>Design QA</a>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="boucle">
+    <h2 class="t-h2" id="boucle">La boucle NOEMA</h2>
+    <p class="t-body u-muted">Vous écrivez une intention dans vos mots. NOEMA en tire des candidats, les classe par degré de confiance, et vous les montre. Elle n'enregistre rien tant que vous n'avez pas validé. Ce qu'elle ne comprend pas vous est dit, jamais deviné.</p>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--col" role="list" aria-label="Les maillons de la boucle">
+        <div class="l-row l-row--between" role="listitem"><span class="t-body">Intention</span><span class="t-caption u-muted">une phrase, pas un formulaire</span></div>
+        <div class="l-row l-row--between" role="listitem"><span class="t-body">Proposition</span><span class="t-caption u-muted">état <span class="u-strong">proposed</span> — jamais un fait</span></div>
+        <div class="l-row l-row--between" role="listitem"><span class="t-body">Validation</span><span class="t-caption u-muted">seul chemin vers un fait confirmé</span></div>
+        <div class="l-row l-row--between" role="listitem"><span class="t-body">Action</span><span class="t-caption u-muted">autorisation et exécution distinctes, tracées</span></div>
+        <div class="l-row l-row--between" role="listitem"><span class="t-body">Mémoire</span><span class="t-caption u-muted">les huit droits : voir, comprendre, corriger, supprimer, pauser, limiter, partager, révoquer</span></div>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Principe</span><span class="t-caption">NOEMA propose. L'humain valide. Une proposition n'a jamais l'apparence d'un fait.</span></p>
+    </div>
+    <div class="l-row">
+      <a class="a-btn a-btn--sm a-btn--primary" href="loop/">Ouvrir la boucle</a>
+      <a class="a-btn a-btn--sm a-btn--ghost" href="design-system/universal-timeline.html"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="time-timeline"/></svg>Timeline universelle</a>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="diagnostic">
+    <h2 class="t-h2" id="diagnostic">Le diagnostic</h2>
+    <p class="t-body u-muted">Un projet existant peut être jugé par le système sans être modifié. Le moteur est celui qui valide les écrans du Design System — pas une copie. Le diagnostic mesure et nomme ; il ne répare rien, la réparation reste une décision humaine.</p>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--col" role="list" aria-label="Ce que publie le diagnostic">
+        <div class="l-row l-row--between" role="listitem"><span class="t-body">Densité d'écarts par écran</span><span class="t-caption u-muted">jamais un score inventé sur 100</span></div>
+        <div class="l-row l-row--between" role="listitem"><span class="t-body">Familles concernées</span><span class="t-caption u-muted">et les écrans les plus touchés</span></div>
+        <div class="l-row l-row--between" role="listitem"><span class="t-body">Ordre de réparation</span><span class="t-caption u-muted">par effet obtenu pour effort dépensé</span></div>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Portée</span><span class="t-caption">Mesure publiée dans <span class="u-strong">AUDIT/DIAGNOSTIC-SURVEY-V1.md</span>, générée par la mesure et non recopiée.</span></p>
+    </div>
+    <div class="l-row">
+      <a class="a-btn a-btn--sm" href="diagnostic/README.md"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-document"/></svg>Mode d'emploi</a>
+      <a class="a-btn a-btn--sm a-btn--ghost" href="AUDIT/DIAGNOSTIC-SURVEY-V1.md"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-proof"/></svg>Rapport mesuré</a>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="regle">
+    <div class="ds-rule">
+      <p class="ds-rule__title">Règle de clôture</p>
+      <p>Aucun style ne peut exister que le système ne sait expliquer. Le Design System prime sur tout écran pris isolément : un écran est une projection du système, jamais l'inverse.</p>
+    </div>
+  </section>
+
+</main>
+</div>
+</body>
+</html>

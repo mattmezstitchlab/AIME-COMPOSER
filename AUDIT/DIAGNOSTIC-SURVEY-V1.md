@@ -7,7 +7,7 @@
 ## Ce que ce document est
 
 Le moteur qui juge ces projets est `design-system/js/qa.js` — **celui qui
-valide les 31 écrans du Design System**, pas une copie. Un projet est donc
+valide les 32 écrans du Design System**, pas une copie. Un projet est donc
 jugé dans les mêmes conditions que les écrans qui sortent, sur le même
 barème. Un écart de densité entre deux projets est une différence réelle.
 
@@ -34,7 +34,7 @@ Cela change la lecture d'une ligne : `AIME-COMPOSER` lui-même. Sa branche
 `main` ne contient pas encore `design-system/` ni `loop/` — ils sont sur une
 branche non fusionnée. La ligne mesure donc `atlas/` seul, 5 écrans de
 Playground écrits avant le système, qui ne référencent aucune de ses
-feuilles. Les 31 écrans du Design System, eux, sont jugés en continu
+feuilles. Les 32 écrans du Design System, eux, sont jugés en continu
 par `npm run check` dans ce même dépôt, et sortent conformes aux 12 familles.
 
 ## Classement
@@ -117,7 +117,7 @@ qui ne porte sur rien.
 ## Ce que cette mesure ne couvre pas
 
 - **Aucune mise en page réelle n'est jugée.** `ALIGNMENT` et `OVERFLOW` sont
-  des heuristiques statiques. Les 31 écrans du système sont vérifiés au rendu
+  des heuristiques statiques. Les 32 écrans du système sont vérifiés au rendu
   par `qa/verify-dom.mjs` ; ce diagnostic ne le fait pas pour un projet tiers.
 - **La collecte est statique.** Du HTML rendu par JavaScript n'est pas vu.
 - **Les icônes générées par JavaScript ne sont pas comptées** par

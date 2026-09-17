@@ -22,7 +22,7 @@ qui la consulte cite l'en-tête, et il a tort.
 
 Le diagnostic n'est pas une phase : c'est une couche transverse. Elle ne
 produit aucune fonctionnalité, elle mesure l'écart entre un projet existant
-et le système — le même moteur que celui qui juge les 31 écrans, appliqué à
+et le système — le même moteur que celui qui juge les 32 écrans, appliqué à
 n'importe quel dépôt. Voir §Diagnostic ci-dessous.
 
 This roadmap turns the convergence architecture into a controlled implementation program. The goal is not to build every feature immediately. The goal is to establish one working spine and attach capabilities to it.
@@ -246,7 +246,7 @@ Three constraints, because a measurement shown to a client must survive
 being read line by line:
 
 - **It is the system's own engine** — `design-system/js/qa.js`, the one that
-  validates the 31 shipped screens, not a copy. A project is judged under the
+  validates the 32 shipped screens, not a copy. A project is judged under the
   same conditions as the screens that ship, on the same scale.
 - **It never writes to the project it examines.** It measures and names.
   Repairing stays a human decision, per the founding principle.
