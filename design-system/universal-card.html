@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="fr" data-aime-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="a-root" content="./">
+<title>Carte Universelle — AIME Design System V1</title>
+<link rel="stylesheet" href="tokens/tokens.css">
+<link rel="stylesheet" href="styles/foundations.css">
+<link rel="stylesheet" href="styles/layout.css">
+<link rel="stylesheet" href="styles/components.css">
+<link rel="stylesheet" href="styles/aime.css">
+<link rel="stylesheet" href="styles/noema.css">
+<link rel="stylesheet" href="styles/patterns.css">
+<link rel="stylesheet" href="styles/dataviz.css">
+<link rel="stylesheet" href="styles/doc.css">
+<script src="js/doc.js" defer></script>
+<script src="js/aime-ui.js" defer></script>
+</head>
+<body>
+<div class="ds-shell">
+<main class="ds-main l-page">
+
+  <header class="ds-hero">
+    <div class="ds-eyebrow"><span class="a-badge">10</span><span class="t-meta">Organe — Carte Universelle</span></div>
+    <h1 class="t-display">Une carte. Pas un formulaire.</h1>
+    <p class="t-body u-muted">La Carte Universelle représente QUI ou QUOI. Huit types d'entités partagent exactement le même cadre : si une carte Personne et une carte Document se distinguaient visuellement, elles ne pourraient pas être composées ensemble. L'universalité est une contrainte de structure, pas une intention.</p>
+  </header>
+
+  <section class="ds-block" aria-labelledby="anatomie">
+    <h2 class="t-h2" id="anatomie">Anatomie</h2>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--col">
+        <article class="ucard ucard--full l-measure-lg">
+          <div class="ucard__id">
+            <span class="ucard__mark" data-type="project"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="prj-project"/></svg></span>
+            <span class="ucard__head"><span class="ucard__type">02 · Type</span><span class="ucard__title">03 · Titre de l'objet</span><span class="ucard__sub">04 · Sous-titre, contexte immédiat</span></span>
+          </div>
+          <div class="ucard__media"><div class="umedia" data-format="16-9"><span class="umedia__label">05 · média optionnel</span></div></div>
+          <dl class="ucard__facts">
+            <div class="ucard__fact"><dt>06 · clé</dt><dd>valeur connue</dd></div>
+            <div class="ucard__fact"><dt>clé</dt><dd class="is-unknown">À confirmer</dd></div>
+          </dl>
+          <div class="ucard__foot"><span class="nstate" data-state="confirmed"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-confirmed"/></svg>07 · état</span><button type="button" class="prov" aria-expanded="false"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="prf-evidence"/></svg>08 · provenance</button><span class="l-spacer"></span><button type="button" class="a-btn a-btn--sm">09 · action</button></div>
+        </article>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Ordre fixe</span><span class="t-caption">01 marque de type · 02 type · 03 titre · 04 sous-titre · 05 média · 06 faits · 07 état · 08 provenance · 09 actions. Aucune permutation n'est autorisée.</span></p>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="types">
+    <h2 class="t-h2" id="types">Les huit types</h2>
+    <div class="ds-rule">
+      <p class="ds-rule__title">Règle</p>
+      <p>Le type est porté par le glyphe et le libellé monospace, jamais par une couleur. Ajouter un neuvième type ne demande ni nouveau composant ni nouvelle couleur : un glyphe de la famille et un libellé.</p>
+    </div>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--grid">
+        <article class="ucard ucard--inline"><span class="ucard__mark" data-type="person"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="ppl-person"/></svg></span><span class="ucard__head"><span class="ucard__type">Personne</span><span class="ucard__title">Camille Vasseur</span></span><span class="a-badge">mémoire</span></article>
+        <article class="ucard ucard--inline"><span class="ucard__mark" data-type="organization"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="ppl-org"/></svg></span><span class="ucard__head"><span class="ucard__type">Organisation</span><span class="ucard__title">Conservatoire de Lyon</span></span><span class="a-badge">mémoire</span></article>
+        <article class="ucard ucard--inline"><span class="ucard__mark" data-type="project"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="prj-project"/></svg></span><span class="ucard__head"><span class="ucard__type">Projet</span><span class="ucard__title">Atelier Nord</span></span><span class="a-badge">12 objets</span></article>
+        <article class="ucard ucard--inline"><span class="ucard__mark" data-type="event"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="time-calendar"/></svg></span><span class="ucard__head"><span class="ucard__type">Événement</span><span class="ucard__title">Concert — 24 septembre</span></span><span class="a-badge">timeline</span></article>
+        <article class="ucard ucard--inline"><span class="ucard__mark" data-type="document"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-document"/></svg></span><span class="ucard__head"><span class="ucard__type">Document</span><span class="ucard__title">Contrat de cession</span></span><span class="a-badge">v2.1</span></article>
+        <article class="ucard ucard--inline"><span class="ucard__mark" data-type="place"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-home"/></svg></span><span class="ucard__head"><span class="ucard__type">Lieu</span><span class="ucard__title">Salle des Fêtes — Brières</span></span><span class="a-badge">géographie</span></article>
+        <article class="ucard ucard--inline"><span class="ucard__mark" data-type="relation"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="rel-relation"/></svg></span><span class="ucard__head"><span class="ucard__type">Relation</span><span class="ucard__title">Intervient sur</span></span><span class="a-badge">prédicat</span></article>
+        <article class="ucard ucard--inline"><span class="ucard__mark" data-type="media"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="med-image"/></svg></span><span class="ucard__head"><span class="ucard__type">Média</span><span class="ucard__title">asset-0087</span></span><span class="a-badge">3 usages</span></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="etats">
+    <h2 class="t-h2" id="etats">États</h2>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--grid">
+        <article class="ucard"><div class="ucard__id"><span class="ucard__mark" data-type="project"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="prj-project"/></svg></span><span class="ucard__head"><span class="ucard__type">Défaut</span><span class="ucard__title">Atelier Nord</span></span></div><p class="t-body-sm u-muted">Arête de contenant, aucune emphase.</p></article>
+        <article class="ucard is-selected"><div class="ucard__id"><span class="ucard__mark" data-type="project"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="prj-project"/></svg></span><span class="ucard__head"><span class="ucard__type">Sélectionné</span><span class="ucard__title">Atelier Nord</span></span></div><p class="t-body-sm u-muted">Arête accentuée et fond d'accent léger.</p></article>
+        <article class="ucard is-proposed"><div class="ucard__id"><span class="ucard__mark" data-type="place"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="noe-proposed"/></svg></span><span class="ucard__head"><span class="ucard__type">Proposé</span><span class="ucard__title">Salle des Fêtes</span></span></div><p class="t-body-sm u-muted">Arête pointillée : l'objet n'existe pas encore.</p></article>
+        <article class="ucard is-superseded"><div class="ucard__id"><span class="ucard__mark" data-type="document"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="noe-superseded"/></svg></span><span class="ucard__head"><span class="ucard__type">Remplacé</span><span class="ucard__title">Contrat v1</span></span></div><p class="t-body-sm u-muted">Barré et atténué, jamais supprimé.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="inconnu">
+    <h2 class="t-h2" id="inconnu">L'inconnu reste inconnu</h2>
+    <div class="ds-rule">
+      <p class="ds-rule__title">Règle</p>
+      <p>Le système ne fabrique jamais de donnée de démonstration pour combler un vide. Une valeur absente est affichée comme absente, en italique atténué, et elle reste une question ouverte plutôt qu'un champ rempli au hasard.</p>
+    </div>
+    <div class="ds-demo">
+      <div class="ds-demo__stage">
+        <article class="ucard l-measure-md">
+          <div class="ucard__id"><span class="ucard__mark" data-type="place"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="nav-home"/></svg></span><span class="ucard__head"><span class="ucard__type">Lieu</span><span class="ucard__title">Salle des Fêtes — Brières</span></span></div>
+          <dl class="ucard__facts">
+            <div class="ucard__fact"><dt>Ville</dt><dd>Brières-les-Scellées</dd></div>
+            <div class="ucard__fact"><dt>Capacité</dt><dd class="is-unknown">À confirmer</dd></div>
+            <div class="ucard__fact"><dt>Accès PMR</dt><dd class="is-unknown">À confirmer</dd></div>
+            <div class="ucard__fact"><dt>Contact</dt><dd class="is-unknown">À confirmer</dd></div>
+          </dl>
+          <div class="ucard__foot"><span class="nstate" data-state="extracted"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-extracted"/></svg>Extrait</span><button type="button" class="a-btn a-btn--sm">Compléter</button></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="relations">
+    <h2 class="t-h2" id="relations">Relations</h2>
+    <p class="t-body u-muted">Une carte n'est jamais isolée : elle se lit dans ses relations. Le pattern relationnel impose l'ordre sujet · prédicat · objet, et le prédicat porté par NOEMA reste pointillé tant qu'il n'est pas validé.</p>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--col">
+        <div class="rview l-measure-xl">
+          <div class="rview__row">
+            <span class="rview__end"><span class="ucard__mark" data-type="person"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="ppl-person"/></svg></span><span><span class="rview__name">Camille Vasseur</span><br><span class="rview__type">Personne</span></span></span>
+            <span class="rview__pred">intervient sur</span>
+            <span class="rview__end rview__end--out"><span><span class="rview__name">Atelier Nord</span><br><span class="rview__type">Projet</span></span><span class="ucard__mark" data-type="project"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="prj-project"/></svg></span></span>
+          </div>
+          <div class="rview__row">
+            <span class="rview__end"><span class="ucard__mark" data-type="project"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="prj-project"/></svg></span><span><span class="rview__name">Atelier Nord</span><br><span class="rview__type">Projet</span></span></span>
+            <span class="rview__pred" data-certainty="proposed">se déroule à</span>
+            <span class="rview__end rview__end--out"><span><span class="rview__name">Salle des Fêtes</span><br><span class="rview__type">Lieu · proposé</span></span><span class="ucard__mark" data-type="place"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-home"/></svg></span></span>
+          </div>
+          <div class="rview__row">
+            <span class="rview__end"><span class="ucard__mark" data-type="document"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-document"/></svg></span><span><span class="rview__name">Contrat de cession</span><br><span class="rview__type">Document</span></span></span>
+            <span class="rview__pred">couvre</span>
+            <span class="rview__end rview__end--out"><span><span class="rview__name">Concert du 24</span><br><span class="rview__type">Événement</span></span><span class="ucard__mark" data-type="event"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="time-calendar"/></svg></span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="responsive">
+    <h2 class="t-h2" id="responsive">Comportement responsive</h2>
+    <div class="ds-table-wrap">
+      <table class="ds-table">
+        <thead><tr><th scope="col">Contexte</th><th scope="col">Comportement</th></tr></thead>
+        <tbody>
+          <tr><td>MOBILE</td><td>La carte occupe toute la largeur. La liste de faits empile clé et valeur au lieu de les aligner en deux colonnes. Les actions passent en pied de carte.</td></tr>
+          <tr><td>TABLET</td><td>Deux cartes par ligne. La liste de faits retrouve ses deux colonnes.</td></tr>
+          <tr><td>DESKTOP</td><td>Trois cartes par ligne en grille de 12. La carte détaillée passe en partition 1.618:1 avec son inspecteur.</td></tr>
+          <tr><td>WIDE</td><td>La mesure reste plafonnée : on n'élargit pas le texte, on augmente l'espace entre les cartes.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <nav class="ds-pager" aria-label="Navigation de chapitre">
+    <a href="noema-components.html"><small>09 — précédent</small><span class="t-body u-strong">Composants NOEMA</span></a>
+    <a href="universal-timeline.html"><small>11 — suivant</small><span class="t-body u-strong">Timeline Universelle</span></a>
+  </nav>
+
+</main>
+</div>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="fr" data-aime-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="a-root" content="./">
+<title>Timeline Universelle — AIME Design System V1</title>
+<link rel="stylesheet" href="tokens/tokens.css">
+<link rel="stylesheet" href="styles/foundations.css">
+<link rel="stylesheet" href="styles/layout.css">
+<link rel="stylesheet" href="styles/components.css">
+<link rel="stylesheet" href="styles/aime.css">
+<link rel="stylesheet" href="styles/noema.css">
+<link rel="stylesheet" href="styles/patterns.css">
+<link rel="stylesheet" href="styles/dataviz.css">
+<link rel="stylesheet" href="styles/doc.css">
+<script src="js/doc.js" defer></script>
+<script src="js/aime-ui.js" defer></script>
+</head>
+<body>
+<div class="ds-shell">
+<main class="ds-main l-page">
+
+  <header class="ds-hero">
+    <div class="ds-eyebrow"><span class="a-badge">11</span><span class="t-meta">Organe — Timeline Universelle</span></div>
+    <h1 class="t-display">Le système nerveux temporel.</h1>
+    <p class="t-body u-muted">La Timeline est une projection du projet, jamais une seconde source de vérité. Un seul moteur, six modes de projection, une granularité de l'année à la seconde. Changer de mode ne change pas les données : cela change ce qu'on a le droit d'en faire.</p>
+  </header>
+
+  <section class="ds-block" aria-labelledby="modes">
+    <h2 class="t-h2" id="modes">Les six modes</h2>
+    <div class="ds-rule">
+      <p class="ds-rule__title">Règle</p>
+      <p>Le mode détermine les capacités actives — déplacer, redimensionner, commenter, lier, verrouiller. Il n'existe donc pas de Timeline Mariage, de Timeline Studio ou de Timeline Théâtre : un moteur, des capacités, des droits.</p>
+    </div>
+    <div class="ds-table-wrap">
+      <table class="ds-table">
+        <thead><tr><th scope="col">Mode</th><th scope="col">Lecture</th><th scope="col">Capacités</th><th scope="col">Orientation</th></tr></thead>
+        <tbody>
+          <tr><td>READ</td><td>Lecture narrative</td><td>aucun déplacement structurel</td><td>verticale</td></tr>
+          <tr><td>PLAN</td><td>Organisation métier</td><td>MOVE · EDIT · LINK</td><td>verticale</td></tr>
+          <tr><td>COMPOSE</td><td>Montage créatif</td><td>MOVE · RESIZE · SPLIT · MERGE · MEDIA</td><td>horizontale, par pistes</td></tr>
+          <tr><td>REVIEW</td><td>Lecture annotée</td><td>COMMENT · LINK · COMPLETE</td><td>verticale</td></tr>
+          <tr><td>LIVE</td><td>Exécution, jour J</td><td>COMPLETE · EDIT limité</td><td>verticale, centrée sur maintenant</td></tr>
+          <tr><td>HISTORY</td><td>Versions et changements</td><td>lecture et comparaison</td><td>verticale</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="marqueurs">
+    <h2 class="t-h2" id="marqueurs">Marqueurs</h2>
+    <div class="ds-rule">
+      <p class="ds-rule__title">Règle</p>
+      <p>Le type d'élément est porté par la forme du marqueur. La couleur ne fait que renforcer : une Timeline imprimée en noir et blanc, ou lue par un utilisateur daltonien, reste parfaitement intelligible.</p>
+    </div>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--col">
+        <div class="utl l-measure-lg">
+          <div class="utl__list">
+            <article class="utl__item"><span class="utl__marker" data-kind="event" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">événement</span><span class="utl__title">Cercle — ponctuel ou étendu</span></div></article>
+            <article class="utl__item"><span class="utl__marker" data-kind="decision" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">décision</span><span class="utl__title">Losange — attribuable et versionnée</span></div></article>
+            <article class="utl__item" data-state="proposed"><span class="utl__marker" data-kind="proposal" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">proposition</span><span class="utl__title">Carré pointillé — en attente de validation</span></div></article>
+            <article class="utl__item"><span class="utl__marker" data-kind="task" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">tâche</span><span class="utl__title">Carré — avec ou sans fenêtre</span></div></article>
+            <article class="utl__item"><span class="utl__marker" data-kind="document" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">document</span><span class="utl__title">Rectangle — rattaché à une version</span></div></article>
+            <article class="utl__item"><span class="utl__marker" data-kind="communication" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">communication</span><span class="utl__title">Double anneau — émise ou reçue</span></div></article>
+            <article class="utl__item"><span class="utl__marker" data-kind="publication" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">publication</span><span class="utl__title">Triangle — rendue publique</span></div></article>
+            <article class="utl__item"><span class="utl__marker" data-kind="change" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">changement</span><span class="utl__title">Mi-plein — avant et après</span></div></article>
+            <article class="utl__item"><span class="utl__marker" data-kind="proof" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">preuve</span><span class="utl__title">Carré plein — produit une évidence</span></div></article>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="lecture">
+    <h2 class="t-h2" id="lecture">Projection verticale</h2>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--col">
+        <div class="utl l-measure-xl">
+          <div class="utl__head">
+            <div class="utl__modes">
+              <button type="button" class="a-pill a-pill--button" aria-current="true">Lecture</button>
+              <button type="button" class="a-pill a-pill--button">Plan</button>
+              <button type="button" class="a-pill a-pill--button">Relecture</button>
+              <button type="button" class="a-pill a-pill--button">Direct</button>
+              <button type="button" class="a-pill a-pill--button">Historique</button>
+            </div>
+            <span class="t-meta">année → mois → semaine → jour → heure</span>
+          </div>
+          <div class="utl__chapter">Avant</div>
+          <div class="utl__list">
+            <article class="utl__item is-selected"><span class="utl__marker" data-kind="decision" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">2026-08-02</span><span class="utl__title">Contrat de cession signé</span><span class="nstate" data-state="confirmed"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-confirmed"/></svg>Confirmé</span></div><p class="utl__body">Décision attribuable à A. Meunier, rattachée à la version 2.1.</p><div class="utl__refs"><span class="a-badge">document</span><span class="a-badge">décision</span><button type="button" class="prov" aria-expanded="false"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="prf-evidence"/></svg>source</button></div></article>
+            <article class="utl__item"><span class="utl__marker" data-kind="change" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">2026-08-19</span><span class="utl__title">Titre de la page d'accueil modifié</span><span class="a-badge">cascade</span></div><p class="utl__body">Le changement a déclenché une analyse d'impact sur 4 sections avant validation.</p></article>
+            <article class="utl__item"><span class="utl__marker" data-kind="communication" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">2026-09-01</span><span class="utl__title">Annonce envoyée à 3 canaux</span><span class="a-badge a-badge--success">publié</span></div><p class="utl__body">Publication autorisée explicitement, après validation humaine.</p></article>
+          </div>
+          <div class="utl__chapter">À venir</div>
+          <div class="utl__list">
+            <article class="utl__item" data-state="proposed"><span class="utl__marker" data-kind="proposal" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">2026-09-24</span><span class="utl__title">Répétition générale</span><span class="nstate" data-state="proposed"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-proposed"/></svg>Proposé</span></div><p class="utl__body">Proposé à partir des disponibilités observées. Rien n'est engagé.</p><div class="utl__refs"><button type="button" class="a-btn a-btn--sm a-btn--primary">Valider</button><button type="button" class="a-btn a-btn--sm a-btn--ghost">Refuser</button></div></article>
+            <article class="utl__item"><span class="utl__marker" data-kind="event" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">2026-10-03</span><span class="utl__title">Concert — Salle des Fêtes</span><span class="a-badge a-badge--accent">J-16</span></div><p class="utl__body">Capacité du lieu encore inconnue : la communication ne peut pas être composée.</p></article>
+          </div>
+        </div>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Règle</span><span class="t-caption">Une action dans la Timeline ne crée jamais de copie concurrente : déplacer un rendez-vous modifie son événement canonique.</span></p>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="compose">
+    <h2 class="t-h2" id="compose">Projection COMPOSE</h2>
+    <div class="ds-rule">
+      <p class="ds-rule__title">Règle</p>
+      <p>Le mode composition bascule la Timeline à l'horizontale et introduit les pistes. Un clip est l'usage concret d'une ressource dans une composition : il porte une position, une durée et un calque, mais jamais l'asset lui-même.</p>
+    </div>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--col">
+        <div class="utl utl--compose">
+          <div class="utl__ruler" aria-hidden="true"><span>00:00</span><span>00:15</span><span>00:30</span><span>00:45</span><span>01:00</span></div>
+          <div class="utl__lane">
+            <div class="utl__clip is-selected" style="--a-x:0;--a-w:38"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="med-image"/></svg>asset-0087</div>
+            <div class="utl__clip" data-state="proposed" style="--a-x:42;--a-w:26"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-proposed"/></svg>proposé</div>
+          </div>
+          <div class="utl__lane">
+            <div class="utl__clip" style="--a-x:8;--a-w:30"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="med-audio"/></svg>piste sonore</div>
+          </div>
+          <div class="utl__lane">
+            <div class="utl__clip" style="--a-x:0;--a-w:100"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="doc-document"/></svg>texte — version 1.0.4</div>
+          </div>
+        </div>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Synchronisation</span><span class="t-caption">Une sélection dans le canvas sélectionne la Timeline et l'inspecteur. Une seule sélection, trois projections.</span></p>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="granularite">
+    <h2 class="t-h2" id="granularite">Granularité</h2>
+    <p class="t-body u-muted">Le zoom change la représentation, pas les données. La même Timeline se lit à l'échelle de l'année pour un programme, du jour pour une production, de la minute pour un direct.</p>
+    <div class="ds-demo">
+      <div class="ds-demo__stage">
+        <button type="button" class="a-pill a-pill--button">Année</button>
+        <button type="button" class="a-pill a-pill--button">Mois</button>
+        <button type="button" class="a-pill a-pill--button" aria-current="true">Semaine</button>
+        <button type="button" class="a-pill a-pill--button">Jour</button>
+        <button type="button" class="a-pill a-pill--button">Heure</button>
+        <button type="button" class="a-pill a-pill--button">Minute</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="responsive">
+    <h2 class="t-h2" id="responsive">Comportement responsive</h2>
+    <div class="ds-table-wrap">
+      <table class="ds-table">
+        <thead><tr><th scope="col">Contexte</th><th scope="col">Comportement</th></tr></thead>
+        <tbody>
+          <tr><td>MOBILE</td><td>Toujours verticale, y compris en mode COMPOSE qui devient une liste de pistes empilées. La tête de lecture reste visible.</td></tr>
+          <tr><td>TABLET</td><td>Verticale avec chapitres repliables. Les références passent sous le titre.</td></tr>
+          <tr><td>DESKTOP</td><td>Verticale en colonne principale, ou persistante en bas du canvas en mode composition.</td></tr>
+          <tr><td>WIDE</td><td>La Timeline compacte reste ancrée en bas ; la mesure du texte ne s'élargit pas.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <nav class="ds-pager" aria-label="Navigation de chapitre">
+    <a href="universal-card.html"><small>10 — précédent</small><span class="t-body u-strong">Carte Universelle</span></a>
+    <a href="universal-grid.html"><small>12 — suivant</small><span class="t-body u-strong">Grille Universelle</span></a>
+  </nav>
+
+</main>
+</div>
+</body>
+</html>

@@ -596,7 +596,7 @@ NOEMA must not silently:
 
 Principle:
 
-**CERISE PROPOSE. L'HUMAIN VALIDE.**
+**NOEMA PROPOSE. L'HUMAIN VALIDE.**
 
 ## 17. Provenance
 

@@ -1,0 +1,161 @@
+/* ══════════════════════════════════════════════════════════════
+   AIME DESIGN SYSTEM V1 — COUCHE 5 : MOTEUR DE LAYOUT
+   Sept principes : GRILLE · ALIGNEMENT · PROPORTION · RYTHME ·
+   ÉQUILIBRE · ESPACE BLANC · HIÉRARCHIE.
+   Règle : l'utilisateur ne positionne jamais un élément au hasard.
+   Il choisit une proportion admise, le système calcule le reste.
+   ══════════════════════════════════════════════════════════════ */
+
+/* 5.1 PAGE — mesure, marges et rythme vertical */
+.l-page {
+  width: 100%;
+  max-width: var(--aime-measure-wide);
+  margin-inline: auto;
+  padding-inline: var(--aime-margin-mobile);
+}
+.l-page--wide { max-width: var(--aime-canvas-max); }
+.l-page--reading { max-width: var(--aime-measure-tablet); }
+
+.l-section { padding-block: var(--aime-gap-section); }
+.l-section--tight { padding-block: var(--aime-gap-group); }
+.l-section__head {
+  display: grid; gap: var(--aime-space-3);
+  padding-block-end: var(--aime-space-6);
+  border-bottom: var(--aime-border-subtle);
+  margin-block-end: var(--aime-space-6);
+}
+
+/* 5.1bis MESURES — largeurs maximales admises pour un bloc de contenu */
+.l-measure-xs { max-width: 240px; }
+.l-measure-sm { max-width: 320px; }
+.l-measure-md { max-width: 480px; }
+.l-measure-lg { max-width: 720px; }
+.l-measure-xl { max-width: 1040px; }
+
+/* 5.2 EMPILEMENT — un seul token de rythme par contexte */
+.l-stack { display: grid; gap: var(--aime-gap-stack); }
+.l-stack--tight { gap: var(--aime-space-2); }
+.l-stack--loose { gap: var(--aime-gap-group); }
+.l-stack--section { gap: var(--aime-gap-section); }
+
+/* 5.3 LIGNE — alignement strict, jamais centré par défaut */
+.l-row { display: flex; align-items: center; gap: var(--aime-gap-inline); flex-wrap: wrap; }
+.l-row--between { justify-content: space-between; }
+.l-row--end { justify-content: flex-end; }
+.l-row--top { align-items: flex-start; }
+.l-row--nowrap { flex-wrap: nowrap; }
+.l-spacer { flex: 1 1 auto; }
+
+/* 5.4 GRILLE — 4 / 6 / 12 colonnes selon le point de rupture */
+.l-grid { display: grid; gap: var(--aime-gutter-mobile); grid-template-columns: repeat(var(--aime-columns-mobile), minmax(0, 1fr)); }
+.l-grid > * { min-width: 0; }
+.l-span-full { grid-column: 1 / -1; }
+
+/* 5.5 PROPORTIONS ADMISES — 1:1, 1:1.618, 2:1, 3:1. Aucune autre.
+       Une proportion arbitraire est une faute de système. */
+.l-split { display: grid; gap: var(--aime-gutter-mobile); grid-template-columns: minmax(0, 1fr); }
+.l-split--equal { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.l-split--golden { grid-template-columns: minmax(0, var(--aime-ratio-golden) fr) minmax(0, 1fr); }
+.l-split--golden-rev { grid-template-columns: minmax(0, 1fr) minmax(0, var(--aime-ratio-golden) fr); }
+.l-split--double { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+.l-split--triple { grid-template-columns: minmax(0, 3fr) minmax(0, 1fr); }
+.l-thirds { display: grid; gap: var(--aime-gutter-mobile); grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+/* 5.6 SHELL — l'ossature d'un espace de travail.
+       CANVAS ↕ TIMELINE ↕ INSPECTOR : une sélection, trois projections. */
+.l-shell { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; min-height: 100vh; }
+.l-shell__top {
+  position: sticky; top: 0; z-index: var(--aime-z-sticky);
+  display: flex; align-items: center; gap: var(--aime-space-4);
+  min-height: var(--aime-space-8);
+  padding-inline: var(--aime-margin-mobile);
+  border-bottom: var(--aime-border-default);
+  background: var(--aime-color-background);
+}
+.l-shell__main { display: grid; grid-template-columns: minmax(0, 1fr); min-height: 0; }
+.l-shell__foot {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--aime-space-4);
+  min-height: var(--aime-space-7);
+  padding-inline: var(--aime-margin-mobile);
+  border-top: var(--aime-border-default);
+  color: var(--aime-color-text-subtle);
+}
+
+/* Panneau latéral : devient drawer sous le seuil desktop */
+.l-pane {
+  display: grid; align-content: start; gap: var(--aime-space-4);
+  padding: var(--aime-space-4);
+  overflow: auto;
+  background: var(--aime-color-surface);
+}
+.l-pane--start { border-inline-end: var(--aime-border-default); }
+.l-pane--end { border-inline-start: var(--aime-border-default); }
+
+/* 5.7 CANVAS — zone de composition, toujours sur son plan propre */
+.l-canvas {
+  position: relative; min-width: 0; min-height: 0;
+  overflow: auto;
+  background-color: var(--aime-color-surface-sunken);
+  background-image:
+    linear-gradient(var(--aime-color-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--aime-color-grid-line) 1px, transparent 1px);
+  background-size: var(--aime-space-6) var(--aime-space-6);
+}
+.l-canvas--dots {
+  background-image: radial-gradient(var(--aime-color-grid-line) 1px, transparent 1px);
+  background-size: var(--aime-space-4) var(--aime-space-4);
+}
+.l-canvas--plain { background-image: none; }
+
+/* ══════════════════════════════════════════════════════════════
+   5.8 RESPONSIVE — on ne réduit pas, on recompose.
+   MOBILE < 640 · TABLET 640–1023 · DESKTOP 1024–1439 · WIDE ≥ 1440
+   ══════════════════════════════════════════════════════════════ */
+@media (min-width: 640px) {
+  .l-page { padding-inline: var(--aime-margin-tablet); }
+  .l-grid { gap: var(--aime-gutter-tablet); grid-template-columns: repeat(var(--aime-columns-tablet), minmax(0, 1fr)); }
+  .l-split, .l-thirds { gap: var(--aime-gutter-tablet); }
+  .l-split--equal { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .l-span-half { grid-column: span 3; }
+}
+
+@media (min-width: 1024px) {
+  .l-page { padding-inline: var(--aime-margin-desktop); }
+  .l-grid { gap: var(--aime-gutter-desktop); grid-template-columns: repeat(var(--aime-columns-desktop), minmax(0, 1fr)); }
+  .l-split, .l-thirds { gap: var(--aime-gutter-desktop); }
+  .l-split--double { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+  .l-split--triple { grid-template-columns: minmax(0, 3fr) minmax(0, 1fr); }
+  .l-span-third { grid-column: span 4; }
+  .l-span-half { grid-column: span 6; }
+  .l-span-two-thirds { grid-column: span 8; }
+  /* Le shell retrouve ses trois projections */
+  .l-shell__main--3 { grid-template-columns: minmax(0, 1fr) minmax(0, var(--aime-ratio-golden) fr) minmax(0, 1fr); }
+  .l-shell__main--2-end { grid-template-columns: minmax(0, 1fr) 340px; }
+  .l-shell__main--2-start { grid-template-columns: 280px minmax(0, 1fr); }
+}
+
+@media (min-width: 1440px) {
+  .l-page { padding-inline: var(--aime-margin-wide); }
+  .l-grid { gap: var(--aime-gutter-wide); }
+}
+
+/* 5.9 REFLUX — à 320 px et à 200 % de zoom, rien ne doit être perdu.
+       Aucune largeur fixe au-delà du seuil mobile. */
+@media (max-width: 639px) {
+  .l-hide-mobile { display: none !important; }
+  /* La Timeline devient verticale, le Composer devient tactile */
+  .l-shell__main--3, .l-shell__main--2-end, .l-shell__main--2-start { grid-template-columns: minmax(0, 1fr); }
+  .l-pane--start, .l-pane--end { border: 0; border-block-start: var(--aime-border-default); }
+}
+@media (min-width: 640px) { .l-hide-tablet-up { display: none !important; } }
+@media (min-width: 1024px) { .l-hide-desktop-up { display: none !important; } }
+
+/* 5.10 OUTILS DE COMPOSITION — alignement et repères */
+.l-guide {
+  position: absolute; background: var(--aime-color-accent);
+  pointer-events: none; opacity: .5; z-index: 2;
+}
+/* Position d'un repère = donnée, transmise par --a-x / --a-y (sans unité). */
+.l-guide--v { width: 1px; inset-block: 0; inset-inline-start: calc(var(--a-x, 0) * 1px); }
+.l-guide--h { height: 1px; inset-inline: 0; inset-block-start: calc(var(--a-y, 0) * 1px); }
+.l-safe { position: absolute; inset: var(--aime-space-4); border: var(--aime-border-width) dashed var(--aime-color-border-strong); pointer-events: none; }

@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="fr" data-aime-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="a-root" content="./">
+<title>Couleur — AIME Design System V1</title>
+<link rel="stylesheet" href="tokens/tokens.css">
+<link rel="stylesheet" href="styles/foundations.css">
+<link rel="stylesheet" href="styles/layout.css">
+<link rel="stylesheet" href="styles/components.css">
+<link rel="stylesheet" href="styles/aime.css">
+<link rel="stylesheet" href="styles/noema.css">
+<link rel="stylesheet" href="styles/patterns.css">
+<link rel="stylesheet" href="styles/dataviz.css">
+<link rel="stylesheet" href="styles/doc.css">
+<script src="js/doc.js" defer></script>
+<script src="js/aime-ui.js" defer></script>
+</head>
+<body>
+<div class="ds-shell">
+<main class="ds-main l-page">
+
+  <header class="ds-hero">
+    <div class="ds-eyebrow"><span class="a-badge">03</span><span class="t-meta">Couche 1 — Tokens · Couleur</span></div>
+    <h1 class="t-display">Aucune couleur n'entre sans preuve.</h1>
+    <p class="t-body u-muted">Trois familles primitives : neutres chauds, ivoire, fuchsia. Elles ne sont jamais consommées directement. Un composant reçoit un rôle — <span class="u-mono">background</span>, <span class="u-mono">text</span>, <span class="u-mono">accent</span> — et le thème décide de la valeur. Chaque paire de rôles est mesurée au build ; le build refuse de générer si un seuil n'est pas atteint.</p>
+    <div class="l-row">
+      <button type="button" class="a-btn" id="a-theme-switch"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="set-theme"/></svg>Basculer le thème</button>
+      <span class="t-caption u-muted">Thème actuel : <span class="u-mono" id="a-theme-name">dark</span></span>
+    </div>
+  </header>
+
+  <section class="ds-block" aria-labelledby="roles">
+    <h2 class="t-h2" id="roles">Rôles, pas couleurs</h2>
+    <div class="ds-rule">
+      <p class="ds-rule__title">Règle</p>
+      <p>Le fuchsia est un signal fonctionnel : il marque ce qui est sélectionné, ce qui est en cours, ce que NOEMA propose et ce qui attend une décision. Il n'est jamais un fond décoratif, un dégradé ou une illustration. En texte, il est toujours servi par <span class="u-mono">accent-text</span>, jamais par <span class="u-mono">accent</span>.</p>
+    </div>
+    <div class="l-grid">
+      <div class="l-span-third l-stack l-stack--tight">
+        <h3 class="t-h3">Le fuchsia signifie</h3>
+        <ul class="l-stack l-stack--tight">
+          <li class="t-body-sm u-muted">Sélection en cours</li>
+          <li class="t-body-sm u-muted">Action primaire, une seule par écran</li>
+          <li class="t-body-sm u-muted">Proposition de NOEMA en attente de validation</li>
+          <li class="t-body-sm u-muted">Élément concerné par une décision</li>
+        </ul>
+      </div>
+      <div class="l-span-third l-stack l-stack--tight">
+        <h3 class="t-h3">Le fuchsia ne signifie jamais</h3>
+        <ul class="l-stack l-stack--tight">
+          <li class="t-body-sm u-muted">Une catégorie ou un type d'objet</li>
+          <li class="t-body-sm u-muted">Un état de succès, d'erreur ou d'alerte</li>
+          <li class="t-body-sm u-muted">Une décoration de fond ou de dégradé</li>
+          <li class="t-body-sm u-muted">Une marque de « nouveauté »</li>
+        </ul>
+      </div>
+      <div class="l-span-third l-stack l-stack--tight">
+        <h3 class="t-h3">Hiérarchie de contraste</h3>
+        <ul class="l-stack l-stack--tight">
+          <li class="t-body-sm u-muted"><span class="u-mono">text</span> — contenu, 4.5:1 minimum</li>
+          <li class="t-body-sm u-muted"><span class="u-mono">text-muted</span> — secondaire, 4.5:1</li>
+          <li class="t-body-sm u-muted"><span class="u-mono">text-subtle</span> — méta, 4.5:1</li>
+          <li class="t-body-sm u-muted"><span class="u-mono">border-strong</span> — identifie un contrôle, 3:1</li>
+          <li class="t-body-sm u-muted"><span class="u-mono">border</span> — arête de contenant, perceptible</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="primitives">
+    <h2 class="t-h2" id="primitives">Palette primitive</h2>
+    <p class="t-body u-muted">Vingt-trois valeurs. Les neutres tirent très légèrement vers l'ivoire pour que le mode sombre reste matériel. Cliquez une pastille pour copier sa valeur.</p>
+    <div class="l-stack" data-a-render="palette"></div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="semantiques">
+    <h2 class="t-h2" id="semantiques">Rôles sémantiques</h2>
+    <p class="t-body u-muted">Vingt-et-un rôles par thème. Les couleurs d'état ne sont pas choisies à l'œil : elles sont résolues par le premier degré de rampe qui atteint le seuil du rôle.</p>
+    <div class="l-stack" data-a-render="roles"></div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="contraste">
+    <h2 class="t-h2" id="contraste">Preuve de contraste</h2>
+    <div class="ds-rule">
+      <p class="ds-rule__title">Règle</p>
+      <p>La cible dépend de la fonction, pas de l'esthétique. Un filet séparateur n'a pas à atteindre 3:1 — il n'identifie rien. Une bordure de champ, si : c'est le seul indice de l'étendue du contrôle (WCAG 1.4.11).</p>
+    </div>
+    <div class="ds-table-wrap">
+      <table class="ds-table" id="a-contrast">
+        <caption>Calcul rejoué dans le navigateur par le même module de contrat que le build.</caption>
+        <thead><tr><th scope="col">Thème</th><th scope="col">Premier plan</th><th scope="col">Fond</th><th scope="col">Rapport</th><th scope="col">Seuil</th><th scope="col">Résultat</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <p class="t-caption u-muted" id="a-contrast-summary"></p>
+  </section>
+
+  <section class="ds-block" aria-labelledby="usage">
+    <h2 class="t-h2" id="usage">Application</h2>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--grid">
+        <div class="ucard">
+          <div class="ucard__id"><span class="ucard__mark" data-type="project"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="prj-project"/></svg></span><span class="ucard__head"><span class="ucard__type">Projet</span><span class="ucard__title">Site — Atelier Nord</span></span></div>
+          <p class="t-body-sm u-muted">Surface par défaut, arête de contenant, texte secondaire. Aucun fuchsia : rien n'est sélectionné.</p>
+        </div>
+        <div class="ucard is-selected">
+          <div class="ucard__id"><span class="ucard__mark" data-type="project"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="prj-project"/></svg></span><span class="ucard__head"><span class="ucard__type">Projet</span><span class="ucard__title">Site — Atelier Nord</span></span></div>
+          <p class="t-body-sm u-muted">Le fuchsia apparaît parce que l'objet est sélectionné. C'est un état, pas un style.</p>
+        </div>
+        <div class="ucard is-proposed">
+          <div class="ucard__id"><span class="ucard__mark" data-type="relation"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="noe-proposed"/></svg></span><span class="ucard__head"><span class="ucard__type">Proposition</span><span class="ucard__title">Ajouter un lieu de répétition</span></span></div>
+          <p class="t-body-sm u-muted">Pointillé et fuchsia : NOEMA propose. Rien n'est écrit dans la mémoire tant que l'humain n'a pas validé.</p>
+        </div>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Lecture</span><span class="t-caption">Le même composant, trois états. La couleur suit l'état ; elle ne le précède jamais.</span></p>
+    </div>
+  </section>
+
+  <nav class="ds-pager" aria-label="Navigation de chapitre">
+    <a href="foundations.html"><small>02 — précédent</small><span class="t-body u-strong">Foundations</span></a>
+    <a href="typography.html"><small>04 — suivant</small><span class="t-body u-strong">Typographie</span></a>
+  </nav>
+
+</main>
+</div>
+<script type="module">
+  import { evaluateContrast } from './src/tokens.mjs';
+  const { rows } = evaluateContrast();
+  const body = document.querySelector('#a-contrast tbody');
+  body.innerHTML = rows
+    .map(
+      (r) => `<tr><td>${r.theme}</td><td>${r.fg}</td><td>${r.bg}</td>
+        <td class="u-mono">${r.ratio}:1</td><td class="u-mono">${r.min}:1</td>
+        <td>${r.ok ? '<span class="u-success">pass</span>' : '<span class="u-error">fail</span>'}</td></tr>`,
+    )
+    .join('');
+  const pass = rows.filter((r) => r.ok).length;
+  const worst = [...rows].sort((a, b) => a.ratio - b.ratio)[0];
+  document.getElementById('a-contrast-summary').textContent =
+    `${pass}/${rows.length} paires conformes · pire paire ${worst.fg}/${worst.bg} = ${worst.ratio}:1 · ${rows.length - pass} échec`;
+  const name = document.getElementById('a-theme-name');
+  const sync = () => { name.textContent = document.documentElement.dataset.aimeTheme || 'dark'; };
+  document.getElementById('a-theme-switch').addEventListener('click', () => document.getElementById('a-theme').click());
+  sync();
+  new MutationObserver(sync).observe(document.documentElement, { attributes: true, attributeFilter: ['data-aime-theme'] });
+</script>
+<script type="module" src="js/render-tokens.js"></script>
+</body>
+</html>

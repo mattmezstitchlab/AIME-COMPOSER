@@ -1,0 +1,139 @@
+#!/usr/bin/env node
+/**
+ * AIME / NOEMA — DIAGNOSTIC COMPARÉ
+ *
+ * Passe plusieurs projets devant le même juge et les classe.
+ *
+ *   node diagnostic/survey.mjs                    tous les dépôts HTML du compte
+ *   node diagnostic/survey.mjs --repo A --repo B  une sélection
+ *   node diagnostic/survey.mjs --path ../projet   un dossier local
+ *
+ * L'intérêt n'est pas le chiffre absolu mais la comparaison : tous ces
+ * projets sont mesurés par le même moteur, sur le même barème, dans les
+ * mêmes conditions que les écrans du Design System. Un écart de densité
+ * entre deux projets est donc une différence réelle, pas un artefact.
+ */
+import { execFileSync } from 'node:child_process';
+import { resolve } from 'node:path';
+import { collect } from './src/collect.mjs';
+import { diagnose } from './src/diagnose.mjs';
+import { reference } from './src/reference.mjs';
+import { fetchRepo } from './diagnose.mjs';
+
+const OWNER = process.env.AIME_OWNER || 'mattmezstitchlab';
+
+const args = process.argv.slice(2);
+/* Une seule fonction de lecture d'arguments : la variante « all » que
+   j'avais écrite d'abord indexait mal le tableau et renvoyait n'importe
+   quoi. Elle n'était appelée par personne — du code mort qui aurait fini
+   par être cru. */
+const flags = (name) => args.reduce((acc, a, i) => (a === `--${name}` ? [...acc, args[i + 1]] : acc), []);
+
+/* ── Cibles ────────────────────────────────────────────────────── */
+let targets = [];
+
+for (const p of flags('path')) targets.push({ label: p, kind: 'path', value: resolve(p) });
+for (const r of flags('repo')) targets.push({ label: `${OWNER}/${r}`, kind: 'repo', value: r });
+
+if (!targets.length) {
+  /* Aucun argument : tous les dépôts du compte qui contiennent du HTML.
+     On ne juge pas un dépôt sans écran — ce serait lui attribuer un
+     score de conformité qui ne porte sur rien. */
+  const raw = execFileSync('gh', ['repo', 'list', OWNER, '--limit', '200',
+    '--json', 'name,primaryLanguage', '--jq', '.[].name'], { encoding: 'utf8' });
+  const names = raw.trim().split('\n').filter(Boolean);
+  /* Sur stderr : avec --json, stdout doit rester du JSON pur. Une ligne de
+     progression écrite avant l'objet casse tout consommateur qui pipe la
+     sortie — `jq`, un tableur, un autre script. L'information reste
+     visible pour un humain, qui lit les deux flux. */
+  console.error(`\n${names.length} dépôts trouvés sur ${OWNER} — clonage peu profond…\n`);
+  for (const name of names) targets.push({ label: `${OWNER}/${name}`, kind: 'repo', value: name });
+}
+
+/* ── Mesure ────────────────────────────────────────────────────── */
+const REF = reference();
+const rows = [];
+
+for (const t of targets) {
+  let root;
+  try {
+    root = t.kind === 'path' ? t.value : fetchRepo(OWNER, t.value);
+  } catch (e) {
+    rows.push({ label: t.label, error: `inaccessible — ${String(e.message).split('\n')[0]}` });
+    continue;
+  }
+  const collected = collect(root);
+  const d = diagnose(collected, REF);
+  if (!d.ok) {
+    rows.push({ label: t.label, pages: 0, note: d.reason });
+    continue;
+  }
+  rows.push({
+    label: t.label,
+    pages: d.pages,
+    ecarts: d.ecarts,
+    density: d.density,
+    adoption: d.adoption.ratio,
+    worst: d.families.filter((f) => f.count).sort((a, b) => b.count - a.count).slice(0, 3)
+      .map((f) => `${f.family} ${f.count}`).join(' · '),
+  });
+}
+
+/* ── Rendu ─────────────────────────────────────────────────────── */
+const judged = rows.filter((r) => r.pages > 0).sort((a, b) => a.density - b.density);
+const unjudged = rows.filter((r) => !r.pages);
+
+/* Sortie machine. Elle existe pour qu'un rapport écrit à partir d'un
+   sondage ne recopie aucun chiffre à la main : un total recopié est un
+   total qui peut mentir sans que personne ne s'en aperçoive. */
+if (args.includes('--json')) {
+  const ecrans = judged.reduce((n, r) => n + r.pages, 0);
+  const total = judged.reduce((n, r) => n + r.ecarts, 0);
+  process.stdout.write(JSON.stringify({
+    owner: OWNER,
+    juges: judged.length,
+    ecartes: unjudged.length,
+    ecrans,
+    ecarts: total,
+    densite_globale: ecrans ? Number((total / ecrans).toFixed(1)) : 0,
+    projets: judged,
+    non_diagnostiques: unjudged.map((r) => ({ label: r.label, raison: r.error || r.note })),
+  }, null, 2) + '\n');
+  process.exit(0);
+}
+
+const line = '─'.repeat(96);
+console.log(`\n${line}`);
+console.log('  DIAGNOSTIC COMPARÉ — AIME Design System');
+console.log(line);
+console.log('  Moins il y a d\'écarts par écran, plus le projet est proche du système.\n');
+console.log(`  ${'PROJET'.padEnd(32)} ${'ÉCR.'.padStart(5)} ${'ÉCARTS'.padStart(7)} ${'/ÉCRAN'.padStart(7)} ${'ADOPTÉ'.padStart(7)}  PRINCIPAUX ÉCARTS`);
+console.log(`  ${'─'.repeat(94)}`);
+
+for (const r of judged) {
+  /* Le taux d'adoption est publié avec la même honnêteté que le reste :
+     0 % n'est pas une faute, c'est le point de départ. Et un projet à
+     30 % du vocabulaire n'est pas « à 30 % conforme » — l'adoption ne
+     mesure que ce qui est déjà écrit avec les mots du système. */
+  const adopt = `${Math.round(r.adoption * 100)} %`;
+  console.log(`  ${r.label.slice(0, 32).padEnd(32)} ${String(r.pages).padStart(5)} ${String(r.ecarts).padStart(7)} ${String(r.density).padStart(7)} ${adopt.padStart(7)}  ${r.worst}`);
+}
+
+if (unjudged.length) {
+  console.log(`\n  NON DIAGNOSTIQUÉS`);
+  for (const r of unjudged) {
+    console.log(`  ${r.label.slice(0, 34).padEnd(34)} ${r.error || r.note}`);
+  }
+}
+
+if (judged.length) {
+  const best = judged[0];
+  const worst = judged[judged.length - 1];
+  console.log(`\n  ${judged.length} projet(s) jugé(s) · ${unjudged.length} écarté(s)`);
+  console.log(`  le plus proche du système : ${best.label} (${best.density} écart/écran)`);
+  console.log(`  le plus éloigné           : ${worst.label} (${worst.density} écart/écran)`);
+}
+
+console.log(`\n  Ce rapport mesure et nomme. Il ne répare rien : la réparation
+  reste une décision humaine. Aucune mise en page réelle n'est jugée
+  (jsdom n'a pas de moteur de layout).\n`);

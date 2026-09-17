@@ -1,0 +1,201 @@
+/* ══════════════════════════════════════════════════════════════
+   AIME DESIGN SYSTEM V1 — COUCHE 4b : COUCHE NOEMA
+
+   PRINCIPE CENTRAL : NOEMA PROPOSE. L'HUMAIN VALIDE.
+   → Une proposition ne doit JAMAIS ressembler à un fait.
+   → Le doute est visible : pointillé, tireté, barré.
+   → NOEMA n'est pas un personnage : pas d'avatar, pas de visage,
+     pas de bulle de chat décorative. Une marque, un rail, un libellé.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── 4b.1 MARQUE — identité sans incarnation */
+.noema-mark { display: inline-flex; align-items: center; gap: var(--aime-space-2); }
+.noema-mark__glyph { color: var(--aime-color-accent-text); flex: none; }
+.noema-mark__word {
+  font-family: var(--aime-font-mono);
+  font-size: var(--aime-text-meta-size);
+  letter-spacing: var(--aime-text-meta-ls);
+  text-transform: uppercase;
+  color: var(--aime-color-text-muted);
+}
+
+/* Rail d'attribution : tout ce que NOEMA produit porte ce rail.
+   C'est le seul signe d'auteur autorisé. */
+.noema-rail {
+  position: relative;
+  border-inline-start: var(--aime-border-width-strong) solid var(--aime-color-accent);
+  padding-inline-start: var(--aime-space-4);
+}
+.noema-rail--muted { border-inline-start-color: var(--aime-color-border-strong); }
+
+/* ── 4b.2 ÉTATS DE CONNAISSANCE ─────────────────────────────────
+   OBSERVED · EXTRACTED · INFERRED · PROPOSED · CONFIRMED · SUPERSEDED
+   Chaque état = un glyphe + un style de trait + un libellé.
+   La couleur est un renfort, jamais le seul canal. */
+.nstate {
+  display: inline-flex; align-items: center; gap: var(--aime-space-2);
+  height: 20px; padding-inline: var(--aime-space-2);
+  border: var(--aime-border-width) solid var(--aime-state-observed-bd);
+  border-radius: var(--aime-radius-small);
+  color: var(--aime-state-observed-fg);
+  font-family: var(--aime-font-mono);
+  font-size: var(--aime-text-meta-size);
+  letter-spacing: var(--aime-text-meta-ls);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.nstate[data-state='observed'] { color: var(--aime-state-observed-fg); border-color: var(--aime-state-observed-bd); border-style: dotted; }
+.nstate[data-state='extracted'] { color: var(--aime-state-extracted-fg); border-color: var(--aime-state-extracted-bd); border-style: dashed; }
+.nstate[data-state='inferred'] { color: var(--aime-state-inferred-fg); border-color: var(--aime-state-inferred-bd); border-style: dashed; }
+.nstate[data-state='proposed'] { color: var(--aime-state-proposed-fg); border-color: var(--aime-state-proposed-bd); border-style: dashed; font-weight: var(--aime-font-medium); }
+.nstate[data-state='confirmed'] { color: var(--aime-state-confirmed-fg); border-color: var(--aime-state-confirmed-bd); border-style: solid; }
+.nstate[data-state='superseded'] { color: var(--aime-state-superseded-fg); border-color: var(--aime-state-superseded-bd); border-style: solid; text-decoration: line-through; }
+
+/* ── 4b.3 CHÂSSIS NOEMA — un seul cadre pour huit usages ────────
+   Proposal · Observation · Question · Alert · Explanation ·
+   Confirmation · Action · Proof.
+   Le cadre est IDENTIQUE ; seuls changent le glyphe, le style de
+   bordure et les actions de pied. C'est ce qui rend NOEMA lisible
+   sans multiplier les composants. */
+.noema-card {
+  display: grid; gap: var(--aime-space-3);
+  padding: var(--aime-space-4);
+  border: var(--aime-border-default);
+  border-inline-start: var(--aime-border-width-strong) solid var(--aime-color-border-strong);
+  border-radius: var(--aime-radius-medium);
+  background: var(--aime-color-surface);
+}
+.noema-card__head { display: flex; align-items: center; gap: var(--aime-space-3); flex-wrap: wrap; }
+.noema-card__kind {
+  display: inline-flex; align-items: center; gap: var(--aime-space-2);
+  font-family: var(--aime-font-mono);
+  font-size: var(--aime-text-meta-size);
+  letter-spacing: var(--aime-text-meta-ls);
+  text-transform: uppercase;
+  color: var(--aime-color-text-subtle);
+}
+.noema-card__title { font-size: var(--aime-text-body-size); font-weight: var(--aime-font-semibold); line-height: 1.3; }
+.noema-card__body { font-size: var(--aime-text-body-small-size); color: var(--aime-color-text-muted); max-width: var(--aime-text-body-measure); }
+.noema-card__body strong { color: var(--aime-color-text); font-weight: var(--aime-font-medium); }
+.noema-card__foot { display: flex; align-items: center; gap: var(--aime-space-3); flex-wrap: wrap; }
+.noema-card__foot .l-spacer { flex: 1; }
+.noema-card__list { display: grid; gap: var(--aime-space-2); margin: 0; padding-inline-start: var(--aime-space-4); font-size: var(--aime-text-body-small-size); color: var(--aime-color-text-muted); }
+.noema-card__list li::marker { color: var(--aime-color-text-subtle); }
+
+/* Différence FACTUEL / PROPOSÉ : la bordure, pas seulement la couleur */
+.noema-card[data-certainty='proposed'] {
+  border-style: dashed;
+  border-color: var(--aime-color-accent);
+  border-inline-start-style: solid;
+  border-inline-start-color: var(--aime-color-accent);
+}
+.noema-card[data-certainty='confirmed'] {
+  border-inline-start-color: var(--aime-color-success-border);
+}
+.noema-card[data-certainty='uncertain'] {
+  border-inline-start-color: var(--aime-color-warning-border);
+  border-style: dashed;
+}
+.noema-card[data-certainty='superseded'] { opacity: .6; }
+.noema-card[data-certainty='superseded'] .noema-card__title { text-decoration: line-through; }
+
+/* Variantes d'usage — même châssis, accentuation différente */
+.noema-card--question { border-inline-start-color: var(--aime-color-info-border); }
+.noema-card--alert { border-inline-start-color: var(--aime-color-warning-border); }
+.noema-card--alert[data-severity='high'] { border-inline-start-color: var(--aime-color-error-border); }
+.noema-card--proof { border-inline-start-color: var(--aime-color-success-border); }
+.noema-card--action { border-inline-start-color: var(--aime-color-accent); }
+.noema-card--explanation { background: var(--aime-color-surface-sunken); }
+
+/* Ce que NOEMA ne sait pas est affiché comme tel. Jamais comblé. */
+.noema-unknown {
+  display: inline-flex; align-items: center; gap: var(--aime-space-2);
+  height: 20px;
+  padding-inline: var(--aime-space-2);
+  border: var(--aime-border-width) dashed var(--aime-color-border-strong);
+  border-radius: var(--aime-radius-small);
+  font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size);
+  letter-spacing: var(--aime-text-meta-ls); text-transform: uppercase;
+  color: var(--aime-color-text-subtle);
+}
+
+/* ── 4b.4 APPROBATION — la décision est attribuable et versionnée */
+.approval {
+  display: grid; gap: var(--aime-space-3);
+  padding: var(--aime-space-4);
+  border: var(--aime-border-default);
+  border-radius: var(--aime-radius-medium);
+  background: var(--aime-color-surface);
+}
+.approval[data-state='pending'] { border-style: dashed; border-color: var(--aime-color-accent); }
+.approval[data-state='accepted'] { border-inline-start: var(--aime-border-width-strong) solid var(--aime-color-success-border); }
+.approval[data-state='rejected'] { border-inline-start: var(--aime-border-width-strong) solid var(--aime-color-error-border); }
+.approval[data-state='superseded'] { opacity: .6; }
+.approval__decision {
+  display: flex; align-items: center; gap: var(--aime-space-3);
+  padding-block-start: var(--aime-space-3);
+  border-top: var(--aime-border-subtle);
+  font-size: var(--aime-text-caption-size);
+  color: var(--aime-color-text-muted);
+}
+
+/* ── 4b.5 PROVENANCE ────────────────────────────────────────────
+   Discrète par défaut, complète à la demande. Elle n'entre jamais
+   dans la hiérarchie principale : c'est une couche de vérification. */
+.prov {
+  display: inline-flex; align-items: center; gap: var(--aime-space-1);
+  min-height: 20px; padding-inline: var(--aime-space-2);
+  border: var(--aime-border-subtle);
+  border-radius: var(--aime-radius-small);
+  background: transparent;
+  color: var(--aime-color-text-subtle);
+  font-family: var(--aime-font-mono);
+  font-size: var(--aime-text-meta-size);
+  letter-spacing: var(--aime-text-meta-ls);
+  text-transform: uppercase;
+  transition: color var(--aime-motion-fast) var(--aime-ease-out), border-color var(--aime-motion-fast) var(--aime-ease-out);
+}
+.prov:hover { color: var(--aime-color-text-muted); border-color: var(--aime-color-border); }
+.prov[aria-expanded='true'] { color: var(--aime-color-text); border-color: var(--aime-color-border-strong); }
+
+.prov__panel {
+  display: grid; gap: var(--aime-space-1);
+  min-width: 280px; padding: var(--aime-space-3);
+  border: var(--aime-border-default); border-radius: var(--aime-radius-medium);
+  background: var(--aime-color-surface-overlay);
+  box-shadow: var(--aime-shadow-raise);
+}
+.prov__row {
+  display: grid; grid-template-columns: 96px minmax(0, 1fr);
+  gap: var(--aime-space-3); align-items: baseline;
+  padding-block: var(--aime-space-1);
+  border-top: var(--aime-border-subtle);
+}
+.prov__row:first-child { border-top: 0; }
+.prov__row dt {
+  font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size);
+  letter-spacing: var(--aime-text-meta-ls); text-transform: uppercase;
+  color: var(--aime-color-text-subtle);
+}
+.prov__row dd { margin: 0; font-size: var(--aime-text-caption-size); color: var(--aime-color-text-muted); overflow-wrap: anywhere; }
+
+/* Confiance : trois degrés, jamais un pourcentage inventé.
+   Afficher 87 % de certitude serait une fausse précision. */
+.conf { display: inline-flex; align-items: center; gap: var(--aime-space-2); }
+.conf__meter { display: inline-flex; gap: var(--aime-space-1); }
+.conf__meter i { width: 10px; height: 4px; border-radius: var(--aime-radius-pill); background: var(--aime-color-surface-overlay); }
+.conf[data-level='low'] .conf__meter i:nth-child(1) { background: var(--aime-color-warning-border); }
+.conf[data-level='medium'] .conf__meter i:nth-child(-n + 2) { background: var(--aime-color-info-border); }
+.conf[data-level='high'] .conf__meter i { background: var(--aime-color-success-border); }
+.conf__label { font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size); letter-spacing: var(--aime-text-meta-ls); text-transform: uppercase; color: var(--aime-color-text-subtle); }
+
+/* ── 4b.6 FIL NOEMA — le flux des interventions, sans chat décoratif */
+.noema-feed { display: grid; gap: var(--aime-space-4); }
+.noema-feed__item { display: grid; gap: var(--aime-space-3); }
+.noema-feed__when {
+  display: flex; align-items: center; gap: var(--aime-space-3);
+  font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size);
+  letter-spacing: var(--aime-text-meta-ls); text-transform: uppercase;
+  color: var(--aime-color-text-subtle);
+}
+.noema-feed__when::after { content: ''; flex: 1; border-top: var(--aime-border-subtle); }

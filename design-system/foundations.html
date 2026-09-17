@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="fr" data-aime-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="a-root" content="./">
+<title>Foundations — AIME Design System V1</title>
+<link rel="stylesheet" href="tokens/tokens.css">
+<link rel="stylesheet" href="styles/foundations.css">
+<link rel="stylesheet" href="styles/layout.css">
+<link rel="stylesheet" href="styles/components.css">
+<link rel="stylesheet" href="styles/aime.css">
+<link rel="stylesheet" href="styles/noema.css">
+<link rel="stylesheet" href="styles/patterns.css">
+<link rel="stylesheet" href="styles/dataviz.css">
+<link rel="stylesheet" href="styles/doc.css">
+<script src="js/doc.js" defer></script>
+<script src="js/aime-ui.js" defer></script>
+</head>
+<body>
+<div class="ds-shell">
+<main class="ds-main l-page">
+
+  <header class="ds-hero">
+    <div class="ds-eyebrow"><span class="a-badge">02</span><span class="t-meta">Couche 2 — Foundations</span></div>
+    <h1 class="t-display">Les fondations décident avant l'écran.</h1>
+    <p class="t-body u-muted">La couche 2 transforme des tokens en comportement par défaut : ce qu'est un texte, ce qu'est une surface, où va le focus, ce qui se passe quand le mouvement est refusé. Aucun écran n'a à répéter ces décisions.</p>
+  </header>
+
+  <section class="ds-block" aria-labelledby="grammaire">
+    <h2 class="t-h2" id="grammaire">Grammaire de nommage</h2>
+    <div class="ds-rule">
+      <p class="ds-rule__title">Règle</p>
+      <p>Le préfixe d'une classe dit à quelle couche elle appartient. Une classe sans préfixe connu est une anomalie : le Design QA la refuse.</p>
+    </div>
+    <div class="ds-table-wrap">
+      <table class="ds-table">
+        <thead><tr><th scope="col">Préfixe</th><th scope="col">Couche</th><th scope="col">Exemple</th><th scope="col">Interdiction</th></tr></thead>
+        <tbody>
+          <tr><td>t-</td><td>Rôle typographique</td><td class="u-mono">t-body · t-meta · t-h2</td><td>Ne porte jamais de couleur propre</td></tr>
+          <tr><td>u-</td><td>Utilitaire lié à un token</td><td class="u-mono">u-muted · u-surface · u-mono</td><td>Ne crée jamais de variante visuelle</td></tr>
+          <tr><td>l-</td><td>Layout</td><td class="u-mono">l-page · l-grid · l-split--golden</td><td>Ne stylise jamais le contenu</td></tr>
+          <tr><td>a-</td><td>Composant fondamental</td><td class="u-mono">a-btn · a-input · a-modal</td><td>Ne contient jamais de règle métier</td></tr>
+          <tr><td>ucard · utl · ugrid · umedia</td><td>Organes AIME</td><td class="u-mono">ucard__fact · utl__marker</td><td>Ne duplique jamais un objet canonique</td></tr>
+          <tr><td>noema- · nstate · prov · approval</td><td>Couche NOEMA</td><td class="u-mono">noema-card · nstate</td><td>Ne présente jamais une proposition comme un fait</td></tr>
+          <tr><td>ds-</td><td>Documentation</td><td class="u-mono">ds-demo · ds-rule</td><td>Ne définit aucun token</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="surfaces">
+    <h2 class="t-h2" id="surfaces">Surfaces — la profondeur sans ombre</h2>
+    <div class="ds-rule">
+      <p class="ds-rule__title">Règle</p>
+      <p>La profondeur vient de la surface, du contraste et de l'espace. L'ombre est réservée à ce qui flotte réellement au-dessus du plan : menu, tiroir, modale, notification, infobulle, objet en cours de déplacement. Une carte dans le flux ne porte jamais d'ombre.</p>
+    </div>
+    <div class="ds-demo">
+      <div class="ds-demo__stage">
+        <div class="l-stack l-stack--tight ds-demo__stack">
+          <div class="u-sunken l-stack l-stack--tight u-pad"><span class="t-label">background</span><span class="t-caption">fond de page · niveau 0</span></div>
+          <div class="u-surface l-stack l-stack--tight u-pad"><span class="t-label">surface</span><span class="t-caption">contenant · niveau 1</span></div>
+          <div class="u-surface-elevated l-stack l-stack--tight u-pad"><span class="t-label">surface-elevated</span><span class="t-caption">contrôle · niveau 2</span></div>
+          <div class="u-surface-overlay l-stack l-stack--tight u-pad u-float"><span class="t-label">surface-overlay</span><span class="t-caption">flottant · niveau 3 · ombre autorisée</span></div>
+        </div>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Ordre</span><span class="t-caption">background &lt; surface &lt; surface-elevated &lt; surface-overlay. Aucune inversion, aucun niveau intermédiaire.</span></p>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="texte">
+    <h2 class="t-h2" id="texte">Rôles de texte</h2>
+    <p class="t-body u-muted">Neuf rôles, et rien d'autre. La classe porte le rôle ; la taille, la hauteur de ligne, l'approche et la mesure maximale viennent des tokens.</p>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--col">
+        <p class="t-display">Display</p>
+        <p class="t-h1">Titre H1 — un seul par écran</p>
+        <p class="t-h2">Titre H2 — section</p>
+        <p class="t-h3">Titre H3 — sous-section</p>
+        <p class="t-body">Body — texte de lecture, mesure maximale 68 caractères pour rester confortable.</p>
+        <p class="t-body-sm">Body small — texte d'interface dense, listes, tableaux, inspecteurs.</p>
+        <p class="t-caption">Caption — annotation, aide, légende.</p>
+        <p class="t-label">Label — libellé de champ, catégorie</p>
+        <p class="t-meta">META · 2026-09-17 · CONFIRMED · v1.0.4</p>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Règle</span><span class="t-caption">LABEL et META sont écrits en minuscules dans le DOM et capitalisés par CSS : les lecteurs d'écran et la traduction restent corrects.</span></p>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="focus">
+    <h2 class="t-h2" id="focus">Focus</h2>
+    <div class="ds-rule">
+      <p class="ds-rule__title">Règle</p>
+      <p>Un seul système de focus : un outline de 2 px en <span class="u-mono">--aime-color-focus-ring</span>, décalé de 2 px. L'outline n'est retiré qu'au pointeur, jamais au clavier. Un composant qui supprime l'anneau doit fournir une substitution dans le même fichier — le Design QA le vérifie.</p>
+    </div>
+    <div class="ds-demo">
+      <div class="ds-demo__stage">
+        <button type="button" class="a-btn">Bouton</button>
+        <button type="button" class="a-icon-btn" aria-label="Exemple d'icône cliquable"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="set-sliders"/></svg></button>
+        <input class="a-input l-measure-xs" type="text" placeholder="Champ" aria-label="Exemple de champ">
+        <a class="a-text-btn" href="#focus">Action texte</a>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Test</span><span class="t-caption">Tabulez : l'anneau apparaît sur chaque cible, y compris sur les icônes seules.</span></p>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="reduit">
+    <h2 class="t-h2" id="reduit">Mouvement réduit</h2>
+    <div class="ds-rule">
+      <p class="ds-rule__title">Règle</p>
+      <p>Aucune animation n'est nécessaire à la compréhension. <span class="u-mono">prefers-reduced-motion</span> est respecté nativement ; le système expose en plus <span class="u-mono">data-aime-motion="reduced"</span> pour le forcer, afin que le moteur d'accessibilité puisse l'auditer sans dépendre du système d'exploitation.</p>
+    </div>
+    <div class="ds-demo">
+      <div class="ds-demo__stage">
+        <button type="button" class="a-btn" id="a-demo-motion">Basculer le mouvement</button>
+        <span class="t-caption u-muted">État actuel : <span class="u-mono" id="a-motion-state">complet</span></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="reset">
+    <h2 class="t-h2" id="reset">Reset</h2>
+    <p class="t-body u-muted">Le reset est neutre : il retire les marges par défaut, uniformise <span class="u-mono">box-sizing</span>, rend les médias fluides et aligne la typographie des contrôles sur le corps de texte. Il n'exprime aucune opinion visuelle — c'est le rôle des couches suivantes.</p>
+    <div class="l-grid">
+      <div class="l-span-third l-stack l-stack--tight">
+        <h3 class="t-h3">Ce que le reset fait</h3>
+        <ul class="l-stack l-stack--tight">
+          <li class="t-body-sm u-muted"><span class="u-mono">box-sizing: border-box</span> partout</li>
+          <li class="t-body-sm u-muted">Marges à zéro sur les blocs et les listes</li>
+          <li class="t-body-sm u-muted">Médias en bloc, largeur maximale 100 %</li>
+          <li class="t-body-sm u-muted">Contrôles héritant de la police du corps</li>
+          <li class="t-body-sm u-muted">Défilement discret, sans décor</li>
+        </ul>
+      </div>
+      <div class="l-span-third l-stack l-stack--tight">
+        <h3 class="t-h3">Ce que le reset ne fait pas</h3>
+        <ul class="l-stack l-stack--tight">
+          <li class="t-body-sm u-muted">Il n'impose aucune police</li>
+          <li class="t-body-sm u-muted">Il ne colore rien</li>
+          <li class="t-body-sm u-muted">Il ne définit aucun rayon</li>
+          <li class="t-body-sm u-muted">Il n'ajoute aucune ombre</li>
+          <li class="t-body-sm u-muted">Il ne supprime pas le focus clavier</li>
+        </ul>
+      </div>
+      <div class="l-span-third l-stack l-stack--tight">
+        <h3 class="t-h3">Fichiers</h3>
+        <ul class="l-stack l-stack--tight">
+          <li class="t-caption u-mono">tokens/tokens.css</li>
+          <li class="t-caption u-mono">styles/foundations.css</li>
+          <li class="t-caption u-mono">styles/layout.css</li>
+          <li class="t-caption u-mono">styles/components.css</li>
+          <li class="t-caption u-mono">styles/aime.css · noema.css</li>
+          <li class="t-caption u-mono">styles/patterns.css · dataviz.css</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <nav class="ds-pager" aria-label="Navigation de chapitre">
+    <a href="index.html"><small>01 — précédent</small><span class="t-body u-strong">Accueil</span></a>
+    <a href="color.html"><small>03 — suivant</small><span class="t-body u-strong">Couleur</span></a>
+  </nav>
+
+</main>
+</div>
+<script>
+  const btn = document.getElementById('a-demo-motion');
+  const out = document.getElementById('a-motion-state');
+  const sync = () => { out.textContent = document.documentElement.dataset.aimeMotion === 'reduced' ? 'réduit' : 'complet'; };
+  btn.addEventListener('click', () => {
+    const on = document.documentElement.dataset.aimeMotion === 'reduced';
+    if (on) delete document.documentElement.dataset.aimeMotion; else document.documentElement.dataset.aimeMotion = 'reduced';
+    try { localStorage.setItem('aime-ds-motion', on ? 'full' : 'reduced'); } catch (e) {}
+    sync();
+  });
+  sync();
+</script>
+</body>
+</html>

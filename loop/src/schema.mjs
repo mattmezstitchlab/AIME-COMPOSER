@@ -1,0 +1,361 @@
+/**
+ * AIME / NOEMA — CONTRAT DE DONNÉES V1
+ *
+ * Implémentation de AUDIT/DATA-MODEL-V1.md. Une entité qui ne respecte pas
+ * ce contrat est refusée à l'écriture : le store ne peut pas contenir un
+ * objet sans propriétaire, sans source ni provenance.
+ *
+ * Le vocabulaire épistémique n'est PAS redéfini ici. Il est importé du
+ * Design System, qui en est la couche inférieure. C'est ce qui rend la
+ * divergence impossible : une seule définition, deux consommateurs.
+ */
+import {
+  EPISTEMIC_KEYS,
+  EPISTEMIC_STATES,
+  CONFIDENCE_LEVELS,
+  DATA_MODEL_CONFIDENCE_MAP,
+} from '../../design-system/src/tokens.mjs';
+
+/* ── Entités ───────────────────────────────────────────────────── */
+
+/** Préfixe d'identifiant canonique, par type d'entité. */
+export const ID_PREFIX = {
+  person: 'ppl',
+  organization: 'org',
+  project: 'prj',
+  object: 'obj',
+  relation: 'rel',
+  event: 'evt',
+  asset: 'ast',
+  document: 'doc',
+  version: 'ver',
+  proposal: 'prop',
+  decision: 'dec',
+  proof: 'prf',
+  action: 'act',
+  grant: 'grt',
+  tombstone: 'tmb',
+};
+
+/** Champs transverses, d'après DATA-MODEL-V1 §3. */
+export const CROSS_CUTTING = [
+  'id', 'source', 'provenance', 'confidence', 'status',
+  'created_at', 'updated_at', 'created_by', 'project_id',
+  /* Gouvernance de la mémoire — constitution §6. Absents du data model :
+     ces champs l'étendent, ils ne le contredisent pas. */
+  'category', 'visibility', 'shared_with', 'paused_until',
+];
+
+/**
+ * Catégories de mémoire, d'après la constitution §6.
+ * Une catégorie n'est pas décorative : elle borne ce qui peut être
+ * partagé, et ce que NOEMA peut collecter quand la collecte est en pause.
+ */
+export const MEMORY_CATEGORIES = ['personnelle', 'projet', 'partagée', 'temporaire', 'sensible'];
+
+/** Portée de visibilité d'une information. */
+export const VISIBILITY = ['privée', 'projet', 'partagée', 'publique'];
+
+/** Les huit droits de la personne sur sa mémoire (constitution §6). */
+export const MEMORY_RIGHTS = [
+  'voir', 'comprendre', 'corriger', 'supprimer',
+  'pauser', 'limiter', 'partager', 'révoquer',
+];
+
+/** Une information sensible ne sort jamais du périmètre privé par défaut. */
+export const CATEGORY_VISIBILITY_CEILING = {
+  personnelle: 'privée',
+  projet: 'projet',
+  partagée: 'partagée',
+  temporaire: 'projet',
+  sensible: 'privée',
+};
+
+/** Champs propres à chaque entité, au-delà des transverses. */
+export const ENTITY_FIELDS = {
+  person: ['display_name', 'roles', 'availability'],
+  organization: ['display_name', 'kind'],
+  project: ['title', 'owner_id', 'template'],
+  object: ['type', 'content'],
+  relation: ['from_id', 'relation_type', 'to_id'],
+  event: ['type', 'start_at', 'end_at', 'description', 'participants'],
+  asset: ['kind', 'rights_until', 'usage_count'],
+  document: ['title', 'version_id'],
+  version: ['target_id', 'number', 'approved_by'],
+  proposal: ['target_id', 'requested_change', 'author', 'evidence', 'resulting_id',
+             'materialized_id', 'materialization_note'],
+  decision: ['target_id', 'decision', 'actor', 'reason', 'before', 'after', 'reversible'],
+  proof: ['target_id', 'proof_type', 'evidence_ref', 'captured_at', 'validation_state'],
+  /* Une action est le seul objet capable d'avoir un effet hors du système.
+     Périmètre, risque, réversibilité et permission y sont obligatoires. */
+  action: ['verb', 'label', 'object', 'scope', 'risk', 'reversible',
+           'permission_required', 'authorized_by', 'executed_at'],
+  /* Un partage est un droit accordé : il porte un bénéficiaire, une
+     finalité et une échéance. Un partage sans échéance n'existe pas. */
+  grant: ['target_id', 'grantee', 'purpose', 'scope', 'expires_at', 'revoked_at'],
+  /* Une pierre tombale prouve qu'une suppression a eu lieu sans conserver
+     le contenu supprimé. C'est ce qui rend SUPPRIMER à la fois réel et
+     auditable. */
+  tombstone: ['target_id', 'target_type', 'deleted_by', 'deleted_at', 'reason'],
+};
+
+export const ENTITY_TYPES = Object.keys(ENTITY_FIELDS);
+
+/**
+ * Statut de cycle de vie, d'après DATA-MODEL-V1 §4.
+ * Une entité peut en utiliser un sous-ensemble, jamais un autre.
+ */
+export const LIFECYCLE = [
+  'discovered', 'draft', 'in_review', 'proposed_change',
+  'revision', 'approved', 'qa', 'published', 'superseded',
+];
+
+/**
+ * Statut spécifique d'une proposition. Une proposition n'est jamais
+ * appliquée par la machine : elle attend un humain.
+ */
+export const PROPOSAL_STATUS = ['open', 'accepted', 'rejected', 'deferred', 'superseded'];
+
+/**
+ * Statut spécifique d'une action. L'ordre est un verrou : `executed` ne
+ * s'atteint qu'après `authorized`. Une action n'a pas d'état intermédiaire
+ * qui permette de contourner l'autorisation.
+ */
+export const ACTION_STATUS = ['pending_authorization', 'authorized', 'refused', 'executed'];
+
+/** Un partage est actif, expiré ou révoqué — jamais « oublié ». */
+export const GRANT_STATUS = ['active', 'expired', 'revoked'];
+
+/**
+ * Types de changement qui créent un objet nouveau. Ce sont les seuls pour
+ * lesquels une proposition peut légitimement n'avoir aucune cible.
+ */
+export const CREATION_KINDS = ['person', 'relation', 'date', 'unknown', 'action_request'];
+
+/** Verbes d'action reconnus, avec ce que chacun coûte. */
+export const ACTION_VERBS = {
+  send:    { label: 'Envoyer un message',       scope: 'external', risk: 'high',   reversible: false, permission: 'external_communication' },
+  publish: { label: 'Publier un contenu',       scope: 'external', risk: 'high',   reversible: true,  permission: 'external_communication' },
+  share:   { label: 'Partager une information', scope: 'external', risk: 'high',   reversible: true,  permission: 'sharing' },
+  book:    { label: 'Réserver une ressource',   scope: 'external', risk: 'high',   reversible: true,  permission: 'external_communication' },
+  cancel:  { label: 'Annuler un engagement',    scope: 'external', risk: 'high',   reversible: false, permission: 'external_communication' },
+  notify:  { label: 'Notifier une personne',    scope: 'internal', risk: 'medium', reversible: false, permission: 'notification' },
+  archive: { label: 'Archiver un objet',        scope: 'internal', risk: 'low',    reversible: true,  permission: 'memory_correction' },
+};
+
+/* ── Vocabulaire épistémique : réexport, jamais copie ──────────── */
+export { EPISTEMIC_KEYS, EPISTEMIC_STATES, CONFIDENCE_LEVELS, DATA_MODEL_CONFIDENCE_MAP };
+
+/**
+ * Traduit une classe de confiance de DATA-MODEL-V1 §5 vers le vocabulaire
+ * du système. Retourne null pour UNKNOWN : l'inconnu n'est pas un état,
+ * c'est une absence — il s'affiche par `.is-unknown`, jamais par une valeur.
+ */
+export function fromDataModelConfidence(klass) {
+  if (!(klass in DATA_MODEL_CONFIDENCE_MAP)) {
+    throw new Error(`classe de confiance inconnue du data model : ${klass}`);
+  }
+  return DATA_MODEL_CONFIDENCE_MAP[klass];
+}
+
+/* ── Validation ────────────────────────────────────────────────── */
+
+/* ISO 8601, secondes fractionnaires comprises — c'est ce que produit
+   new Date().toISOString(). Une regex trop stricte ici rejetterait toute
+   horloge réelle : les tests passaient uniquement parce qu'ils utilisaient
+   une date fixe sans millisecondes. */
+const ISO = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2}(\.\d{1,9})?)?(Z|[+-]\d{2}:?\d{2})?)?$/;
+
+/**
+ * Vérifie un objet avant écriture. Retourne la liste des violations ;
+ * une liste vide signifie que l'objet est admissible.
+ *
+ * Règle de fond (roadmap, Phase 0) :
+ *   « Every persisted object has an owner, source, visibility and provenance. »
+ */
+export function validate(type, obj) {
+  const errors = [];
+  const need = (field, why) => {
+    const v = obj[field];
+    if (v === undefined || v === null || v === '') errors.push(`${type}.${field} — ${why}`);
+  };
+
+  if (!ENTITY_TYPES.includes(type)) return [`type d'entité inconnu : ${type}`];
+
+  /* Identifiant canonique */
+  const prefix = ID_PREFIX[type];
+  if (typeof obj.id !== 'string' || !obj.id.startsWith(`${prefix}-`)) {
+    errors.push(`${type}.id — attendu « ${prefix}-… », reçu « ${obj.id} »`);
+  }
+
+  /* Provenance : obligatoire sur toute entité */
+  need('source', 'obligatoire — aucune donnée sans origine');
+  if (!obj.provenance || typeof obj.provenance !== 'object') {
+    errors.push(`${type}.provenance — obligatoire`);
+  } else {
+    if (!obj.provenance.origin) {
+      errors.push(`${type}.provenance.origin — d'où vient l'information`);
+    }
+    if (!EPISTEMIC_KEYS.includes(obj.provenance.state)) {
+      errors.push(`${type}.provenance.state — « ${obj.provenance.state} » hors du vocabulaire (${EPISTEMIC_KEYS.join(', ')})`);
+    }
+  }
+
+  /* Confiance : trois degrés, jamais un pourcentage */
+  if (obj.confidence !== undefined) {
+    if (!CONFIDENCE_LEVELS.includes(obj.confidence)) {
+      errors.push(`${type}.confidence — « ${obj.confidence} » hors des trois degrés (${CONFIDENCE_LEVELS.join(', ')})`);
+    }
+  }
+
+  /* Propriétaire et horodatage */
+  need('created_by', 'obligatoire — tout objet a un auteur');
+  if (!ISO.test(String(obj.created_at))) errors.push(`${type}.created_at — date ISO attendue`);
+  if (obj.updated_at !== undefined && !ISO.test(String(obj.updated_at))) {
+    errors.push(`${type}.updated_at — date ISO attendue`);
+  }
+
+  /* Statut */
+  if (obj.status !== undefined) {
+    const allowed = type === 'proposal' ? PROPOSAL_STATUS
+                  : type === 'action' ? ACTION_STATUS
+                  : type === 'grant' ? GRANT_STATUS
+                  : LIFECYCLE;
+    if (!allowed.includes(obj.status)) {
+      errors.push(`${type}.status — « ${obj.status} » hors du cycle (${allowed.join(', ')})`);
+    }
+  }
+
+  /* Champs propres */
+  for (const f of ENTITY_FIELDS[type]) {
+    if (REQUIRED_FIELDS[type]?.includes(f)) need(f, 'champ propre obligatoire');
+  }
+
+  /* Gouvernance de la mémoire */
+  if (obj.category !== undefined && obj.category !== null
+      && !MEMORY_CATEGORIES.includes(obj.category)) {
+    errors.push(`${type}.category — « ${obj.category} » hors des catégories de mémoire (${MEMORY_CATEGORIES.join(', ')})`);
+  }
+  if (obj.visibility !== undefined && obj.visibility !== null) {
+    if (!VISIBILITY.includes(obj.visibility)) {
+      errors.push(`${type}.visibility — « ${obj.visibility} » hors (${VISIBILITY.join(', ')})`);
+    } else if (obj.category && VISIBILITY.indexOf(obj.visibility) > VISIBILITY.indexOf(CATEGORY_VISIBILITY_CEILING[obj.category])) {
+      errors.push(`${type}.visibility — « ${obj.visibility} » dépasse le plafond de la catégorie « ${obj.category} » (${CATEGORY_VISIBILITY_CEILING[obj.category]})`);
+    }
+  }
+
+  /* Règles métier */
+  if (type === 'action') {
+    /* Le registre est la seule source du coût d'une action : un appel ne
+       peut pas se déclarer moins risqué que ce que son verbe implique. */
+    const spec = ACTION_VERBS[obj.verb];
+    if (!spec) {
+      errors.push(`action.verb — « ${obj.verb} » hors du registre (${Object.keys(ACTION_VERBS).join(', ')})`);
+    } else {
+      for (const [k, v] of [['scope', spec.scope], ['risk', spec.risk],
+                            ['reversible', spec.reversible], ['permission_required', spec.permission]]) {
+        if (obj[k] !== undefined && obj[k] !== v) {
+          errors.push(`action.${k} — « ${obj[k]} » contredit le registre (« ${v} ») : le coût d'une action n'est pas négociable`);
+        }
+      }
+    }
+    if (obj.status === 'executed' && !obj.executed_at) {
+      errors.push('action.executed_at — une action exécutée sans horodatage est intraçable');
+    }
+  }
+  if (type === 'grant') {
+    /* Un partage perpétuel n'est pas un droit, c'est un abandon. */
+    if (!obj.expires_at) errors.push('grant.expires_at — un partage sans échéance n\'est pas révocable');
+    else if (!ISO.test(String(obj.expires_at))) errors.push('grant.expires_at — date ISO attendue');
+    if (obj.revoked_at !== undefined && obj.revoked_at !== null && !ISO.test(String(obj.revoked_at))) {
+      errors.push('grant.revoked_at — date ISO attendue');
+    }
+    if (!obj.purpose) errors.push('grant.purpose — un partage sans finalité ne peut pas être évalué');
+  }
+  if (type === 'tombstone') {
+    /* Le contenu supprimé ne doit pas survivre sous un autre nom. */
+    for (const forbidden of ['content', 'display_name', 'title', 'body', 'value']) {
+      if (obj[forbidden] !== undefined) {
+        errors.push(`tombstone.${forbidden} — une pierre tombale ne conserve pas le contenu supprimé`);
+      }
+    }
+  }
+  if (type === 'relation') {
+    if (obj.from_id === obj.to_id) errors.push('relation.from_id — une entité ne peut pas être en relation avec elle-même');
+    if (!RELATION_TYPES.includes(obj.relation_type)) {
+      errors.push(`relation.relation_type — « ${obj.relation_type} » hors vocabulaire`);
+    }
+  }
+  if (type === 'proposal') {
+    /* Une proposition vise un objet existant — sauf lorsqu'elle propose de
+       créer quelque chose de nouveau, auquel cas il n'y a pas de cible et
+       `target_id` vaut null. C'est la seule raison admise : un target_id
+       absent par oubli reste une erreur. */
+    const kind = obj.requested_change?.kind;
+    if (obj.target_id === null || obj.target_id === undefined) {
+      if (!CREATION_KINDS.includes(kind)) {
+        errors.push(`proposal.target_id — aucune cible, et « ${kind} » n'est pas un type de création (${CREATION_KINDS.join(', ')})`);
+      }
+    } else if (typeof obj.target_id !== 'string' || !obj.target_id) {
+      errors.push('proposal.target_id — identifiant canonique attendu, ou null pour une création');
+    }
+  }
+  if (type === 'proposal') {
+    /* Le cœur du système : une proposition porte sa preuve et son auteur. */
+    if (!Array.isArray(obj.evidence) || obj.evidence.length === 0) {
+      errors.push('proposal.evidence — une proposition sans évidence ne peut pas être évaluée');
+    } else {
+      for (const [i, e] of obj.evidence.entries()) {
+        if (!EPISTEMIC_KEYS.includes(e.state)) {
+          errors.push(`proposal.evidence[${i}].state — « ${e.state} » hors du vocabulaire`);
+        }
+        if (!e.ref) errors.push(`proposal.evidence[${i}].ref — chaque évidence cite sa source`);
+      }
+    }
+    if (!PROPOSAL_STATUS.includes(obj.status)) {
+      errors.push(`proposal.status — « ${obj.status} » hors (${PROPOSAL_STATUS.join(', ')})`);
+    }
+  }
+  if (type === 'decision') {
+    if (!['accepted', 'rejected', 'deferred'].includes(obj.decision)) {
+      errors.push(`decision.decision — « ${obj.decision} » hors (accepted, rejected, deferred)`);
+    }
+    if (!obj.actor) errors.push('decision.actor — une décision sans auteur n\'est pas attribuable');
+  }
+  if (type === 'proof') {
+    if (!obj.evidence_ref) errors.push('proof.evidence_ref — une preuve sans référence n\'en est pas une');
+    if (!ISO.test(String(obj.captured_at))) errors.push('proof.captured_at — date ISO attendue');
+  }
+
+  return errors;
+}
+
+/** Champs propres réellement obligatoires, par entité. */
+const REQUIRED_FIELDS = {
+  person: ['display_name'],
+  organization: ['display_name'],
+  project: ['title', 'owner_id'],
+  relation: ['from_id', 'relation_type', 'to_id'],
+  event: ['type', 'start_at'],
+  proposal: ['requested_change', 'author'],
+  decision: ['target_id', 'decision', 'actor'],
+  proof: ['target_id', 'proof_type'],
+  action: ['verb', 'scope', 'risk', 'permission_required'],
+  grant: ['target_id', 'grantee', 'purpose'],
+  tombstone: ['target_id', 'target_type', 'deleted_by', 'deleted_at'],
+};
+
+/** Types de relation, d'après DATA-MODEL-V1 §2 (PERSON / ORGANIZATION). */
+export const RELATION_TYPES = [
+  'owns', 'collaborates_with', 'client_of', 'member_of',
+  'validates', 'provides', 'intervenes_on', 'takes_place_at', 'covers',
+];
+
+/**
+ * Un objet est-il un fait établi ? Une proposition ne l'est jamais,
+ * quelle que soit sa confiance : seul un humain établit un fait.
+ */
+export function isEstablished(obj) {
+  const st = EPISTEMIC_STATES.find((s) => s.key === obj?.provenance?.state);
+  return Boolean(st?.established) && obj?.status !== 'open';
+}

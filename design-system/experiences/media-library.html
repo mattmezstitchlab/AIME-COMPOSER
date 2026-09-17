@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="fr" data-aime-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="a-root" content="../">
+<title>Médiathèque — AIME</title>
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../styles/foundations.css">
+<link rel="stylesheet" href="../styles/layout.css">
+<link rel="stylesheet" href="../styles/components.css">
+<link rel="stylesheet" href="../styles/aime.css">
+<link rel="stylesheet" href="../styles/noema.css">
+<link rel="stylesheet" href="../styles/patterns.css">
+<link rel="stylesheet" href="../styles/dataviz.css">
+<link rel="stylesheet" href="../styles/doc.css">
+<script src="../js/doc.js" defer></script>
+<script src="../js/aime-ui.js" defer></script>
+</head>
+<body>
+<div class="ds-shell">
+<main class="ds-main l-page">
+
+  <header class="ohead">
+    <nav aria-label="Fil d'ariane"><ol class="a-crumbs"><li><a href="bureau.html">Atelier Nord</a><span class="a-crumbs__sep" aria-hidden="true">/</span></li><li><span aria-current="page">Médiathèque</span></li></ol></nav>
+    <div class="ohead__title-row">
+      <span class="ohead__mark"><svg class="a-ic a-ic--lg" aria-hidden="true" width="24" height="24"><use data-a-icon="med-library"/></svg></span>
+      <div class="ohead__titles"><span class="t-meta">12 assets · 3 collections</span><h1 class="t-h1">Médiathèque</h1></div>
+      <span class="l-spacer"></span>
+      <span class="ohead__actions"><button type="button" class="a-btn a-btn--sm">Importer</button><button type="button" class="a-btn a-btn--sm a-btn--primary">Nouvelle collection</button></span>
+    </div>
+  </header>
+
+  <div class="a-search l-measure-md">
+    <svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="src-search"/></svg>
+    <label class="u-sr" for="ml-search">Rechercher un asset</label>
+    <input class="a-search__input" id="ml-search" type="search" placeholder="Nom, collection, usage…" autocomplete="off">
+  </div>
+
+  <section class="ds-block" aria-labelledby="assets">
+    <h2 class="t-h2" id="assets">Assets</h2>
+    <div class="ds-rule">
+      <p class="ds-rule__title">Règle</p>
+      <p>Un asset existe une fois. Chaque carte indique le nombre de compositions qui l'utilisent : supprimer un asset utilisé doit être impossible sans traiter ses usages.</p>
+    </div>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--grid">
+        <article class="ucard is-selected">
+          <div class="ucard__media"><div class="umedia" data-format="3-2"><span class="umedia__label">asset-0087</span></div></div>
+          <div class="ucard__id"><span class="ucard__mark" data-type="media"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="med-image"/></svg></span><span class="ucard__head"><span class="ucard__type">Image</span><span class="ucard__title">asset-0087</span></span></div>
+          <dl class="ucard__facts">
+            <div class="ucard__fact"><dt>Usages</dt><dd>3 compositions</dd></div>
+            <div class="ucard__fact"><dt>Droits</dt><dd class="u-error">Expire le 30 sept.</dd></div>
+          </dl>
+          <div class="ucard__foot"><span class="a-badge a-badge--error">action requise</span><button type="button" class="prov" aria-expanded="false"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="prf-evidence"/></svg>source</button></div>
+        </article>
+        <article class="ucard">
+          <div class="ucard__media"><div class="umedia" data-format="1-1"><span class="umedia__label">asset-0091</span></div></div>
+          <div class="ucard__id"><span class="ucard__mark" data-type="media"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="med-image"/></svg></span><span class="ucard__head"><span class="ucard__type">Image</span><span class="ucard__title">asset-0091</span></span></div>
+          <dl class="ucard__facts"><div class="ucard__fact"><dt>Usages</dt><dd>1 composition</dd></div><div class="ucard__fact"><dt>Droits</dt><dd class="u-success">Libre</dd></div></dl>
+        </article>
+        <article class="ucard">
+          <div class="ucard__media"><div class="umedia" data-format="16-9"><span class="umedia__label">asset-0104</span></div></div>
+          <div class="ucard__id"><span class="ucard__mark" data-type="media"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="med-video"/></svg></span><span class="ucard__head"><span class="ucard__type">Vidéo</span><span class="ucard__title">asset-0104</span></span></div>
+          <dl class="ucard__facts"><div class="ucard__fact"><dt>Durée</dt><dd class="u-mono">01:24</dd></div><div class="ucard__fact"><dt>Usages</dt><dd class="is-unknown">Aucun</dd></div></dl>
+        </article>
+        <article class="ucard">
+          <div class="ucard__media"><div class="umedia" data-format="16-9"><span class="umedia__label">asset-0110 · forme d'onde</span></div></div>
+          <div class="ucard__id"><span class="ucard__mark" data-type="media"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="med-audio"/></svg></span><span class="ucard__head"><span class="ucard__type">Audio</span><span class="ucard__title">asset-0110</span></span></div>
+          <dl class="ucard__facts"><div class="ucard__fact"><dt>Durée</dt><dd class="u-mono">03:48</dd></div><div class="ucard__fact"><dt>Usages</dt><dd>2 compositions</dd></div></dl>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="usages">
+    <h2 class="t-h2" id="usages">Usages de la sélection</h2>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--col">
+        <div class="viz-proof l-measure-lg">
+          <div class="viz-proof__step" data-state="confirmed"><span class="viz-proof__dot" aria-hidden="true"></span><span class="viz-proof__body"><span class="t-body-sm u-strong">Page d'accueil — Atelier Nord</span><span class="t-caption">section héros · calque 1 · v1.0.4</span></span></div>
+          <div class="viz-proof__step" data-state="confirmed"><span class="viz-proof__dot" aria-hidden="true"></span><span class="viz-proof__body"><span class="t-body-sm u-strong">Affiche — version 3</span><span class="t-caption">fond · recadré 3:2 · en attente d'approbation</span></span></div>
+          <div class="viz-proof__step" data-state="proposed"><span class="viz-proof__dot" aria-hidden="true"></span><span class="viz-proof__body"><span class="t-body-sm u-strong">Annonce réseaux</span><span class="t-caption">proposé par NOEMA · non autorisé</span></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <nav class="ds-pager" aria-label="Navigation d'écran">
+    <a href="grid.html"><small>20.5 — précédent</small><span class="t-body u-strong">Grille</span></a>
+    <a href="noema.html"><small>20.8 — suivant</small><span class="t-body u-strong">NOEMA</span></a>
+  </nav>
+
+</main>
+</div>
+</body>
+</html>

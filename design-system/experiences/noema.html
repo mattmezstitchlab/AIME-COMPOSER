@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="fr" data-aime-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="a-root" content="../">
+<title>NOEMA — AIME</title>
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../styles/foundations.css">
+<link rel="stylesheet" href="../styles/layout.css">
+<link rel="stylesheet" href="../styles/components.css">
+<link rel="stylesheet" href="../styles/aime.css">
+<link rel="stylesheet" href="../styles/noema.css">
+<link rel="stylesheet" href="../styles/patterns.css">
+<link rel="stylesheet" href="../styles/dataviz.css">
+<link rel="stylesheet" href="../styles/doc.css">
+<script src="../js/doc.js" defer></script>
+<script src="../js/aime-ui.js" defer></script>
+</head>
+<body>
+<div class="ds-shell">
+<main class="ds-main l-page">
+
+  <header class="ohead">
+    <nav aria-label="Fil d'ariane"><ol class="a-crumbs"><li><a href="bureau.html">Atelier Nord</a><span class="a-crumbs__sep" aria-hidden="true">/</span></li><li><span aria-current="page">NOEMA</span></li></ol></nav>
+    <div class="ohead__title-row">
+      <span class="ohead__mark"><span class="noema-mark"><svg class="a-ic a-ic--lg noema-mark__glyph" aria-hidden="true" width="24" height="24"><use data-a-icon="noe-mark"/></svg></span></span>
+      <div class="ohead__titles"><span class="t-meta">Couche NOEMA · observation continue</span><h1 class="t-h1">Ce que NOEMA sait</h1></div>
+      <span class="l-spacer"></span>
+      <span class="ohead__actions"><label class="a-toggle"><input type="checkbox" checked><span class="a-toggle__track"><span class="a-toggle__thumb"></span></span><span class="a-toggle__text">Autoriser les propositions</span></label></span>
+    </div>
+  </header>
+
+  <section class="ds-block" aria-labelledby="file">
+    <h2 class="t-h2" id="file">File de décision</h2>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--col">
+        <article class="noema-card noema-rail" data-certainty="proposed">
+          <div class="noema-card__head">
+            <span class="noema-card__kind"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="noe-proposed"/></svg>Proposal</span>
+            <span class="nstate" data-state="proposed"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-proposed"/></svg>Proposé</span>
+          </div>
+          <p class="noema-card__title">Décaler la répétition générale au 24 septembre</p>
+          <ul class="noema-card__list">
+            <li><strong>Observé</strong> — deux indisponibilités déclarées</li>
+            <li><strong>Déduit</strong> — la salle reste libre le 24, non confirmé par le lieu</li>
+          </ul>
+          <div class="noema-card__foot">
+            <button type="button" class="a-btn a-btn--sm a-btn--primary">Valider</button>
+            <button type="button" class="a-btn a-btn--sm">Modifier</button>
+            <button type="button" class="a-btn a-btn--sm a-btn--ghost">Refuser</button>
+            <span class="l-spacer"></span>
+            <button type="button" class="prov" aria-expanded="false"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="prf-evidence"/></svg>Provenance</button>
+          </div>
+        </article>
+
+        <article class="noema-card noema-card--question noema-rail noema-rail--muted" data-certainty="uncertain">
+          <div class="noema-card__head">
+            <span class="noema-card__kind"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="com-message"/></svg>Question</span>
+            <span class="noema-unknown"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-inferred"/></svg>Information manquante</span>
+          </div>
+          <p class="noema-card__title">Quelle capacité pour la salle des Fêtes ?</p>
+          <p class="noema-card__body">Cette donnée conditionne le format de l'affiche et le nombre de places annoncées.</p>
+          <div class="noema-card__foot">
+            <div class="a-field l-measure-sm"><label class="a-field__label" for="nx-cap">Capacité</label><input class="a-input" id="nx-cap" type="number" placeholder="ex. 180"></div>
+            <button type="button" class="a-btn a-btn--sm">Enregistrer</button>
+            <button type="button" class="a-text-btn">Passer</button>
+          </div>
+        </article>
+
+        <article class="noema-card noema-card--alert noema-rail noema-rail--muted" data-certainty="uncertain" data-severity="high">
+          <div class="noema-card__head">
+            <span class="noema-card__kind"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="com-alert"/></svg>Alert</span>
+            <span class="a-badge a-badge--error">élevée</span>
+          </div>
+          <p class="noema-card__title">Droits d'image expirés pour l'asset 0087</p>
+          <div class="noema-card__foot"><button type="button" class="a-btn a-btn--sm">Voir les compositions</button></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="observe">
+    <h2 class="t-h2" id="observe">Journal d'observation</h2>
+    <div class="ds-demo">
+      <div class="ds-demo__stage">
+        <div class="utl l-measure-xl">
+          <div class="utl__list">
+            <article class="utl__item"><span class="utl__marker" data-kind="proof" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">16:20</span><span class="utl__title">Indisponibilité déclarée par L. Ferrand</span><span class="nstate" data-state="observed"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-observed"/></svg>Observé</span></div></article>
+            <article class="utl__item"><span class="utl__marker" data-kind="document" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">15:04</span><span class="utl__title">Calendrier de production mis à jour</span><span class="nstate" data-state="extracted"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-extracted"/></svg>Extrait</span></div></article>
+            <article class="utl__item"><span class="utl__marker" data-kind="change" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">14:02</span><span class="utl__title">Titre modifié — impact sur 4 sections</span><span class="nstate" data-state="inferred"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-inferred"/></svg>Déduit</span></div></article>
+            <article class="utl__item"><span class="utl__marker" data-kind="decision" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">09:15</span><span class="utl__title">Proposition de report refusée par A. Meunier</span><span class="nstate" data-state="superseded"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-superseded"/></svg>Superseded</span></div></article>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="silence">
+    <h2 class="t-h2" id="silence">Ce que NOEMA ne dit pas</h2>
+    <div class="ds-demo">
+      <div class="ds-demo__stage">
+        <div class="a-state l-measure-md">
+          <span class="a-state__icon"><svg class="a-ic a-ic--lg" aria-hidden="true" width="24" height="24"><use data-a-icon="noe-mark"/></svg></span>
+          <p class="t-h3">Aucune autre proposition</p>
+          <p class="t-body-sm u-muted">Rien d'autre n'atteint le seuil de confiance nécessaire. NOEMA continue d'observer sans intervenir.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <nav class="ds-pager" aria-label="Navigation d'écran">
+    <a href="media-library.html"><small>20.7 — précédent</small><span class="t-body u-strong">Médiathèque</span></a>
+    <a href="public-site.html"><small>20.9 — suivant</span><span class="t-body u-strong">Site public</span></a>
+  </nav>
+
+</main>
+</div>
+</body>
+</html>

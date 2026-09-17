@@ -1,0 +1,97 @@
+/* ══════════════════════════════════════════════════════════════
+   AIME DESIGN SYSTEM V1 — DATA VISUALIZATION
+
+   LANGAGE : éditorial, pas financier.
+   1. Les données sont en encre ; le fuchsia ne marque QUE l'élément
+      concerné par la décision en cours.
+   2. Aucun dégradé, aucune 3D, aucune ombre portée sur une donnée.
+   3. Pas de camembert, pas de jauge, pas d'axe décoratif.
+   4. Les nombres sont en mono, tabulaires, alignés.
+   5. Une courbe n'est utilisée que si le temps est réellement l'axe.
+   6. Toute visualisation expose sa source (provenance).
+   ══════════════════════════════════════════════════════════════ */
+
+.viz { display: grid; gap: var(--aime-space-4); }
+.viz__head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--aime-space-3); flex-wrap: wrap; }
+.viz__foot { display: flex; align-items: center; gap: var(--aime-space-4); flex-wrap: wrap; }
+.viz__axis {
+  display: flex; justify-content: space-between;
+  padding-block-start: var(--aime-space-1); border-top: var(--aime-border-subtle);
+  font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size);
+  letter-spacing: var(--aime-text-meta-ls); color: var(--aime-color-text-subtle);
+  font-variant-numeric: tabular-nums;
+}
+.viz__legend { display: flex; align-items: center; gap: var(--aime-space-4); flex-wrap: wrap; }
+.viz__legend span { display: inline-flex; align-items: center; gap: var(--aime-space-2); font-size: var(--aime-text-meta-size); font-family: var(--aime-font-mono); letter-spacing: var(--aime-text-meta-ls); text-transform: uppercase; color: var(--aime-color-text-subtle); }
+.viz__legend i { width: 10px; height: 10px; border-radius: var(--aime-radius-small); background: var(--aime-color-border-strong); }
+.viz__legend i[data-role='accent'] { background: var(--aime-color-accent); }
+.viz__legend i[data-role='success'] { background: var(--aime-color-success-border); }
+.viz__legend i[data-role='warning'] { background: var(--aime-color-warning-border); }
+.viz__legend i[data-role='proposed'] { background: transparent; border: var(--aime-border-width-strong) dashed var(--aime-color-accent); }
+
+/* Barres horizontales — la comparaison par longueur est la plus lisible */
+.viz-bars { display: grid; gap: var(--aime-space-3); }
+.viz-bars__row { display: grid; grid-template-columns: minmax(96px, auto) minmax(0, 1fr) auto; align-items: center; gap: var(--aime-space-3); }
+.viz-bars__label { font-size: var(--aime-text-caption-size); color: var(--aime-color-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.viz-bars__track { position: relative; height: 8px; border-radius: var(--aime-radius-pill); background: var(--aime-color-surface-overlay); overflow: hidden; }
+.viz-bars__fill { position: absolute; inset-block: 0; inset-inline-start: 0; width: calc(var(--a-value, 0) * 1%); background: var(--aime-color-border-strong); border-radius: var(--aime-radius-pill); transition: width var(--aime-motion-slow) var(--aime-ease-out); }
+.viz-bars__row[data-role='accent'] .viz-bars__fill { background: var(--aime-color-accent); }
+.viz-bars__row[data-role='success'] .viz-bars__fill { background: var(--aime-color-success-border); }
+.viz-bars__row[data-role='warning'] .viz-bars__fill { background: var(--aime-color-warning-border); }
+.viz-bars__row[data-certainty='proposed'] .viz-bars__fill {
+  background: repeating-linear-gradient(90deg, var(--aime-color-accent) 0 4px, transparent 4px 8px);
+}
+.viz-bars__value { font-family: var(--aime-font-mono); font-size: var(--aime-text-caption-size); font-variant-numeric: tabular-nums; color: var(--aime-color-text); text-align: end; min-width: 44px; }
+
+/* Colonnes — pour une quantité par période, jamais plus de 12 */
+.viz-cols { display: grid; gap: var(--aime-space-2); align-items: end; height: 120px; }
+.viz-cols__col { display: grid; grid-template-rows: 1fr auto; gap: var(--aime-space-2); align-items: end; min-width: 0; }
+.viz-cols__bar { width: 100%; height: calc(var(--a-value, 0) * 1%); background: var(--aime-color-border-strong); border-radius: var(--aime-radius-small) var(--aime-radius-small) 0 0; transition: height var(--aime-motion-slow) var(--aime-ease-out); }
+.viz-cols__col[data-role='accent'] .viz-cols__bar { background: var(--aime-color-accent); }
+.viz-cols__col[data-certainty='proposed'] .viz-cols__bar { background: repeating-linear-gradient(0deg, var(--aime-color-accent) 0 4px, transparent 4px 8px); }
+.viz-cols__key { font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size); letter-spacing: 0; color: var(--aime-color-text-subtle); text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Graphe relationnel — traits droits ou coudés, jamais une soupe de courbes */
+.viz-graph { position: relative; width: 100%; overflow: hidden; border: var(--aime-border-subtle); border-radius: var(--aime-radius-medium); background: var(--aime-color-surface-sunken); }
+.viz-graph svg { width: 100%; height: auto; display: block; }
+.viz-graph__edge { stroke: var(--aime-color-border-strong); stroke-width: 1.5; fill: none; }
+.viz-graph__edge[data-certainty='proposed'] { stroke: var(--aime-color-accent); stroke-dasharray: 4 3; }
+.viz-graph__edge.is-active { stroke: var(--aime-color-accent); stroke-width: 2; }
+.viz-graph__node { fill: var(--aime-color-surface-elevated); stroke: var(--aime-color-border-strong); stroke-width: 1.5; }
+.viz-graph__node.is-active { stroke: var(--aime-color-accent); stroke-width: 2; }
+.viz-graph__node[data-kind='proposal'] { stroke-dasharray: 3 2; stroke: var(--aime-color-accent); }
+.viz-graph__label { fill: var(--aime-color-text); font-family: var(--aime-font-sans); font-size: var(--aime-text-caption-size); }
+.viz-graph__sub { fill: var(--aime-color-text-subtle); font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size); letter-spacing: var(--aime-text-meta-ls); text-transform: uppercase; }
+
+/* Matrice d'états — la densité sans le bruit */
+.viz-matrix { display: grid; gap: var(--aime-space-1); grid-template-columns: repeat(var(--a-cols, 8), minmax(0, 1fr)); }
+.viz-matrix__cell {
+  aspect-ratio: 1; border-radius: var(--aime-radius-small);
+  background: var(--aime-color-surface-overlay);
+}
+.viz-matrix__cell[data-level='1'] { background: var(--aime-color-border); }
+.viz-matrix__cell[data-level='2'] { background: var(--aime-color-border-strong); }
+.viz-matrix__cell[data-level='3'] { background: var(--aime-color-text-muted); }
+.viz-matrix__cell[data-level='focus'] { background: var(--aime-color-accent); }
+
+/* Chaîne de preuve — chaque maillon expose sa source */
+.viz-proof { display: grid; gap: 0; }
+.viz-proof__step { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--aime-space-3); padding-block: var(--aime-space-3); border-top: var(--aime-border-subtle); }
+.viz-proof__step:first-child { border-top: 0; }
+.viz-proof__dot { position: relative; width: 12px; height: 12px; margin-block-start: var(--aime-space-1); border: var(--aime-border-width-strong) solid var(--aime-color-border-strong); border-radius: var(--aime-radius-pill); background: var(--aime-color-background); }
+/* Les six états épistémiques, lus depuis les jetons d'état. Un maillon
+   observé, extrait, déduit, proposé, confirmé ou remplacé se distingue
+   par la forme de son arête — pas seulement par sa couleur. */
+.viz-proof__step[data-state='observed'] .viz-proof__dot   { border-color: var(--aime-state-observed-bd); border-style: dotted; }
+.viz-proof__step[data-state='extracted'] .viz-proof__dot  { border-color: var(--aime-state-extracted-bd); border-style: dashed; }
+.viz-proof__step[data-state='inferred'] .viz-proof__dot   { border-color: var(--aime-state-inferred-bd); border-style: dashed; }
+.viz-proof__step[data-state='proposed'] .viz-proof__dot   { border-color: var(--aime-state-proposed-bd); border-style: dashed; }
+.viz-proof__step[data-state='confirmed'] .viz-proof__dot  { border-color: var(--aime-state-confirmed-bd); background: var(--aime-state-confirmed-bd); }
+.viz-proof__step[data-state='superseded'] .viz-proof__dot { border-color: var(--aime-state-superseded-bd); background: var(--aime-state-superseded-bd); opacity: .6; }
+.viz-proof__step[data-state='missing'] .viz-proof__dot { border-color: var(--aime-color-warning-border); }
+.viz-proof__body { display: grid; gap: var(--aime-space-1); }
+
+/* Étincelle — tendance minimale, sans axe ni grille */
+.viz-spark { display: block; width: 100%; height: 32px; }
+.viz-spark path { fill: none; stroke: var(--aime-color-border-strong); stroke-width: 1.5; }
+.viz-spark path[data-role='accent'] { stroke: var(--aime-color-accent); }

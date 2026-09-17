@@ -1,0 +1,407 @@
+/* ══════════════════════════════════════════════════════════════
+   AIME DESIGN SYSTEM V1 — COUCHE 4a : COMPOSANTS AIME
+   Les cinq organes visuels. Chacun projette un objet canonique ;
+   aucun ne crée de modèle parallèle.
+
+   CARTE UNIVERSELLE → QUI / QUOI
+   MÉDIA UNIVERSEL   → ASSET
+   TIMELINE          → QUAND
+   GRILLE            → OÙ / FORMAT
+   COMPOSER          → COMMENT
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── 4a.1 CARTE UNIVERSELLE ─────────────────────────────────────
+   Le CADRE ne change jamais. Seul le contenu s'adapte au type.
+   Une carte Personne et une carte Document sont indiscernables
+   structurellement : c'est la condition de la réutilisation. */
+.ucard {
+  display: grid;
+  gap: var(--aime-space-3);
+  padding: var(--aime-space-4);
+  border: var(--aime-border-default);
+  border-radius: var(--aime-radius-large);
+  background: var(--aime-color-surface);
+  transition: border-color var(--aime-motion-fast) var(--aime-ease-out), background-color var(--aime-motion-fast) var(--aime-ease-out);
+}
+.ucard:hover { border-color: var(--aime-color-border-strong); }
+.ucard.is-selected { border-color: var(--aime-color-accent); background: var(--aime-color-accent-subtle); }
+.ucard.is-proposed { border-style: dashed; border-color: var(--aime-color-accent); }
+.ucard.is-superseded { opacity: .6; }
+.ucard.is-superseded .ucard__title { text-decoration: line-through; }
+
+.ucard__id { display: flex; align-items: center; gap: var(--aime-space-3); min-width: 0; }
+.ucard__mark {
+  display: grid; place-items: center; flex: none;
+  width: var(--aime-control-md); height: var(--aime-control-md);
+  border: var(--aime-border-default);
+  border-radius: var(--aime-radius-medium);
+  background: var(--aime-color-surface-elevated);
+  color: var(--aime-color-text-muted);
+}
+/* Le type est porté par le glyphe et le libellé, jamais par une couleur */
+.ucard__mark[data-type='person'],
+.ucard__mark[data-type='organization'] { border-radius: var(--aime-radius-medium); }
+.ucard__mark[data-type='relation'] { color: var(--aime-color-accent-text); }
+.ucard__head { display: grid; gap: var(--aime-space-1); min-width: 0; }
+.ucard__type {
+  font-family: var(--aime-font-mono);
+  font-size: var(--aime-text-meta-size);
+  letter-spacing: var(--aime-text-meta-ls);
+  text-transform: uppercase;
+  color: var(--aime-color-text-subtle);
+}
+.ucard__title {
+  font-size: var(--aime-text-body-size);
+  font-weight: var(--aime-font-semibold);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.ucard__sub { font-size: var(--aime-text-caption-size); color: var(--aime-color-text-muted); overflow-wrap: anywhere; }
+
+/* Faits : une liste de définitions, jamais une mise en page libre */
+.ucard__facts { display: grid; gap: var(--aime-space-1); margin: 0; }
+.ucard__fact {
+  display: grid; grid-template-columns: minmax(88px, auto) minmax(0, 1fr);
+  gap: var(--aime-space-3); align-items: baseline;
+  padding-block: var(--aime-space-2);
+  border-top: var(--aime-border-subtle);
+}
+.ucard__fact dt {
+  font-family: var(--aime-font-mono);
+  font-size: var(--aime-text-meta-size);
+  letter-spacing: var(--aime-text-meta-ls);
+  text-transform: uppercase;
+  color: var(--aime-color-text-subtle);
+}
+.ucard__fact dd { margin: 0; font-size: var(--aime-text-body-small-size); overflow-wrap: anywhere; }
+/* .is-unknown est un état sémantique général : voir foundations.css §2.7. */
+
+.ucard__foot { display: flex; align-items: center; justify-content: space-between; gap: var(--aime-space-3); flex-wrap: wrap; }
+.ucard__media { border-radius: var(--aime-radius-medium); overflow: hidden; border: var(--aime-border-subtle); }
+
+/* Variantes de densité — même structure, même cadre */
+.ucard--inline { grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--aime-space-3); padding: var(--aime-space-3); border-radius: var(--aime-radius-medium); }
+.ucard--tile { gap: var(--aime-space-4); }
+.ucard--full { padding: var(--aime-space-6); }
+
+/* ── 4a.2 MÉDIA UNIVERSEL ─────────────────────────────────────
+   Un asset, plusieurs contextes, aucune duplication. */
+.umedia {
+  position: relative;
+  display: block; width: 100%;
+  border: var(--aime-border-subtle);
+  border-radius: var(--aime-radius-medium);
+  background: var(--aime-color-surface-sunken);
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+}
+.umedia[data-format='1-1'] { aspect-ratio: 1 / 1; }
+.umedia[data-format='4-5'] { aspect-ratio: 4 / 5; }
+.umedia[data-format='16-9'] { aspect-ratio: 16 / 9; }
+.umedia[data-format='9-16'] { aspect-ratio: 9 / 16; }
+.umedia[data-format='3-2'] { aspect-ratio: 3 / 2; }
+.umedia[data-format='a4'] { aspect-ratio: 210 / 297; }
+.umedia img, .umedia video { width: 100%; height: 100%; object-fit: cover; }
+.umedia--contain img { object-fit: contain; }
+.umedia__label {
+  position: absolute; inset-block-end: var(--aime-space-2); inset-inline-start: var(--aime-space-2);
+  display: inline-flex; align-items: center; height: 20px;
+  padding-inline: var(--aime-space-2);
+  border-radius: var(--aime-radius-small);
+  background: var(--aime-color-background);
+  color: var(--aime-color-text);
+  font-family: var(--aime-font-mono);
+  font-size: var(--aime-text-meta-size);
+  letter-spacing: var(--aime-text-meta-ls);
+  text-transform: uppercase;
+  opacity: .92;
+}
+.umedia__reuse {
+  position: absolute; inset-block-start: var(--aime-space-2); inset-inline-end: var(--aime-space-2);
+  display: inline-flex; align-items: center; gap: var(--aime-space-1);
+  height: 20px;
+  padding-inline: var(--aime-space-2);
+  border-radius: var(--aime-radius-pill);
+  background: var(--aime-color-background);
+  color: var(--aime-color-text-muted);
+  font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size);
+}
+.umedia.is-empty {
+  display: grid; place-items: center; gap: var(--aime-space-2);
+  border-style: dashed; border-color: var(--aime-color-border-strong);
+  color: var(--aime-color-text-subtle);
+}
+.umedia.is-selected { border-color: var(--aime-color-accent); border-width: var(--aime-border-width-strong); }
+
+/* Emplacement média : la place est certaine, l'asset peut ne pas l'être */
+.aslot { display: grid; gap: var(--aime-space-2); }
+.aslot__caption { display: flex; align-items: center; gap: var(--aime-space-2); font-size: var(--aime-text-caption-size); color: var(--aime-color-text-muted); }
+
+/* ── 4a.3 TIMELINE UNIVERSELLE ────────────────────────────────
+   Un seul moteur, six modes. Le mode change la projection, pas les données.
+   Orientation : verticale en lecture, horizontale en composition. */
+.utl { --utl-axis: 20px; display: grid; gap: 0; position: relative; }
+.utl__head {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--aime-space-3);
+  padding-block-end: var(--aime-space-3); flex-wrap: wrap;
+}
+.utl__modes { display: flex; gap: var(--aime-space-1); overflow-x: auto; scrollbar-width: none; }
+.utl__modes::-webkit-scrollbar { display: none; }
+
+/* Axe vertical (défaut) */
+.utl__list { position: relative; display: grid; gap: 0; padding-inline-start: var(--aime-space-6); }
+.utl__list::before {
+  content: ''; position: absolute; inset-block: 0; inset-inline-start: 8px;
+  width: 1px; background: var(--aime-color-border);
+}
+.utl__item {
+  position: relative;
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--aime-space-2);
+  padding-block: var(--aime-space-3);
+  border-bottom: var(--aime-border-subtle);
+  transition: background-color var(--aime-motion-fast) var(--aime-ease-out);
+}
+.utl__item:hover { background: var(--aime-color-surface); }
+.utl__item.is-selected { background: var(--aime-color-accent-subtle); }
+.utl__item:last-child { border-bottom: 0; }
+
+/* Marqueur : la FORME distingue le type, la couleur ne fait que renforcer */
+.utl__marker {
+  position: absolute; inset-inline-start: calc(var(--aime-space-6) * -1 + 2px); inset-block-start: calc(var(--aime-space-3) + 4px);
+  width: 12px; height: 12px;
+  border: var(--aime-border-width-strong) solid var(--aime-color-border-strong);
+  background: var(--aime-color-background);
+  border-radius: var(--aime-radius-pill);
+}
+.utl__marker[data-kind='decision'] { border-radius: 0; transform: rotate(45deg); }
+.utl__marker[data-kind='proposal'] { border-style: dashed; border-color: var(--aime-color-accent); border-radius: 0; }
+.utl__marker[data-kind='task'] { border-radius: var(--aime-radius-small); }
+.utl__marker[data-kind='document'] { border-radius: var(--aime-radius-small); height: 14px; width: 10px; }
+.utl__marker[data-kind='communication'] { border-radius: var(--aime-radius-pill); box-shadow: inset 0 0 0 2px var(--aime-color-background); }
+.utl__marker[data-kind='publication'] { border: 0; width: 0; height: 0; border-inline: 6px solid transparent; border-block-end: 11px solid var(--aime-color-border-strong); background: none; }
+.utl__marker[data-kind='proof'] { border-radius: var(--aime-radius-small); border-color: var(--aime-color-success-border); }
+.utl__marker[data-kind='change'] {
+  border-radius: var(--aime-radius-pill);
+  background: linear-gradient(90deg, var(--aime-color-border-strong) 50%, var(--aime-color-background) 50%);
+}
+.utl__item[data-state='proposed'] .utl__marker { border-style: dashed; border-color: var(--aime-color-accent); }
+.utl__item[data-state='confirmed'] .utl__marker { background: var(--aime-color-accent); border-color: var(--aime-color-accent); }
+
+.utl__row { display: flex; align-items: baseline; gap: var(--aime-space-3); flex-wrap: wrap; }
+.utl__when {
+  font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size);
+  letter-spacing: var(--aime-text-meta-ls); text-transform: uppercase;
+  color: var(--aime-color-text-subtle); font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.utl__title { font-size: var(--aime-text-body-small-size); font-weight: var(--aime-font-medium); }
+.utl__body { font-size: var(--aime-text-caption-size); color: var(--aime-color-text-muted); max-width: var(--aime-text-body-measure); }
+.utl__refs { display: flex; gap: var(--aime-space-2); flex-wrap: wrap; align-items: center; }
+.utl__item[data-state='proposed'] { border-inline-start: var(--aime-border-width-strong) dashed var(--aime-color-accent); padding-inline-start: var(--aime-space-3); margin-inline-start: calc(var(--aime-space-3) * -1); }
+
+/* Tête de lecture */
+.utl__now {
+  position: absolute; inset-inline: 0; height: 1px;
+  background: var(--aime-color-accent);
+}
+.utl__now::before {
+  content: attr(data-a-now);
+  position: absolute; inset-inline-start: 0; inset-block-start: calc(var(--aime-space-2) * -1 - 6px);
+  display: inline-flex; align-items: center; height: 16px;
+  padding-inline: var(--aime-space-2);
+  border-radius: var(--aime-radius-small);
+  background: var(--aime-color-accent); color: var(--aime-color-accent-on);
+  font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size); letter-spacing: var(--aime-text-meta-ls);
+}
+
+/* Chapitres */
+.utl__chapter {
+  display: flex; align-items: center; gap: var(--aime-space-3);
+  padding-block: var(--aime-space-3);
+  font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size);
+  letter-spacing: var(--aime-text-meta-ls); text-transform: uppercase;
+  color: var(--aime-color-text-subtle);
+}
+.utl__chapter::after { content: ''; flex: 1; border-top: var(--aime-border-subtle); }
+
+/* Orientation COMPOSE : horizontale, avec pistes */
+.utl--compose .utl__list { padding-inline-start: 0; display: grid; gap: var(--aime-space-2); }
+.utl--compose .utl__list::before { display: none; }
+.utl--compose .utl__lane {
+  position: relative; height: var(--aime-control-lg);
+  border: var(--aime-border-subtle); border-radius: var(--aime-radius-medium);
+  background: var(--aime-color-surface);
+}
+/* Position et durée d'un clip = données, transmises par --a-x et --a-w. */
+.utl--compose .utl__clip {
+  position: absolute; inset-block: 4px;
+  inset-inline-start: calc(var(--a-x, 0) * 1%);
+  width: calc(var(--a-w, 20) * 1%);
+  display: flex; align-items: center; gap: var(--aime-space-2);
+  padding-inline: var(--aime-space-3);
+  border: var(--aime-border-default); border-radius: var(--aime-radius-small);
+  background: var(--aime-color-surface-elevated);
+  font-size: var(--aime-text-caption-size);
+  overflow: hidden; white-space: nowrap;
+  cursor: grab;
+  transition: border-color var(--aime-motion-fast) var(--aime-ease-out);
+}
+.utl--compose .utl__clip:hover { border-color: var(--aime-color-border-strong); }
+.utl--compose .utl__clip.is-selected { border-color: var(--aime-color-accent); border-width: var(--aime-border-width-strong); }
+.utl--compose .utl__clip[data-state='proposed'] { border-style: dashed; border-color: var(--aime-color-accent); }
+.utl__ruler {
+  display: flex; justify-content: space-between;
+  padding-block-end: var(--aime-space-1);
+  border-bottom: var(--aime-border-subtle);
+  font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size);
+  color: var(--aime-color-text-subtle); font-variant-numeric: tabular-nums;
+}
+
+/* ── 4a.4 GRILLE UNIVERSELLE ──────────────────────────────────
+   Un espace de mesure, pas une grille de cartes.
+   Le profil de format établit la géométrie ; la grille ne publie jamais. */
+.ugrid {
+  position: relative;
+  display: grid; place-items: center;
+  padding: var(--aime-space-6);
+  background-color: var(--aime-color-surface-sunken);
+  background-image:
+    linear-gradient(var(--aime-color-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--aime-color-grid-line) 1px, transparent 1px);
+  background-size: var(--aime-space-6) var(--aime-space-6);
+  overflow: auto;
+}
+.ugrid__page {
+  position: relative;
+  width: 100%; max-width: 420px;
+  aspect-ratio: 210 / 297;
+  border: var(--aime-border-default);
+  background: var(--aime-color-surface-elevated);
+  box-shadow: var(--aime-shadow-raise);
+  overflow: hidden;
+}
+.ugrid__page[data-format='a5'] { aspect-ratio: 148 / 210; }
+.ugrid__page[data-format='card'] { aspect-ratio: 85 / 55; max-width: 300px; }
+.ugrid__page[data-format='16-9'] { aspect-ratio: 16 / 9; max-width: 640px; }
+.ugrid__page[data-format='9-16'] { aspect-ratio: 9 / 16; max-width: 240px; }
+.ugrid__page[data-format='1-1'] { aspect-ratio: 1 / 1; max-width: 420px; }
+.ugrid__page[data-format='web'] { aspect-ratio: 16 / 10; max-width: 720px; }
+.ugrid__page[data-format='stitch'] { aspect-ratio: 1 / 1; max-width: 400px; }
+
+.ugrid__cols {
+  position: absolute; inset: var(--aime-space-6);
+  display: grid; gap: var(--aime-space-2);
+  grid-template-columns: repeat(var(--aime-columns-mobile), minmax(0, 1fr));
+  pointer-events: none;
+}
+.ugrid__cols i { background: var(--aime-color-accent-subtle); border-inline: var(--aime-border-width) solid var(--aime-color-accent); opacity: .35; }
+.ugrid__page[data-cols='6'] .ugrid__cols { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.ugrid__page[data-cols='12'] .ugrid__cols { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+.ugrid[data-show='cells'] .ugrid__page {
+  background-image: linear-gradient(var(--aime-color-grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--aime-color-grid-line) 1px, transparent 1px);
+  background-size: var(--aime-space-3) var(--aime-space-3);
+}
+.ugrid__safe { position: absolute; inset: var(--aime-space-6); border: var(--aime-border-width) dashed var(--aime-color-border-strong); pointer-events: none; }
+.ugrid__bleed { position: absolute; inset: calc(var(--aime-space-3) * -1); border: var(--aime-border-width) dashed var(--aime-color-border); pointer-events: none; opacity: .6; }
+.ugrid__thirds {
+  position: absolute; inset: 0; pointer-events: none; opacity: .5;
+  background-image:
+    linear-gradient(90deg, transparent calc(33.333% - .5px), var(--aime-color-border-strong) calc(33.333% - .5px), var(--aime-color-border-strong) calc(33.333% + .5px), transparent calc(33.333% + .5px)),
+    linear-gradient(90deg, transparent calc(66.666% - .5px), var(--aime-color-border-strong) calc(66.666% - .5px), var(--aime-color-border-strong) calc(66.666% + .5px), transparent calc(66.666% + .5px)),
+    linear-gradient(0deg, transparent calc(33.333% - .5px), var(--aime-color-border-strong) calc(33.333% - .5px), var(--aime-color-border-strong) calc(33.333% + .5px), transparent calc(33.333% + .5px)),
+    linear-gradient(0deg, transparent calc(66.666% - .5px), var(--aime-color-border-strong) calc(66.666% - .5px), var(--aime-color-border-strong) calc(66.666% + .5px), transparent calc(66.666% + .5px));
+}
+.ugrid__snap {
+  position: absolute; inset-block: 0; width: 1px; background: var(--aime-color-accent);
+}
+.ugrid__snap::after {
+  content: attr(data-a-snap);
+  position: absolute; inset-block-start: var(--aime-space-2); inset-inline-start: var(--aime-space-2);
+  display: inline-flex; align-items: center; height: 16px; max-width: 160px;
+  overflow: hidden; text-overflow: ellipsis;
+  padding-inline: var(--aime-space-2); border-radius: var(--aime-radius-small);
+  background: var(--aime-color-accent); color: var(--aime-color-accent-on);
+  font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size); letter-spacing: var(--aime-text-meta-ls);
+  white-space: nowrap;
+}
+.ugrid__mark {
+  position: absolute; font-family: var(--aime-font-mono);
+  font-size: var(--aime-text-meta-size); letter-spacing: var(--aime-text-meta-ls);
+  color: var(--aime-color-text-subtle);
+}
+
+/* ── 4a.5 COMPOSER ────────────────────────────────────────────
+   Palette · Canvas · Inspecteur. Une sélection, trois projections. */
+.composer__palette { display: grid; gap: var(--aime-space-2); align-content: start; }
+.composer__primitive {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: var(--aime-space-3);
+  width: 100%; min-height: var(--aime-control-md);
+  padding: var(--aime-space-2) var(--aime-space-3);
+  border: var(--aime-border-default); border-radius: var(--aime-radius-medium);
+  background: var(--aime-color-surface-elevated);
+  color: var(--aime-color-text); text-align: start;
+  transition: border-color var(--aime-motion-fast) var(--aime-ease-out), background-color var(--aime-motion-fast) var(--aime-ease-out);
+}
+.composer__primitive:hover { border-color: var(--aime-color-accent); background: var(--aime-color-surface-overlay); }
+.composer__primitive small { display: block; color: var(--aime-color-text-subtle); font-size: var(--aime-text-meta-size); letter-spacing: var(--aime-text-meta-ls); text-transform: uppercase; font-family: var(--aime-font-mono); }
+.composer__primitive b { font-weight: var(--aime-font-medium); font-size: var(--aime-text-body-small-size); }
+
+.composer__toolbar {
+  display: flex; align-items: center; gap: var(--aime-space-2); flex-wrap: wrap;
+  padding: var(--aime-space-2) var(--aime-space-3);
+  border-bottom: var(--aime-border-subtle);
+  background: var(--aime-color-surface);
+}
+
+/* Position = donnée. Elle arrive par --a-x / --a-y, jamais par un style en dur. */
+.cnode {
+  position: absolute;
+  left: calc(var(--a-x, 0) * 1px);
+  top: calc(var(--a-y, 0) * 1px);
+  width: 208px;
+  display: grid; gap: var(--aime-space-2);
+  padding: var(--aime-space-3);
+  border: var(--aime-border-default); border-radius: var(--aime-radius-medium);
+  background: var(--aime-color-surface-elevated);
+  cursor: grab; touch-action: none;
+  transition: border-color var(--aime-motion-fast) var(--aime-ease-out), box-shadow var(--aime-motion-fast) var(--aime-ease-out);
+}
+.cnode:hover { border-color: var(--aime-color-border-strong); }
+.cnode.is-selected { border-color: var(--aime-color-accent); border-width: var(--aime-border-width-strong); }
+.cnode.is-dragging { box-shadow: var(--aime-shadow-drag); cursor: grabbing; }
+.cnode[data-state='proposed'] { border-style: dashed; border-color: var(--aime-color-accent); }
+.cnode__type {
+  font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size);
+  letter-spacing: var(--aime-text-meta-ls); text-transform: uppercase; color: var(--aime-color-text-subtle);
+}
+.cnode__title { font-size: var(--aime-text-body-small-size); font-weight: var(--aime-font-semibold); }
+.cnode__desc { font-size: var(--aime-text-caption-size); color: var(--aime-color-text-muted); }
+.cnode__port {
+  position: absolute; top: 50%; width: 12px; height: 12px;
+  border: var(--aime-border-width-strong) solid var(--aime-color-background);
+  border-radius: var(--aime-radius-pill);
+  background: var(--aime-color-border-strong);
+  transform: translateY(-50%);
+  cursor: crosshair;
+}
+.cnode__port--out { inset-inline-end: -6px; background: var(--aime-color-accent); }
+.cnode__port--in { inset-inline-start: -6px; }
+
+.clink { stroke: var(--aime-color-border-strong); stroke-width: 1.5; fill: none; }
+.clink.is-active { stroke: var(--aime-color-accent); stroke-width: 2; }
+.clink.is-proposed { stroke-dasharray: 4 3; stroke: var(--aime-color-accent); }
+/* CONNECT — la relation se trace au lieu d'apparaître. Longueur transmise par --a-len. */
+@keyframes a-connect { from { stroke-dashoffset: var(--a-len, 120); } to { stroke-dashoffset: 0; } }
+.clink.is-connecting {
+  stroke-dasharray: var(--a-len, 120);
+  animation: a-connect var(--aime-motion-slow) var(--aime-ease-out) both;
+}
+/* DRAG — primitive continue : transition, pas d'animation d'entrée. */
+.cnode.is-dragging { transition: box-shadow var(--aime-motion-fast) var(--aime-ease-out); }
+
+/* Inspecteur : une colonne de champs, jamais une mise en page libre */
+.inspector { display: grid; gap: var(--aime-space-4); align-content: start; }
+.inspector__group { display: grid; gap: var(--aime-space-2); padding-block-start: var(--aime-space-4); border-top: var(--aime-border-subtle); }
+.inspector__group:first-child { border-top: 0; padding-block-start: 0; }
+.inspector__row { display: grid; grid-template-columns: minmax(80px, auto) minmax(0, 1fr); gap: var(--aime-space-3); align-items: baseline; }
+.inspector__row dt { font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size); letter-spacing: var(--aime-text-meta-ls); text-transform: uppercase; color: var(--aime-color-text-subtle); }
+.inspector__row dd { margin: 0; font-size: var(--aime-text-body-small-size); overflow-wrap: anywhere; }

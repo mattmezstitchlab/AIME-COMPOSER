@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="fr" data-aime-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="a-root" content="../">
+<title>Carte Universelle — AIME</title>
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../styles/foundations.css">
+<link rel="stylesheet" href="../styles/layout.css">
+<link rel="stylesheet" href="../styles/components.css">
+<link rel="stylesheet" href="../styles/aime.css">
+<link rel="stylesheet" href="../styles/noema.css">
+<link rel="stylesheet" href="../styles/patterns.css">
+<link rel="stylesheet" href="../styles/dataviz.css">
+<link rel="stylesheet" href="../styles/doc.css">
+<script src="../js/doc.js" defer></script>
+<script src="../js/aime-ui.js" defer></script>
+</head>
+<body>
+<div class="ds-shell">
+<main class="ds-main l-page">
+
+  <header class="ohead">
+    <nav aria-label="Fil d'ariane"><ol class="a-crumbs"><li><a href="bureau.html">Atelier Nord</a><span class="a-crumbs__sep" aria-hidden="true">/</span></li><li><span aria-current="page">Mémoire</span></li></ol></nav>
+    <div class="ohead__title-row">
+      <span class="ohead__mark"><svg class="a-ic a-ic--lg" aria-hidden="true" width="24" height="24"><use data-a-icon="mem-card"/></svg></span>
+      <div class="ohead__titles"><span class="t-meta">34 objets</span><h1 class="t-h1">Carte Universelle</h1></div>
+      <span class="l-spacer"></span>
+      <span class="ohead__actions"><button type="button" class="a-btn a-btn--sm">Filtrer</button><button type="button" class="a-btn a-btn--sm a-btn--primary">Nouvel objet</button></span>
+    </div>
+  </header>
+
+  <div class="a-search l-measure-md">
+    <svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="src-search"/></svg>
+    <label class="u-sr" for="uc-search">Rechercher un objet</label>
+    <input class="a-search__input" id="uc-search" type="search" placeholder="Personne, lieu, document, média…" autocomplete="off">
+  </div>
+
+  <section class="ds-block" aria-labelledby="objets">
+    <h2 class="t-h2" id="objets">Objets du projet</h2>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--grid">
+        <article class="ucard is-selected">
+          <div class="ucard__id"><span class="ucard__mark" data-type="person"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="ppl-person"/></svg></span><span class="ucard__head"><span class="ucard__type">Personne</span><span class="ucard__title">Camille Vasseur</span><span class="ucard__sub">Saxophoniste · Lyon</span></span></div>
+          <div class="ucard__media"><div class="umedia" data-format="3-2"><span class="umedia__label">portrait · asset-0042</span></div></div>
+          <dl class="ucard__facts">
+            <div class="ucard__fact"><dt>Rôle</dt><dd>Intervenante</dd></div>
+            <div class="ucard__fact"><dt>Projets</dt><dd>3</dd></div>
+            <div class="ucard__fact"><dt>Contact</dt><dd class="is-unknown">À confirmer</dd></div>
+          </dl>
+          <div class="ucard__foot"><span class="nstate" data-state="confirmed"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-confirmed"/></svg>Confirmé</span><button type="button" class="prov" aria-expanded="false"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="prf-evidence"/></svg>source</button></div>
+        </article>
+
+        <article class="ucard">
+          <div class="ucard__id"><span class="ucard__mark" data-type="place"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="nav-home"/></svg></span><span class="ucard__head"><span class="ucard__type">Lieu</span><span class="ucard__title">Salle des Fêtes</span><span class="ucard__sub">Brières-les-Scellées</span></span></div>
+          <dl class="ucard__facts">
+            <div class="ucard__fact"><dt>Capacité</dt><dd class="is-unknown">À confirmer</dd></div>
+            <div class="ucard__fact"><dt>Accès PMR</dt><dd class="is-unknown">À confirmer</dd></div>
+          </dl>
+          <div class="ucard__foot"><span class="nstate" data-state="extracted"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-extracted"/></svg>Extrait</span><button type="button" class="a-btn a-btn--sm">Compléter</button></div>
+        </article>
+
+        <article class="ucard">
+          <div class="ucard__id"><span class="ucard__mark" data-type="document"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="doc-contract"/></svg></span><span class="ucard__head"><span class="ucard__type">Document</span><span class="ucard__title">Contrat de cession</span><span class="ucard__sub">Droits d'exploitation</span></span></div>
+          <div class="ucard__media"><div class="umedia" data-format="a4"><span class="umedia__label">page 1 sur 6</span></div></div>
+          <dl class="ucard__facts">
+            <div class="ucard__fact"><dt>Version</dt><dd class="u-mono">v2.1</dd></div>
+            <div class="ucard__fact"><dt>Signé</dt><dd>2026-08-02</dd></div>
+            <div class="ucard__fact"><dt>Échéance</dt><dd>2026-09-30</dd></div>
+          </dl>
+          <div class="ucard__foot"><span class="nstate" data-state="confirmed"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-confirmed"/></svg>Confirmé</span><span class="a-badge a-badge--warning">échéance proche</span></div>
+        </article>
+
+        <article class="ucard">
+          <div class="ucard__id"><span class="ucard__mark" data-type="media"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="med-image"/></svg></span><span class="ucard__head"><span class="ucard__type">Média</span><span class="ucard__title">asset-0087</span><span class="ucard__sub">Photographie · 4032 × 3024</span></span></div>
+          <div class="ucard__media"><div class="umedia" data-format="16-9"><span class="umedia__label">aperçu</span></div></div>
+          <dl class="ucard__facts">
+            <div class="ucard__fact"><dt>Usages</dt><dd>3 compositions</dd></div>
+            <div class="ucard__fact"><dt>Droits</dt><dd class="u-error">Expirés le 30 sept.</dd></div>
+          </dl>
+          <div class="ucard__foot"><span class="nstate" data-state="confirmed"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-confirmed"/></svg>Confirmé</span><button type="button" class="a-btn a-btn--sm">Renouveler</button></div>
+        </article>
+
+        <article class="ucard is-proposed">
+          <div class="ucard__id"><span class="ucard__mark" data-type="relation"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="noe-proposed"/></svg></span><span class="ucard__head"><span class="ucard__type">Relation</span><span class="ucard__title">Se déroule à</span><span class="ucard__sub">Concert du 24 → Salle des Fêtes</span></span></div>
+          <p class="t-body-sm u-muted">Proposée à partir de la disponibilité observée. Non confirmée par le lieu.</p>
+          <div class="ucard__foot"><span class="nstate" data-state="proposed"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-proposed"/></svg>Proposé</span><button type="button" class="a-btn a-btn--sm a-btn--primary">Valider</button><button type="button" class="a-btn a-btn--sm a-btn--ghost">Refuser</button></div>
+        </article>
+
+        <article class="ucard is-superseded">
+          <div class="ucard__id"><span class="ucard__mark" data-type="document"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="noe-superseded"/></svg></span><span class="ucard__head"><span class="ucard__type">Document</span><span class="ucard__title">Contrat de cession</span><span class="ucard__sub">Version 1</span></span></div>
+          <dl class="ucard__facts"><div class="ucard__fact"><dt>Remplacé par</dt><dd class="u-mono">v2.1</dd></div></dl>
+          <div class="ucard__foot"><span class="nstate" data-state="superseded"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-superseded"/></svg>Superseded</span><button type="button" class="a-text-btn">Voir l'historique</button></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="relations">
+    <h2 class="t-h2" id="relations">Relations de la sélection</h2>
+    <div class="ds-demo">
+      <div class="ds-demo__stage">
+        <div class="rview l-measure-xl">
+          <div class="rview__row">
+            <span class="rview__end"><span class="ucard__mark" data-type="person"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="ppl-person"/></svg></span><span><span class="rview__name">Camille Vasseur</span><br><span class="rview__type">Personne</span></span></span>
+            <span class="rview__pred">intervient sur</span>
+            <span class="rview__end rview__end--out"><span><span class="rview__name">Concert du 24</span><br><span class="rview__type">Événement</span></span><span class="ucard__mark" data-type="event"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="time-calendar"/></svg></span></span>
+          </div>
+          <div class="rview__row">
+            <span class="rview__end"><span class="ucard__mark" data-type="person"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="ppl-person"/></svg></span><span><span class="rview__name">Camille Vasseur</span><br><span class="rview__type">Personne</span></span></span>
+            <span class="rview__pred" data-certainty="proposed">collabore avec</span>
+            <span class="rview__end rview__end--out"><span><span class="rview__name">L. Ferrand</span><br><span class="rview__type">Personne · proposé</span></span><span class="ucard__mark" data-type="person"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="ppl-person"/></svg></span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <nav class="ds-pager" aria-label="Navigation d'écran">
+    <a href="composer.html"><small>20.2 — précédent</small><span class="t-body u-strong">Composer</span></a>
+    <a href="timeline.html"><small>20.4 — suivant</small><span class="t-body u-strong">Timeline</span></a>
+  </nav>
+
+</main>
+</div>
+</body>
+</html>

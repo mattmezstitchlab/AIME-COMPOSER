@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="fr" data-aime-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="a-root" content="../">
+<title>Playground — AIME</title>
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../styles/foundations.css">
+<link rel="stylesheet" href="../styles/layout.css">
+<link rel="stylesheet" href="../styles/components.css">
+<link rel="stylesheet" href="../styles/aime.css">
+<link rel="stylesheet" href="../styles/noema.css">
+<link rel="stylesheet" href="../styles/patterns.css">
+<link rel="stylesheet" href="../styles/dataviz.css">
+<link rel="stylesheet" href="../styles/doc.css">
+<script src="../js/doc.js" defer></script>
+<script src="../js/aime-ui.js" defer></script>
+</head>
+<body>
+<div class="ds-shell">
+<main class="ds-main l-page">
+
+  <header class="ohead">
+    <nav aria-label="Fil d'ariane"><ol class="a-crumbs"><li><a href="index.html">Expériences</a><span class="a-crumbs__sep" aria-hidden="true">/</span></li><li><span aria-current="page">Playground</span></li></ol></nav>
+    <div class="ohead__title-row">
+      <span class="ohead__mark"><svg class="a-ic a-ic--lg" aria-hidden="true" width="24" height="24"><use data-a-icon="cmp-layers"/></svg></span>
+      <div class="ohead__titles"><span class="t-meta">Terrain d'essai</span><h1 class="t-h1">Nouveau projet</h1></div>
+      <span class="l-spacer"></span>
+      <span class="ohead__actions"><button type="button" class="a-btn a-btn--sm a-btn--ghost">Annuler</button><button type="button" class="a-btn a-btn--sm a-btn--primary">Créer le projet</button></span>
+    </div>
+  </header>
+
+  <section class="ds-block" aria-labelledby="formulaire">
+    <h2 class="t-h2" id="formulaire">Identité du projet</h2>
+    <div class="l-grid">
+      <div class="l-span-half">
+        <form class="l-stack" aria-labelledby="formulaire">
+          <div class="a-field"><label class="a-field__label" for="p-name">Nom du projet</label><input class="a-input" id="p-name" type="text" value="Atelier Nord" autocomplete="off"><p class="a-field__hint">Visible par toute l'équipe.</p></div>
+          <div class="a-field"><label class="a-field__label" for="p-brief">Brief</label><textarea class="a-textarea" id="p-brief" rows="3">Identité, site et supports imprimés pour la saison 2026-2027.</textarea></div>
+          <div class="a-field"><label class="a-field__label" for="p-client">Client</label><input class="a-input" id="p-client" type="text" aria-describedby="p-client-err" aria-invalid="true"><p class="a-field__error" id="p-client-err">Aucun client sélectionné : un projet doit être rattaché à une organisation.</p></div>
+          <div class="a-field"><label class="a-field__label" for="p-role">Responsable</label><select class="a-select" id="p-role"><option>A. Meunier</option><option>C. Vasseur</option><option>L. Ferrand</option></select></div>
+          <fieldset class="l-stack l-stack--tight">
+            <legend class="a-field__label">Diffusion</legend>
+            <label class="a-check"><input type="checkbox" checked><span class="a-check__box"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="act-check"/></svg></span>Site public</label>
+            <label class="a-check"><input type="checkbox"><span class="a-check__box"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="act-check"/></svg></span>Portail client</label>
+            <label class="a-radio"><input type="radio" name="vis" checked><span class="a-radio__box" aria-hidden="true"></span>Visibilité restreinte</label>
+            <label class="a-radio"><input type="radio" name="vis"><span class="a-radio__box" aria-hidden="true"></span>Visibilité publique</label>
+          </fieldset>
+          <label class="a-toggle"><input type="checkbox" checked><span class="a-toggle__track"><span class="a-toggle__thumb"></span></span><span class="a-toggle__text">Autoriser NOEMA à proposer</span></label>
+        </form>
+      </div>
+      <div class="l-span-half l-stack">
+        <div class="a-search"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="src-search"/></svg><label class="u-sr" for="pg-search">Rechercher un objet</label><input class="a-search__input" id="pg-search" type="search" placeholder="Rechercher dans le projet" autocomplete="off"></div>
+        <div class="a-tabs">
+          <div class="a-tabs__list" role="tablist" aria-label="Sections du projet">
+            <button class="a-tabs__tab" role="tab" id="pg-t1" aria-controls="pg-p1" aria-selected="true" type="button">Objets</button>
+            <button class="a-tabs__tab" role="tab" id="pg-t2" aria-controls="pg-p2" aria-selected="false" tabindex="-1" type="button">Médias</button>
+            <button class="a-tabs__tab" role="tab" id="pg-t3" aria-controls="pg-p3" aria-selected="false" tabindex="-1" type="button">Versions</button>
+          </div>
+          <div class="a-tabs__panel" role="tabpanel" id="pg-p1" aria-labelledby="pg-t1">
+            <article class="ucard ucard--inline"><span class="ucard__mark" data-type="person"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="ppl-person"/></svg></span><span class="ucard__head"><span class="ucard__type">Personne</span><span class="ucard__title">Camille Vasseur</span></span></article>
+            <article class="ucard ucard--inline"><span class="ucard__mark" data-type="document"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-document"/></svg></span><span class="ucard__head"><span class="ucard__type">Document</span><span class="ucard__title">Contrat de cession</span></span><span class="a-badge">v2.1</span></article>
+          </div>
+          <div class="a-tabs__panel" role="tabpanel" id="pg-p2" aria-labelledby="pg-t2" hidden><p class="t-body-sm u-muted">Aucun média rattaché pour l'instant.</p></div>
+          <div class="a-tabs__panel" role="tabpanel" id="pg-p3" aria-labelledby="pg-t3" hidden><p class="t-body-sm u-muted">Aucune version enregistrée.</p></div>
+        </div>
+        <div class="a-progress" role="progressbar" aria-valuenow="46" aria-valuemin="0" aria-valuemax="100" aria-label="Complétude du projet"><span class="a-progress__bar" style="--a-value:46"></span></div>
+        <p class="t-caption u-muted">46 % des champs obligatoires renseignés.</p>
+      </div>
+    </div>
+  </section>
+
+  <nav class="ds-pager" aria-label="Navigation d'écran">
+    <a href="index.html"><small>20 — précédent</small><span class="t-body u-strong">Expériences</span></a>
+    <a href="composer.html"><small>20.2 — suivant</small><span class="t-body u-strong">Composer</span></a>
+  </nav>
+
+</main>
+</div>
+</body>
+</html>

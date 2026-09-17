@@ -1,0 +1,122 @@
+{
+  "version": "1.0.0",
+  "at": "2026-09-17T20:14:59.909Z",
+  "scope": {
+    "css": 9,
+    "pages": 32,
+    "icons": 85
+  },
+  "checks": [
+    {
+      "id": "alignment",
+      "family": "ALIGNMENT",
+      "result": "pass",
+      "count": 0,
+      "issues": [],
+      "truncated": 0
+    },
+    {
+      "id": "spacing",
+      "family": "SPACING",
+      "result": "pass",
+      "count": 0,
+      "issues": [],
+      "truncated": 0
+    },
+    {
+      "id": "typography",
+      "family": "TYPOGRAPHY",
+      "result": "pass",
+      "count": 0,
+      "issues": [],
+      "truncated": 0
+    },
+    {
+      "id": "color",
+      "family": "COLOR",
+      "result": "pass",
+      "count": 0,
+      "issues": [],
+      "truncated": 0
+    },
+    {
+      "id": "contrast",
+      "family": "CONTRAST",
+      "result": "pass",
+      "count": 0,
+      "issues": [],
+      "truncated": 0
+    },
+    {
+      "id": "iconography",
+      "family": "ICONOGRAPHY",
+      "result": "pass",
+      "count": 0,
+      "issues": [],
+      "truncated": 0
+    },
+    {
+      "id": "hierarchy",
+      "family": "HIERARCHY",
+      "result": "pass",
+      "count": 0,
+      "issues": [],
+      "truncated": 0
+    },
+    {
+      "id": "responsive",
+      "family": "RESPONSIVE",
+      "result": "pass",
+      "count": 0,
+      "issues": [],
+      "truncated": 0
+    },
+    {
+      "id": "overflow",
+      "family": "OVERFLOW",
+      "result": "pass",
+      "count": 0,
+      "issues": [],
+      "truncated": 0
+    },
+    {
+      "id": "focus",
+      "family": "FOCUS",
+      "result": "pass",
+      "count": 0,
+      "issues": [],
+      "truncated": 0
+    },
+    {
+      "id": "motion",
+      "family": "MOTION",
+      "result": "pass",
+      "count": 0,
+      "issues": [],
+      "truncated": 0
+    },
+    {
+      "id": "consistency",
+      "family": "CONSISTENCY",
+      "result": "pass",
+      "count": 0,
+      "issues": [],
+      "truncated": 0
+    }
+  ],
+  "issues": 0,
+  "pass": true,
+  "contrast": {
+    "total": 80,
+    "pass": 80,
+    "worst": {
+      "theme": "dark",
+      "fg": "border-subtle",
+      "bg": "surface",
+      "ratio": 1.18,
+      "min": 1.1,
+      "ok": true,
+      "why": "Filet séparateur sur surface"
+    }
+  }
+}

@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="fr" data-aime-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="a-root" content="../">
+<title>Composer — AIME</title>
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../styles/foundations.css">
+<link rel="stylesheet" href="../styles/layout.css">
+<link rel="stylesheet" href="../styles/components.css">
+<link rel="stylesheet" href="../styles/aime.css">
+<link rel="stylesheet" href="../styles/noema.css">
+<link rel="stylesheet" href="../styles/patterns.css">
+<link rel="stylesheet" href="../styles/dataviz.css">
+<link rel="stylesheet" href="../styles/doc.css">
+<script src="../js/doc.js" defer></script>
+<script src="../js/aime-ui.js" defer></script>
+</head>
+<body>
+<div class="ds-shell">
+<main class="ds-main l-page">
+
+  <header class="ohead">
+    <nav aria-label="Fil d'ariane"><ol class="a-crumbs"><li><a href="bureau.html">Bureau</a><span class="a-crumbs__sep" aria-hidden="true">/</span></li><li><a href="bureau.html">Atelier Nord</a><span class="a-crumbs__sep" aria-hidden="true">/</span></li><li><span aria-current="page">Composer</span></li></ol></nav>
+    <div class="ohead__title-row">
+      <span class="ohead__mark"><svg class="a-ic a-ic--lg" aria-hidden="true" width="24" height="24"><use data-a-icon="cmp-compose"/></svg></span>
+      <div class="ohead__titles"><span class="t-meta">Composition · site public</span><h1 class="t-h1">Page d'accueil</h1></div>
+      <span class="l-spacer"></span>
+      <span class="ohead__actions"><button type="button" class="a-btn a-btn--sm">Aperçu</button><button type="button" class="a-btn a-btn--sm">Historique</button><button type="button" class="a-btn a-btn--sm a-btn--primary">Enregistrer</button></span>
+    </div>
+    <div class="ohead__meta">
+      <span class="ohead__states"><span class="a-badge">v1.0.4</span><span class="nstate" data-state="confirmed"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-confirmed"/></svg>Confirmé</span></span>
+      <button type="button" class="prov" aria-expanded="false"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="prf-evidence"/></svg>Provenance</button>
+      <span class="t-meta">enregistré il y a 12 minutes par A. Meunier</span>
+    </div>
+  </header>
+
+  <div class="cmdbar" data-a-cmdbar>
+    <div class="cmdbar__field">
+      <svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="src-search"/></svg>
+      <label class="u-sr" for="cx-input">Rechercher une commande ou un objet</label>
+      <input class="cmdbar__input" id="cx-input" type="text" placeholder="Composer, timeline, carte…" autocomplete="off">
+      <kbd class="a-kbd">esc</kbd>
+    </div>
+    <div class="cmdbar__results">
+      <p class="cmdbar__group">Organes</p>
+      <button type="button" class="cmdbar__item" aria-selected="true"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="time-timeline"/></svg>Ouvrir la Timeline<kbd class="a-kbd">T</kbd></button>
+      <button type="button" class="cmdbar__item"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="grd-grid"/></svg>Ouvrir la Grille<kbd class="a-kbd">G</kbd></button>
+      <p class="cmdbar__group">Actions</p>
+      <button type="button" class="cmdbar__item"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="act-export"/></svg>Exporter la composition<kbd class="a-kbd">⌘E</kbd></button>
+    </div>
+    <div class="cmdbar__foot"><span class="cmdbar__hint"><kbd class="a-kbd">↑</kbd><kbd class="a-kbd">↓</kbd>naviguer</span><span class="cmdbar__hint"><kbd class="a-kbd">↵</kbd>ouvrir</span></div>
+  </div>
+
+  <section class="ds-block" aria-labelledby="espace">
+    <h2 class="t-h2" id="espace">Espace de travail</h2>
+    <div class="l-shell__main l-shell__main--2-start">
+      <aside class="l-pane l-pane--start">
+        <p class="t-label">Primitives</p>
+        <div class="composer__palette">
+          <button type="button" class="composer__primitive"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="ppl-person"/></svg><span><small>Qui</small><b>Personne</b></span></button>
+          <button type="button" class="composer__primitive"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="prj-project"/></svg><span><small>Quoi</small><b>Projet</b></span></button>
+          <button type="button" class="composer__primitive"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="time-calendar"/></svg><span><small>Quand</small><b>Événement</b></span></button>
+          <button type="button" class="composer__primitive"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="med-image"/></svg><span><small>Asset</small><b>Média</b></span></button>
+          <button type="button" class="composer__primitive"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="rel-relation"/></svg><span><small>Lien</small><b>Relation</b></span></button>
+          <button type="button" class="composer__primitive"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-document"/></svg><span><small>Preuve</small><b>Document</b></span></button>
+        </div>
+        <p class="t-label">Collections</p>
+        <div class="composer__palette">
+          <button type="button" class="composer__primitive"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="med-library"/></svg><span><small>12 assets</small><b>Médiathèque</b></span></button>
+        </div>
+      </aside>
+
+      <div class="l-stack">
+        <div class="composer__toolbar">
+          <span class="a-pill a-pill--button" aria-current="true">Compose</span>
+          <button type="button" class="a-pill a-pill--button">Repères</button>
+          <button type="button" class="a-pill a-pill--button">Magnétisme</button>
+          <span class="l-spacer"></span>
+          <button type="button" class="a-icon-btn" aria-label="Annuler"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="act-undo"/></svg></button>
+          <button type="button" class="a-icon-btn" aria-label="Publier"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="act-publish"/></svg></button>
+        </div>
+
+        <div class="l-canvas ds-demo__canvas">
+          <svg class="l-guide l-guide--v" style="--a-x:288" aria-hidden="true"></svg>
+          <svg width="100%" height="100%" aria-hidden="true" style="position:absolute;inset:0">
+            <path class="clink is-connecting" style="--a-len:220" d="M232 96 C 280 96, 300 152, 352 152"/>
+          </svg>
+          <div class="cnode is-selected" style="--a-x:24;--a-y:56">
+            <span class="cnode__type">Personne</span>
+            <span class="cnode__title">Camille Vasseur</span>
+            <span class="cnode__desc">Saxophoniste · Lyon</span>
+            <span class="cnode__port cnode__port--out" aria-hidden="true"></span>
+          </div>
+          <div class="cnode" style="--a-x:352;--a-y:120">
+            <span class="cnode__type">Événement</span>
+            <span class="cnode__title">Concert du 24</span>
+            <span class="cnode__desc">Salle des Fêtes · 20 h 30</span>
+            <span class="cnode__port cnode__port--in" aria-hidden="true"></span>
+          </div>
+          <div class="cnode" style="--a-x:24;--a-y:184" data-state="proposed">
+            <span class="cnode__type">Lieu · proposé</span>
+            <span class="cnode__title">Salle des Fêtes</span>
+            <span class="cnode__desc">Capacité inconnue</span>
+          </div>
+        </div>
+
+        <div class="utl">
+          <div class="utl__head"><span class="t-label">Timeline</span><span class="t-meta">semaine 38</span></div>
+          <div class="utl__list">
+            <article class="utl__item is-selected"><span class="utl__marker" data-kind="event" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">24 sept.</span><span class="utl__title">Concert — Salle des Fêtes</span></div></article>
+            <article class="utl__item" data-state="proposed"><span class="utl__marker" data-kind="proposal" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">24 sept.</span><span class="utl__title">Répétition générale</span><span class="nstate" data-state="proposed"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-proposed"/></svg>Proposé</span></div></article>
+          </div>
+        </div>
+      </div>
+
+      <aside class="l-pane l-pane--end">
+        <div class="inspector">
+          <div class="inspector__group">
+            <p class="t-label">Sélection</p>
+            <dl class="inspector__row"><dt>type</dt><dd>personne</dd></dl>
+            <dl class="inspector__row"><dt>id</dt><dd>ppl-0142</dd></dl>
+          </div>
+          <div class="inspector__group">
+            <p class="t-label">Géométrie</p>
+            <dl class="inspector__row"><dt>x</dt><dd>24</dd></dl>
+            <dl class="inspector__row"><dt>y</dt><dd>56</dd></dl>
+            <dl class="inspector__row"><dt>calque</dt><dd>1</dd></dl>
+          </div>
+          <div class="inspector__group">
+            <p class="t-label">Relations</p>
+            <dl class="inspector__row"><dt>sortie</dt><dd>intervient sur · Concert du 24</dd></dl>
+            <dl class="inspector__row"><dt>crédit</dt><dd class="is-unknown">À confirmer</dd></dl>
+          </div>
+          <div class="inspector__group">
+            <button type="button" class="a-btn a-btn--sm a-btn--block">Appliquer</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <nav class="ds-pager" aria-label="Navigation d'écran">
+    <a href="bureau.html"><small>20.6 — précédent</small><span class="t-body u-strong">Bureau</span></a>
+    <a href="universal-card.html"><small>20.3 — suivant</small><span class="t-body u-strong">Carte Universelle</span></a>
+  </nav>
+
+</main>
+</div>
+</body>
+</html>

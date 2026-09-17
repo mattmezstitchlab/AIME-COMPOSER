@@ -1,0 +1,12 @@
+{
+  "name": "aime-noema-loop",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Boucle minimale AIME/NOEMA : contrat de données, store à provenance, moteur de propositions, validation humaine.",
+  "scripts": {
+    "test": "node test/run.mjs && node test/api.mjs",
+    "test:unit": "node test/run.mjs",
+    "test:api": "node test/api.mjs"
+  }
+}

@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="fr" data-aime-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="a-root" content="./">
+<title>Composants AIME — AIME Design System V1</title>
+<link rel="stylesheet" href="tokens/tokens.css">
+<link rel="stylesheet" href="styles/foundations.css">
+<link rel="stylesheet" href="styles/layout.css">
+<link rel="stylesheet" href="styles/components.css">
+<link rel="stylesheet" href="styles/aime.css">
+<link rel="stylesheet" href="styles/noema.css">
+<link rel="stylesheet" href="styles/patterns.css">
+<link rel="stylesheet" href="styles/dataviz.css">
+<link rel="stylesheet" href="styles/doc.css">
+<script src="js/doc.js" defer></script>
+<script src="js/aime-ui.js" defer></script>
+</head>
+<body>
+<div class="ds-shell">
+<main class="ds-main l-page">
+
+  <header class="ds-hero">
+    <div class="ds-eyebrow"><span class="a-badge">08</span><span class="t-meta">Couche 4a — Composants AIME</span></div>
+    <h1 class="t-display">Cinq organes, aucune variante.</h1>
+    <p class="t-body u-muted">AIME ne multiplie pas les composants selon le métier. Il projette cinq objets canoniques, et chacun répond à une question. Le cadre ne change jamais : seul le contenu s'adapte. C'est la condition de la réutilisation — une carte Personne et une carte Document doivent être indiscernables structurellement.</p>
+  </header>
+
+  <section class="ds-block" aria-labelledby="ucard">
+    <h2 class="t-h2" id="ucard">Carte Universelle — QUI / QUOI</h2>
+    <div class="ds-rule">
+      <p class="ds-rule__title">Règle</p>
+      <p>Huit types — personne, organisation, projet, événement, document, lieu, relation, média — partagent exactement la même structure : marque, type, titre, sous-titre, faits, pied. Le type est porté par le glyphe et le libellé, jamais par une couleur. Ce qui n'est pas connu est affiché comme inconnu, jamais comblé.</p>
+    </div>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--grid">
+        <article class="ucard">
+          <div class="ucard__id">
+            <span class="ucard__mark" data-type="person"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="ppl-person"/></svg></span>
+            <span class="ucard__head"><span class="ucard__type">Personne</span><span class="ucard__title">Camille Vasseur</span><span class="ucard__sub">Saxophoniste · Lyon</span></span>
+          </div>
+          <dl class="ucard__facts">
+            <div class="ucard__fact"><dt>Rôle</dt><dd>Musicienne intervenante</dd></div>
+            <div class="ucard__fact"><dt>Projet</dt><dd>Atelier Nord</dd></div>
+            <div class="ucard__fact"><dt>Contact</dt><dd class="is-unknown">À confirmer</dd></div>
+          </dl>
+          <div class="ucard__foot"><span class="nstate" data-state="confirmed"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-confirmed"/></svg>Confirmé</span><button type="button" class="prov" aria-expanded="false"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="prf-evidence"/></svg>Provenance</button></div>
+        </article>
+        <article class="ucard">
+          <div class="ucard__id">
+            <span class="ucard__mark" data-type="document"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="doc-document"/></svg></span>
+            <span class="ucard__head"><span class="ucard__type">Document</span><span class="ucard__title">Contrat de cession</span><span class="ucard__sub">Signé · 2026-08-02</span></span>
+          </div>
+          <dl class="ucard__facts">
+            <div class="ucard__fact"><dt>Type</dt><dd>Contrat</dd></div>
+            <div class="ucard__fact"><dt>Version</dt><dd class="u-mono">v2.1</dd></div>
+            <div class="ucard__fact"><dt>Droits</dt><dd>Cession 12 mois</dd></div>
+          </dl>
+          <div class="ucard__foot"><span class="nstate" data-state="confirmed"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-confirmed"/></svg>Confirmé</span><button type="button" class="prov" aria-expanded="false"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="prf-evidence"/></svg>Provenance</button></div>
+        </article>
+        <article class="ucard is-proposed">
+          <div class="ucard__id">
+            <span class="ucard__mark" data-type="place"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="noe-proposed"/></svg></span>
+            <span class="ucard__head"><span class="ucard__type">Lieu</span><span class="ucard__title">Salle des Fêtes — Brières</span><span class="ucard__sub">Proposé par NOEMA</span></span>
+          </div>
+          <dl class="ucard__facts">
+            <div class="ucard__fact"><dt>Capacité</dt><dd class="is-unknown">Inconnue</dd></div>
+            <div class="ucard__fact"><dt>Accès</dt><dd class="is-unknown">Inconnu</dd></div>
+          </dl>
+          <div class="ucard__foot"><span class="nstate" data-state="proposed"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-proposed"/></svg>Proposé</span><button type="button" class="a-btn a-btn--sm a-btn--primary">Valider</button></div>
+        </article>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Lecture</span><span class="t-caption">Trois types différents, un seul cadre. La troisième carte est pointillée : elle n'existe pas encore dans la mémoire.</span></p>
+    </div>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--col">
+        <p class="t-label">Densités</p>
+        <div class="ucard ucard--inline">
+          <span class="ucard__mark" data-type="organization"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="ppl-org"/></svg></span>
+          <span class="ucard__head"><span class="ucard__type">Organisation</span><span class="ucard__title">Conservatoire de Lyon</span></span>
+          <span class="a-badge">12 projets</span>
+        </div>
+        <div class="ucard ucard--inline is-selected">
+          <span class="ucard__mark" data-type="event"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="time-calendar"/></svg></span>
+          <span class="ucard__head"><span class="ucard__type">Événement</span><span class="ucard__title">Concert — Atelier Nord</span></span>
+          <span class="a-badge a-badge--accent">J-14</span>
+        </div>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Variantes</span><span class="t-caption"><span class="u-mono">ucard--inline</span> pour les listes, défaut pour la lecture, <span class="u-mono">ucard--tile</span> et <span class="u-mono">ucard--full</span> pour les vues détaillées. Même structure, même cadre.</span></p>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="umedia">
+    <h2 class="t-h2" id="umedia">Média Universel — ASSET</h2>
+    <div class="ds-rule">
+      <p class="ds-rule__title">Règle</p>
+      <p>Une ressource existe une fois et peut être composée dans plusieurs contextes sans duplication de sa source. Le format est un profil, pas un composant : le même emplacement accepte le 1:1, le 16:9, le 9:16 ou l'A4. Ce qui n'est pas encore attribué reste un emplacement vide, jamais une image inventée.</p>
+    </div>
+    <div class="ds-demo">
+      <div class="ds-demo__stage">
+        <div class="aslot l-measure-xs">
+          <div class="umedia" data-format="1-1">
+            <span class="umedia__label">affiche · 1:1</span>
+            <span class="umedia__reuse"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="cmp-layers"/></svg>3</span>
+          </div>
+          <div class="aslot__caption"><span class="u-mono">asset-0142</span><span>réutilisé dans 3 compositions</span></div>
+        </div>
+        <div class="aslot l-measure-sm">
+          <div class="umedia" data-format="16-9">
+            <span class="umedia__label">bandeau · 16:9</span>
+            <span class="umedia__reuse"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="cmp-layers"/></svg>1</span>
+          </div>
+          <div class="aslot__caption"><span class="u-mono">asset-0087</span><span>autorisé · droits 12 mois</span></div>
+        </div>
+        <div class="aslot l-measure-xs">
+          <div class="umedia is-empty" data-format="9-16">
+            <svg class="a-ic a-ic--lg" aria-hidden="true" width="24" height="24"><use data-a-icon="med-image"/></svg>
+            <span class="t-caption">Emplacement libre</span>
+          </div>
+          <div class="aslot__caption"><span class="u-mono">story · 9:16</span><span>aucun asset attribué</span></div>
+        </div>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Règle</span><span class="t-caption">Le compteur de réutilisation est visible : il rappelle qu'un asset n'est jamais copié, seulement référencé.</span></p>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="utl">
+    <h2 class="t-h2" id="utl">Timeline Universelle — QUAND</h2>
+    <div class="ds-rule">
+      <p class="ds-rule__title">Règle</p>
+      <p>Un seul moteur, six modes : lecture, plan, composition, relecture, direct, historique. Le mode change la projection, jamais les données. Le type d'élément est porté par la forme du marqueur — cercle, losange, carré, carré pointillé, triangle — et la couleur ne fait que renforcer.</p>
+    </div>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--col">
+        <div class="utl">
+          <div class="utl__head">
+            <div class="utl__modes">
+              <button type="button" class="a-pill a-pill--button" aria-current="true">Lecture</button>
+              <button type="button" class="a-pill a-pill--button">Plan</button>
+              <button type="button" class="a-pill a-pill--button">Compose</button>
+              <button type="button" class="a-pill a-pill--button">Relecture</button>
+              <button type="button" class="a-pill a-pill--button">Direct</button>
+              <button type="button" class="a-pill a-pill--button">Historique</button>
+            </div>
+            <span class="t-meta">128 éléments · 2026</span>
+          </div>
+          <div class="utl__chapter">Production</div>
+          <div class="utl__list">
+            <article class="utl__item" data-state="confirmed">
+              <span class="utl__marker" data-kind="decision" aria-hidden="true"></span>
+              <div class="utl__row"><span class="utl__when">2026-08-02</span><span class="utl__title">Contrat de cession signé</span><span class="nstate" data-state="confirmed"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-confirmed"/></svg>Confirmé</span></div>
+              <p class="utl__body">Décision attribuable, rattachée à la version 2.1 du document.</p>
+              <div class="utl__refs"><span class="a-badge">document</span><span class="a-badge">décision</span></div>
+            </article>
+            <article class="utl__item" data-state="proposed">
+              <span class="utl__marker" data-kind="proposal" aria-hidden="true"></span>
+              <div class="utl__row"><span class="utl__when">2026-09-24</span><span class="utl__title">Répétition générale</span><span class="nstate" data-state="proposed"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-proposed"/></svg>Proposé</span></div>
+              <p class="utl__body">NOEMA propose ce créneau à partir des disponibilités observées. Rien n'est engagé.</p>
+              <div class="utl__refs"><button type="button" class="a-btn a-btn--sm a-btn--primary">Valider</button><button type="button" class="a-btn a-btn--sm a-btn--ghost">Refuser</button></div>
+            </article>
+            <article class="utl__item">
+              <span class="utl__marker" data-kind="proof" aria-hidden="true"></span>
+              <div class="utl__row"><span class="utl__when">2026-09-10</span><span class="utl__title">Contraste vérifié</span><span class="a-badge a-badge--success">proof</span></div>
+              <p class="utl__body">80 paires de rôles mesurées, aucune sous son seuil.</p>
+            </article>
+          </div>
+        </div>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Marqueurs</span><span class="t-caption">Événement · décision (losange) · proposition (pointillé) · tâche (carré) · document (rectangle) · publication (triangle) · preuve (carré vert) · changement (mi-plein).</span></p>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="ugrid">
+    <h2 class="t-h2" id="ugrid">Grille Universelle — OÙ / FORMAT</h2>
+    <div class="ds-rule">
+      <p class="ds-rule__title">Règle</p>
+      <p>La grille est un système de mesure et de placement, pas une grille de cartes. Un profil de format établit la géométrie ; la grille ne publie jamais. Il n'existe pas d'éditeur d'impression, d'éditeur web ou d'éditeur vidéo séparés : un moteur, des profils.</p>
+    </div>
+    <div class="ds-demo">
+      <div class="ds-demo__stage">
+        <div class="ugrid l-measure-md">
+          <div class="ugrid__page" data-format="a4" data-cols="6">
+            <div class="ugrid__cols" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="ugrid__safe" aria-hidden="true"></div>
+            <div class="ugrid__thirds" aria-hidden="true"></div>
+            <div class="ugrid__snap" data-a-snap="col 3 · 12 mm" aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Repères</span><span class="t-caption">Colonnes, zone sûre, règle des tiers et accroche magnétique expliquée. Le repère dit pourquoi l'objet s'est aligné.</span></p>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="composer">
+    <h2 class="t-h2" id="composer">Composer — COMMENT</h2>
+    <div class="ds-rule">
+      <p class="ds-rule__title">Règle</p>
+      <p>Palette · canvas · inspecteur. Une seule sélection, trois projections : sélectionner un objet dans le canvas le sélectionne dans la Timeline et l'affiche dans l'inspecteur. Le Composer ne crée jamais de copie concurrente d'une donnée canonique.</p>
+    </div>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--col">
+        <div class="composer__toolbar">
+          <span class="a-pill a-pill--button" aria-current="true">Compose</span>
+          <span class="a-pill a-pill--button">Repères</span>
+          <span class="a-pill a-pill--button">Magnétisme</span>
+          <span class="l-spacer"></span>
+          <span class="t-meta">2 objets · 1 relation</span>
+        </div>
+        <div class="l-grid">
+          <div class="l-span-third">
+            <div class="composer__palette">
+              <p class="t-label">Primitives</p>
+              <button type="button" class="composer__primitive"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="ppl-person"/></svg><span><small>Qui</small><b>Personne</b></span></button>
+              <button type="button" class="composer__primitive"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="prj-project"/></svg><span><small>Quoi</small><b>Projet</b></span></button>
+              <button type="button" class="composer__primitive"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="med-image"/></svg><span><small>Asset</small><b>Média</b></span></button>
+              <button type="button" class="composer__primitive"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="rel-relation"/></svg><span><small>Lien</small><b>Relation</b></span></button>
+            </div>
+          </div>
+          <div class="l-span-two-thirds l-stack">
+            <div class="l-canvas l-measure-lg ds-demo__canvas">
+              <div class="cnode is-selected" style="--a-x:24;--a-y:24">
+                <span class="cnode__type">Personne</span>
+                <span class="cnode__title">Camille Vasseur</span>
+                <span class="cnode__desc">Saxophoniste · Lyon</span>
+                <span class="cnode__port cnode__port--in" aria-hidden="true"></span>
+                <span class="cnode__port cnode__port--out" aria-hidden="true"></span>
+              </div>
+            </div>
+            <div class="inspector">
+              <div class="inspector__group">
+                <p class="t-label">Inspecteur</p>
+                <dl class="inspector__row"><dt>Type</dt><dd>Personne</dd></dl>
+                <dl class="inspector__row"><dt>État</dt><dd><span class="nstate" data-state="confirmed"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-confirmed"/></svg>Confirmé</span></dd></dl>
+                <dl class="inspector__row"><dt>Source</dt><dd class="u-mono">atelier-nord/personne</dd></dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <nav class="ds-pager" aria-label="Navigation de chapitre">
+    <a href="components.html"><small>07 — précédent</small><span class="t-body u-strong">Composants</span></a>
+    <a href="noema-components.html"><small>09 — suivant</small><span class="t-body u-strong">Composants NOEMA</span></a>
+  </nav>
+
+</main>
+</div>
+</body>
+</html>

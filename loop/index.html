@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="fr" data-aime-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="a-root" content="../design-system/">
+<title>Boucle minimale — AIME / NOEMA</title>
+<link rel="stylesheet" href="../design-system/tokens/tokens.css">
+<link rel="stylesheet" href="../design-system/styles/foundations.css">
+<link rel="stylesheet" href="../design-system/styles/layout.css">
+<link rel="stylesheet" href="../design-system/styles/components.css">
+<link rel="stylesheet" href="../design-system/styles/aime.css">
+<link rel="stylesheet" href="../design-system/styles/noema.css">
+<link rel="stylesheet" href="../design-system/styles/patterns.css">
+<link rel="stylesheet" href="../design-system/styles/dataviz.css">
+<link rel="stylesheet" href="../design-system/styles/doc.css">
+<script src="../design-system/js/doc.js" defer></script>
+<script src="../design-system/js/aime-ui.js" defer></script>
+<script type="module" src="ui.mjs"></script>
+</head>
+<body>
+<div class="ds-shell">
+<main class="ds-main l-page">
+
+  <header class="ohead">
+    <nav aria-label="Fil d'ariane"><ol class="a-crumbs"><li><a href="../design-system/index.html">Design System</a><span class="a-crumbs__sep" aria-hidden="true">/</span></li><li><span aria-current="page">Boucle minimale</span></li></ol></nav>
+    <div class="ohead__title-row">
+      <span class="ohead__mark"><span class="noema-mark"><svg class="a-ic a-ic--lg noema-mark__glyph" aria-hidden="true" width="24" height="24"><use data-a-icon="noe-mark"/></svg></span></span>
+      <div class="ohead__titles"><span class="t-meta">Atelier Nord · monde de démonstration</span><h1 class="t-h1">NOEMA propose. Vous validez.</h1></div>
+      <span class="l-spacer"></span>
+      <span class="ohead__actions">
+        <button type="button" class="a-btn a-btn--sm" id="b-reset">Réinitialiser</button>
+        <button type="button" class="a-btn a-btn--sm a-btn--primary" id="b-observe">Faire observer NOEMA</button>
+      </span>
+    </div>
+    <div class="ohead__meta">
+      <span class="ohead__states" id="h-counts"><span class="a-badge">chargement…</span></span>
+      <span class="t-meta" id="h-stamp">—</span>
+    </div>
+  </header>
+
+  <div class="ds-rule">
+    <p class="ds-rule__title">Ce que cet écran prouve</p>
+    <p>Chaque objet persisté a un propriétaire, une source et une provenance. NOEMA observe et propose — elle n'écrit jamais un fait. Une proposition devient un fait uniquement par une décision humaine attribuée, qui laisse une preuve. Sous le seuil de confiance, NOEMA se tait : les propositions retenues sont affichées comme retenues, jamais appliquées.</p>
+  </div>
+
+  <section class="ds-block" aria-labelledby="intention">
+    <h2 class="t-h2" id="intention">Ce que vous dites à NOEMA</h2>
+    <p class="t-body-sm u-muted">Une phrase dans vos mots, pas un formulaire. NOEMA en tire des candidats et vous les montre — elle n'enregistre rien tant que vous n'avez pas validé. Ce qu'elle ne comprend pas vous est dit, jamais deviné.</p>
+    <div class="a-field">
+      <label class="a-field__label" for="i-text">Votre intention</label>
+      <textarea class="a-textarea" id="i-text" placeholder="Camille Vasseur est saxophoniste ; il faut la capacité de la salle ; envoyer l'annonce pour le 24 septembre"></textarea>
+      <span class="a-field__hint" id="i-hint">Extraction par motifs : ce n'est pas une compréhension du langage, et la confiance reste basse tant que vous n'avez pas validé.</span>
+    </div>
+    <div class="l-row">
+      <button type="button" class="a-btn a-btn--sm" id="i-read">Lire sans écrire</button>
+      <button type="button" class="a-btn a-btn--sm a-btn--primary" id="i-submit">Proposer à la validation</button>
+    </div>
+    <div class="l-stack" id="intention-out" aria-live="polite"></div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="propositions">
+    <h2 class="t-h2" id="propositions">Ce que NOEMA propose</h2>
+    <div class="l-stack" id="proposals">
+      <p class="t-body-sm u-muted">Chargement…</p>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="actions">
+    <h2 class="t-h2" id="actions">Actions — ce qui sortirait de la machine</h2>
+    <p class="t-body-sm u-muted">Valider une demande d'action ne l'exécute pas : elle entre en attente d'autorisation. Périmètre, risque et réversibilité viennent du registre, jamais de la demande. Autoriser et exécuter sont deux actes distincts, tous deux attribués.</p>
+    <div class="l-stack" id="actions">
+      <p class="t-body-sm u-muted">Aucune action préparée.</p>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="retenu">
+    <h2 class="t-h2" id="retenu">Ce que NOEMA retient</h2>
+    <p class="t-body-sm u-muted">Le silence est une capacité. Ces ébauches n'atteignent pas le seuil de confiance : elles ne sont pas proposées, et encore moins appliquées.</p>
+    <div class="l-stack" id="withheld">
+      <p class="t-body-sm u-muted">Rien de retenu.</p>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="journal">
+    <h2 class="t-h2" id="journal">Journal</h2>
+    <div class="ds-table-wrap">
+      <table class="ds-table">
+        <caption>Append-only. Chaque entrée porte un acteur et un horodatage.</caption>
+        <thead><tr><th scope="col">Horodatage</th><th scope="col">Opération</th><th scope="col">Cible</th><th scope="col">Acteur</th><th scope="col">Cause</th></tr></thead>
+        <tbody id="journal"><tr><td colspan="5">Chargement…</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="monde">
+    <h2 class="t-h2" id="monde">Le monde</h2>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--grid" id="world">
+        <p class="t-body-sm u-muted">Chargement…</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="timeline">
+    <h2 class="t-h2" id="timeline">Timeline universelle</h2>
+    <p class="t-body-sm u-muted">Une projection du projet, jamais une seconde source de vérité. Un seul moteur, six modes : ce qui change d'un mode à l'autre, ce sont les capacités actives — pas les données. Déplacer un événement modifie l'événement canonique, jamais une copie.</p>
+    <div class="l-row">
+      <div class="a-field">
+        <label class="a-field__label" for="t-mode">Mode</label>
+        <select class="a-select" id="t-mode">
+          <option value="PLAN">PLAN — organisation</option>
+          <option value="READ">READ — lecture</option>
+          <option value="COMPOSE">COMPOSE — montage</option>
+          <option value="REVIEW">REVIEW — annotation</option>
+          <option value="LIVE">LIVE — jour J</option>
+          <option value="HISTORY">HISTORY — versions</option>
+        </select>
+      </div>
+      <div class="a-field">
+        <label class="a-field__label" for="t-gran">Granularité</label>
+        <select class="a-select" id="t-gran">
+          <option>ANNÉE</option><option>MOIS</option><option>SEMAINE</option>
+          <option selected>JOUR</option><option>HEURE</option><option>MINUTE</option><option>SECONDE</option>
+        </select>
+      </div>
+    </div>
+    <div class="l-stack" id="t-out">
+      <p class="t-body-sm u-muted">Chargement…</p>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="memoire">
+    <h2 class="t-h2" id="memoire">Votre mémoire — les huit droits</h2>
+    <p class="t-body-sm u-muted">La mémoire appartient à l'humain. Choisissez un sujet : ce que le système en sait, pourquoi il le croit, et ce que vous pouvez en faire. Chaque droit exercé est attribué et tracé — un droit anonyme n'est pas vérifiable.</p>
+    <div class="l-row">
+      <div class="a-field">
+        <label class="a-field__label" for="m-subject">Sujet</label>
+        <select class="a-select" id="m-subject"></select>
+      </div>
+    </div>
+    <div class="l-row" id="m-rights"></div>
+    <div class="l-stack" id="m-out" aria-live="polite">
+      <p class="t-body-sm u-muted">Choisissez un sujet puis un droit.</p>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="preuve">
+    <h2 class="t-h2" id="preuve">Preuves</h2>
+    <div class="l-stack" id="proofs">
+      <p class="t-body-sm u-muted">Aucune décision prise pour l'instant.</p>
+    </div>
+  </section>
+
+</main>
+</div>
+</body>
+</html>

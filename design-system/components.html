@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="fr" data-aime-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="a-root" content="./">
+<title>Composants — AIME Design System V1</title>
+<link rel="stylesheet" href="tokens/tokens.css">
+<link rel="stylesheet" href="styles/foundations.css">
+<link rel="stylesheet" href="styles/layout.css">
+<link rel="stylesheet" href="styles/components.css">
+<link rel="stylesheet" href="styles/aime.css">
+<link rel="stylesheet" href="styles/noema.css">
+<link rel="stylesheet" href="styles/patterns.css">
+<link rel="stylesheet" href="styles/dataviz.css">
+<link rel="stylesheet" href="styles/doc.css">
+<script src="js/doc.js" defer></script>
+<script src="js/aime-ui.js" defer></script>
+</head>
+<body>
+<div class="ds-shell">
+<main class="ds-main l-page">
+
+  <header class="ds-hero">
+    <div class="ds-eyebrow"><span class="a-badge">07</span><span class="t-meta">Couche 3 — Composants fondamentaux</span></div>
+    <h1 class="t-display">Vingt-neuf composants, sept états.</h1>
+    <p class="t-body u-muted">Chaque composant expose la même matrice : default · hover · active · focus · disabled · loading · error. Aucun composant n'invente un état supplémentaire, et aucun écran ne redéfinit un état existant.</p>
+  </header>
+
+  <section class="ds-block" aria-labelledby="button">
+    <h2 class="t-h2" id="button">Button</h2>
+    <div class="ds-demo">
+      <div class="ds-demo__stage">
+        <button type="button" class="a-btn a-btn--primary">Primaire</button>
+        <button type="button" class="a-btn">Secondaire</button>
+        <button type="button" class="a-btn a-btn--ghost">Fantôme</button>
+        <button type="button" class="a-btn a-btn--danger">Destructif</button>
+        <button type="button" class="a-btn a-btn--sm">Petit</button>
+        <button type="button" class="a-btn a-btn--lg">Grand</button>
+        <button type="button" class="a-btn"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="act-export"/></svg>Avec icône</button>
+      </div>
+      <div class="ds-states">
+        <div class="ds-states__cell"><span class="ds-states__key">default</span><button type="button" class="a-btn">Action</button></div>
+        <div class="ds-states__cell" data-state="hover"><span class="ds-states__key">hover</span><button type="button" class="a-btn">Action</button></div>
+        <div class="ds-states__cell" data-state="active"><span class="ds-states__key">active</span><button type="button" class="a-btn">Action</button></div>
+        <div class="ds-states__cell" data-state="focus"><span class="ds-states__key">focus</span><button type="button" class="a-btn">Action</button></div>
+        <div class="ds-states__cell" data-state="disabled"><span class="ds-states__key">disabled</span><button type="button" class="a-btn" disabled>Action</button></div>
+        <div class="ds-states__cell"><span class="ds-states__key">loading</span><button type="button" class="a-btn is-loading"><span class="a-btn__label">Action</span><span class="a-dots"><i></i><i></i><i></i></span></button></div>
+        <div class="ds-states__cell" data-state="error"><span class="ds-states__key">error</span><button type="button" class="a-btn is-error">Action</button></div>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Règle</span><span class="t-caption">Une seule action primaire par écran. Le chargement est une séquence de fondu, jamais une rotation ajoutée au système.</span></p>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="iconbutton">
+    <h2 class="t-h2" id="iconbutton">IconButton · TextButton</h2>
+    <div class="ds-demo">
+      <div class="ds-demo__stage">
+        <button type="button" class="a-icon-btn" aria-label="Réglages"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="set-sliders"/></svg></button>
+        <button type="button" class="a-icon-btn a-icon-btn--edge" aria-label="Rechercher"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="src-search"/></svg></button>
+        <button type="button" class="a-icon-btn" disabled aria-label="Action indisponible"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="act-export"/></svg></button>
+        <span class="a-divider a-divider--vertical" role="presentation"></span>
+        <button type="button" class="a-text-btn">Action texte</button>
+        <button type="button" class="a-text-btn a-text-btn--accent">Action accentuée</button>
+        <button type="button" class="a-text-btn" disabled>Indisponible</button>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Cible</span><span class="t-caption">Aucune cible sous 24 px (WCAG 2.5.8). En densité tactile, le minimum passe à 44 px.</span></p>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="champs">
+    <h2 class="t-h2" id="champs">Input · Textarea · Select · Search</h2>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--grid">
+        <div class="a-field">
+          <label class="a-field__label" for="f-name">Nom du projet</label>
+          <input class="a-input" id="f-name" type="text" placeholder="Atelier Nord" aria-describedby="f-name-hint">
+          <span class="a-field__hint" id="f-name-hint">Visible par l'équipe du projet.</span>
+        </div>
+        <div class="a-field">
+          <label class="a-field__label" for="f-cat">Catégorie</label>
+          <select class="a-select" id="f-cat">
+            <option>Création web</option><option>Événement</option><option>Musique</option><option>Document</option>
+          </select>
+        </div>
+        <div class="a-field">
+          <label class="a-field__label" for="f-brief">Brief</label>
+          <textarea class="a-textarea" id="f-brief" placeholder="Quelques lignes sur l'intention du projet."></textarea>
+        </div>
+        <div class="a-field">
+          <label class="a-field__label" for="f-search">Recherche</label>
+          <span class="a-search">
+            <span class="a-search__icon"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="src-search"/></svg></span>
+            <input class="a-search__input" id="f-search" type="search" placeholder="Personne, projet, document…">
+            <span class="a-search__kbd">⌘K</span>
+          </span>
+        </div>
+        <div class="a-field">
+          <label class="a-field__label" for="f-err">Champ en erreur</label>
+          <input class="a-input" id="f-err" type="email" value="adresse-invalide" aria-invalid="true" aria-describedby="f-err-msg">
+          <span class="a-field__error" id="f-err-msg"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="com-alert"/></svg>Format d'adresse invalide</span>
+        </div>
+        <div class="a-field">
+          <label class="a-field__label" for="f-dis">Champ désactivé</label>
+          <input class="a-input" id="f-dis" type="text" value="Lecture seule" disabled>
+        </div>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Règle</span><span class="t-caption">La bordure d'un champ l'identifie : elle utilise <span class="u-mono">border-strong</span> et atteint 3:1. L'erreur ajoute une bordure plus épaisse et un message, jamais la couleur seule.</span></p>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="choix">
+    <h2 class="t-h2" id="choix">Toggle · Checkbox · Radio</h2>
+    <div class="ds-demo">
+      <div class="ds-demo__stage">
+        <label class="a-toggle"><input type="checkbox" checked><span class="a-toggle__track"><span class="a-toggle__thumb"></span></span><span class="a-toggle__text">Magnétisme</span></label>
+        <label class="a-toggle"><input type="checkbox"><span class="a-toggle__track"><span class="a-toggle__thumb"></span></span><span class="a-toggle__text">Repères</span></label>
+        <label class="a-toggle"><input type="checkbox" disabled><span class="a-toggle__track"><span class="a-toggle__thumb"></span></span><span class="a-toggle__text">Verrouillé</span></label>
+        <span class="a-divider a-divider--vertical" role="presentation"></span>
+        <label class="a-check"><input type="checkbox" checked><span class="a-check__box"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="act-check"/></svg></span>Case cochée</label>
+        <label class="a-check"><input type="checkbox"><span class="a-check__box"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="act-check"/></svg></span>Case libre</label>
+        <span class="a-divider a-divider--vertical" role="presentation"></span>
+        <label class="a-radio"><input type="radio" name="demo-mode" checked><span class="a-radio__box"></span>Lecture</label>
+        <label class="a-radio"><input type="radio" name="demo-mode"><span class="a-radio__box"></span>Composition</label>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="jetons">
+    <h2 class="t-h2" id="jetons">Badge · Tag · Pill</h2>
+    <div class="ds-demo">
+      <div class="ds-demo__stage">
+        <span class="a-badge">défaut</span>
+        <span class="a-badge a-badge--success">confirmed</span>
+        <span class="a-badge a-badge--warning">inferred</span>
+        <span class="a-badge a-badge--error">error</span>
+        <span class="a-badge a-badge--info">observed</span>
+        <span class="a-badge a-badge--accent">proposed</span>
+        <span class="a-badge a-badge--superseded">superseded</span>
+        <span class="a-divider a-divider--vertical" role="presentation"></span>
+        <button type="button" class="a-tag a-tag--button"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="nav-close"/></svg>Étiquette</button>
+        <button type="button" class="a-tag a-tag--button" aria-pressed="true">Filtre actif</button>
+        <span class="a-divider a-divider--vertical" role="presentation"></span>
+        <button type="button" class="a-pill a-pill--button">Plan</button>
+        <button type="button" class="a-pill a-pill--button" aria-current="true">Compose</button>
+        <button type="button" class="a-pill a-pill--button" disabled>Live</button>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Distinction</span><span class="t-caption">Badge = état en monospace. Tag = qualification filtrable. Pill = mode ou segment sélectionnable.</span></p>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="structure">
+    <h2 class="t-h2" id="structure">Divider · Tooltip · Avatar · Progress</h2>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--col">
+        <hr class="a-divider">
+        <hr class="a-divider a-divider--strong">
+        <div class="a-divider a-divider--label" role="separator">Chapitre</div>
+        <div class="l-row">
+          <span class="a-tip" data-a-tip="Enregistrer la version"><button type="button" class="a-icon-btn" aria-label="Enregistrer la version"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="doc-version"/></svg></button></span>
+          <span class="a-tip" data-a-tip="Une infobulle ne porte jamais une information critique"><span class="t-caption u-muted">Survolez ou tabulez sur l'icône</span></span>
+        </div>
+        <div class="l-row">
+          <span class="a-avatar">AN</span>
+          <span class="a-avatar a-avatar--sm">JD</span>
+          <span class="a-avatar a-avatar--lg a-avatar--org">ON</span>
+          <span class="a-avatar-group">
+            <span class="a-avatar">AN</span><span class="a-avatar">JD</span><span class="a-avatar">ML</span><span class="a-avatar">+4</span>
+          </span>
+        </div>
+        <div class="l-stack l-stack--tight l-measure-md">
+          <span class="a-progress"><span class="a-progress__bar" style="--a-value:78"></span></span>
+          <span class="a-progress a-progress--success"><span class="a-progress__bar" style="--a-value:100"></span></span>
+          <span class="a-progress a-progress--warning"><span class="a-progress__bar" style="--a-value:46"></span></span>
+          <span class="a-progress a-progress--indeterminate"><span class="a-progress__bar"></span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="surfaces">
+    <h2 class="t-h2" id="surfaces">Modal · Drawer · Popover · Dropdown · Toast</h2>
+    <div class="ds-demo">
+      <div class="ds-demo__stage">
+        <button type="button" class="a-btn" data-a-open="#demo-modal">Modale</button>
+        <button type="button" class="a-btn" data-a-open="#demo-drawer">Tiroir</button>
+        <button type="button" class="a-btn" data-a-pop="#demo-menu" aria-expanded="false" aria-haspopup="true">Menu</button>
+        <button type="button" class="a-btn" data-a-toast="Version enregistrée" data-a-toast-text="v1.0.4 — 2026-09-17" data-a-tone="success">Notification</button>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Contrat</span><span class="t-caption">Focus piégé et rendu à l'ouverture, fermeture par Échap, voile cliquable, une seule couche active à la fois.</span></p>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="tabs">
+    <h2 class="t-h2" id="tabs">Tabs · Breadcrumb</h2>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--col">
+        <nav aria-label="Fil d'ariane">
+          <ol class="a-crumbs">
+            <li><a href="index.html">AIME</a><span class="a-crumbs__sep" aria-hidden="true">/</span></li>
+            <li><a href="experiences/index.html">Projets</a><span class="a-crumbs__sep" aria-hidden="true">/</span></li>
+            <li><span aria-current="page">Atelier Nord</span></li>
+          </ol>
+        </nav>
+        <div class="a-tabs">
+          <div class="a-tabs__list" role="tablist" aria-label="Vues de l'objet">
+            <button type="button" class="a-tabs__tab" role="tab" id="t1" aria-controls="p1" aria-selected="true">Aperçu</button>
+            <button type="button" class="a-tabs__tab" role="tab" id="t2" aria-controls="p2" aria-selected="false">Timeline</button>
+            <button type="button" class="a-tabs__tab" role="tab" id="t3" aria-controls="p3" aria-selected="false">Provenance</button>
+          </div>
+          <div class="a-tabs__panel" role="tabpanel" id="p1" aria-labelledby="t1">
+            <p class="t-body-sm u-muted">Une seule sélection, trois projections. Le contenu change, l'objet reste le même.</p>
+          </div>
+          <div class="a-tabs__panel" role="tabpanel" id="p2" aria-labelledby="t2" hidden>
+            <p class="t-body-sm u-muted">La Timeline projette le même objet dans le temps. Aucune donnée n'est dupliquée.</p>
+          </div>
+          <div class="a-tabs__panel" role="tabpanel" id="p3" aria-labelledby="t3" hidden>
+            <p class="t-body-sm u-muted">La provenance expose source, évidence, confiance, version, date, propriétaire et permission.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="etats">
+    <h2 class="t-h2" id="etats">États d'interface</h2>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--grid">
+        <div class="a-state">
+          <span class="a-state__icon"><svg class="a-ic a-ic--lg" aria-hidden="true" width="24" height="24"><use data-a-icon="src-search"/></svg></span>
+          <p class="t-h3">Aucun résultat</p>
+          <p class="t-body-sm u-muted">Aucun objet ne correspond à « atelier sud ». Vérifiez l'orthographe ou élargissez la recherche aux projets archivés.</p>
+          <div class="a-state__actions"><button type="button" class="a-btn a-btn--sm">Élargir la recherche</button><button type="button" class="a-btn a-btn--sm a-btn--ghost">Créer un objet</button></div>
+        </div>
+        <div class="a-state">
+          <span class="a-state__icon"><span class="a-dots"><i></i><i></i><i></i></span></span>
+          <p class="t-h3">Chargement</p>
+          <p class="t-body-sm u-muted">Récupération de 128 objets et de leurs relations.</p>
+          <span class="a-skeleton"></span>
+          <span class="a-skeleton"></span>
+        </div>
+        <div class="a-state a-state--error">
+          <span class="a-state__icon"><svg class="a-ic a-ic--lg" aria-hidden="true" width="24" height="24"><use data-a-icon="com-alert"/></svg></span>
+          <p class="t-h3">Source inaccessible</p>
+          <p class="t-body-sm u-muted">La source du projet n'a pas répondu. Aucune donnée n'a été modifiée : la dernière version confirmée reste affichée.</p>
+          <div class="a-state__actions"><button type="button" class="a-btn a-btn--sm">Réessayer</button><button type="button" class="a-btn a-btn--sm a-btn--ghost">Voir la provenance</button></div>
+        </div>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Règle</span><span class="t-caption">Un état vide explique et propose une sortie. Un état d'erreur dit ce qui n'a pas été modifié. Aucun des deux ne décore.</span></p>
+    </div>
+  </section>
+
+  <nav class="ds-pager" aria-label="Navigation de chapitre">
+    <a href="icons.html"><small>06 — précédent</small><span class="t-body u-strong">Iconographie</span></a>
+    <a href="aime-components.html"><small>08 — suivant</small><span class="t-body u-strong">Composants AIME</span></a>
+  </nav>
+
+</main>
+</div>
+
+<div class="a-modal" id="demo-modal" data-a-layer hidden role="dialog" aria-modal="true" aria-labelledby="demo-modal-title">
+  <div class="a-modal__head"><h2 class="t-h3" id="demo-modal-title">Enregistrer la version</h2><button type="button" class="a-icon-btn" data-a-close aria-label="Fermer"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="nav-close"/></svg></button></div>
+  <div class="a-modal__body">
+    <p class="t-body-sm u-muted">Une version fige la composition, la provenance et les décisions associées. Elle reste réversible.</p>
+    <div class="a-field"><label class="a-field__label" for="m-note">Note de version</label><input class="a-input" id="m-note" data-a-autofocus placeholder="v1.0.4 — validation client"></div>
+  </div>
+  <div class="a-modal__foot"><button type="button" class="a-btn a-btn--ghost" data-a-close>Annuler</button><button type="button" class="a-btn a-btn--primary" data-a-close>Enregistrer</button></div>
+</div>
+
+<div class="a-drawer" id="demo-drawer" data-a-layer hidden role="dialog" aria-modal="true" aria-labelledby="demo-drawer-title">
+  <div class="a-drawer__head"><h2 class="t-h3" id="demo-drawer-title">Inspecteur</h2><button type="button" class="a-icon-btn" data-a-close aria-label="Fermer le tiroir"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="nav-close"/></svg></button></div>
+  <div class="a-drawer__body">
+    <dl class="inspector__row"><dt>Type</dt><dd>Projet</dd></dl>
+    <dl class="inspector__row"><dt>État</dt><dd><span class="nstate" data-state="confirmed"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-confirmed"/></svg>Confirmé</span></dd></dl>
+    <dl class="inspector__row"><dt>Version</dt><dd class="u-mono">v1.0.4</dd></dl>
+    <dl class="inspector__row"><dt>Source</dt><dd class="u-mono">atelier-nord/projet</dd></dl>
+  </div>
+  <div class="a-drawer__foot"><button type="button" class="a-btn a-btn--ghost" data-a-close>Fermer</button></div>
+</div>
+
+<div class="a-pop" id="demo-menu" hidden>
+  <ul class="a-menu">
+    <li class="a-menu__label">Version</li>
+    <li><button type="button" class="a-menu__item"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-version"/></svg>Enregistrer la version</button></li>
+    <li><button type="button" class="a-menu__item"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="time-history"/></svg>Historique</button></li>
+    <li class="a-menu__sep" role="presentation"></li>
+    <li><button type="button" class="a-menu__item a-menu__item--danger"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="apr-rejected"/></svg>Supprimer</button></li>
+  </ul>
+</div>
+
+</body>
+</html>
