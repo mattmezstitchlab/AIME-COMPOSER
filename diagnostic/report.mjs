@@ -14,11 +14,29 @@
  * limites se fait corriger par le premier lecteur compétent.
  */
 import { readFileSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const HERE = dirname(fileURLToPath(import.meta.url));
 
 /* survey.mjs écrit sa progression sur stderr, donc stdin est du JSON pur.
    S'il fallait ici découper la chaîne pour retrouver l'objet, ce serait le
    signe que la source s'est remise à polluer sa sortie machine. */
 const d = JSON.parse(readFileSync(0, 'utf8'));
+
+/* Le rapport cite le périmètre du Design System. Ces nombres sont lus du
+   rapport QA que `npm run check` écrit, pas recopiés : tapés à la main,
+   ils mentiraient silencieusement dès que le système gagnerait un écran.
+   C'est exactement le défaut que ce script existe pour éviter — il était
+   présent ici aussi, et la relecture du document l'a révélé. */
+const QA = JSON.parse(readFileSync(join(HERE, '..', 'design-system', 'tokens', 'QA-REPORT.json'), 'utf8'));
+const ECRANS_DS = QA.scope.pages;
+const FAMILLES = QA.checks.length;
+const DS_CONFORME = QA.pass === true && QA.issues === 0;
+
+/* Le nombre d'écrans d'`atlas/` vient de la mesure du dépôt lui-même,
+   qui figure déjà au classement. */
+const composeur = d.projets.find((p) => p.label.endsWith('/AIME-COMPOSER'));
 
 const aujourdhui = new Date().toISOString().slice(0, 10);
 const L = [];
@@ -33,7 +51,7 @@ w();
 w('## Ce que ce document est');
 w();
 w(`Le moteur qui juge ces projets est \`design-system/js/qa.js\` — **celui qui`);
-w('valide les 31 écrans du Design System**, pas une copie. Un projet est donc');
+w(`valide les ${ECRANS_DS} écrans du Design System**, pas une copie. Un projet est donc`);
 w('jugé dans les mêmes conditions que les écrans qui sortent, sur le même');
 w('barème. Un écart de densité entre deux projets est une différence réelle.');
 w();
@@ -57,11 +75,12 @@ w('Chaque dépôt est cloné peu profond **sur sa branche par défaut**. Le rapp
 w('décrit donc l\'état publié du projet, pas un travail en cours sur une branche.');
 w();
 w('Cela change la lecture d\'une ligne : `AIME-COMPOSER` lui-même. Sa branche');
-w('`main` ne contient pas encore `design-system/` ni `loop/` — ils sont sur la');
-w('branche de la PR #39, non fusionnée. La ligne mesure donc `atlas/` seul, cinq');
-w('écrans de Playground écrits avant le système et qui ne référencent aucune de');
-w('ses feuilles. Les 31 écrans du Design System, eux, sont jugés en continu par');
-w('`npm run check` dans ce même dépôt, et sortent conformes aux 12 familles.');
+w('`main` ne contient pas encore `design-system/` ni `loop/` — ils sont sur une');
+w(`branche non fusionnée. La ligne mesure donc \`atlas/\` seul${composeur ? `, ${composeur.pages} ` : ' '}écran${composeur && composeur.pages > 1 ? 's' : ''} de`);
+w(`Playground écrit${composeur && composeur.pages > 1 ? 's' : ''} avant le système, qui ne référencent aucune de ses`);
+w(`feuilles. Les ${ECRANS_DS} écrans du Design System, eux, sont jugés en continu`);
+w('par `npm run check` dans ce même dépôt, et sortent ' +
+  (DS_CONFORME ? `conformes aux ${FAMILLES} familles.` : `avec ${QA.issues} écart(s) — le rapport QA ne dit donc pas « conforme ».`));
 w();
 w('## Classement');
 w();
@@ -109,7 +128,7 @@ w();
 w('## Ce que cette mesure ne couvre pas');
 w();
 w('- **Aucune mise en page réelle n\'est jugée.** `ALIGNMENT` et `OVERFLOW` sont');
-w('  des heuristiques statiques. Les 31 écrans du système sont vérifiés au rendu');
+w(`  des heuristiques statiques. Les ${ECRANS_DS} écrans du système sont vérifiés au rendu`);
 w('  par `qa/verify-dom.mjs` ; ce diagnostic ne le fait pas pour un projet tiers.');
 w('- **La collecte est statique.** Du HTML rendu par JavaScript n\'est pas vu.');
 w('- **Les icônes générées par JavaScript ne sont pas comptées** par');

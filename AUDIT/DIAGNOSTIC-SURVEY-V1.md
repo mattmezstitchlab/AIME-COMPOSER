@@ -31,11 +31,11 @@ Chaque dépôt est cloné peu profond **sur sa branche par défaut**. Le rapport
 décrit donc l'état publié du projet, pas un travail en cours sur une branche.
 
 Cela change la lecture d'une ligne : `AIME-COMPOSER` lui-même. Sa branche
-`main` ne contient pas encore `design-system/` ni `loop/` — ils sont sur la
-branche de la PR #39, non fusionnée. La ligne mesure donc `atlas/` seul, cinq
-écrans de Playground écrits avant le système et qui ne référencent aucune de
-ses feuilles. Les 31 écrans du Design System, eux, sont jugés en continu par
-`npm run check` dans ce même dépôt, et sortent conformes aux 12 familles.
+`main` ne contient pas encore `design-system/` ni `loop/` — ils sont sur une
+branche non fusionnée. La ligne mesure donc `atlas/` seul, 5 écrans de
+Playground écrits avant le système, qui ne référencent aucune de ses
+feuilles. Les 31 écrans du Design System, eux, sont jugés en continu
+par `npm run check` dans ce même dépôt, et sortent conformes aux 12 familles.
 
 ## Classement
 
