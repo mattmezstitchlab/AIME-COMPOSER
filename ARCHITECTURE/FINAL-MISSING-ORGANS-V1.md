@@ -284,7 +284,7 @@ Rollback must be possible where technically feasible.
 
 Publication creates a proof record containing the released version and relevant checks.
 
-For structured data, automated validation should be treated as a QA signal, not as a guarantee of search appearance. Google recommends validation and Search Console monitoring after deployment. citeturn0search0turn0search3
+Automated validation of structured data is a QA signal, not a guarantee of search appearance; production monitoring remains necessary.
 
 ## 12. Universal Proof / QA Engine
 
@@ -349,7 +349,7 @@ The universal architecture also needs operational safeguards:
 - revocation;
 - service dependency visibility.
 
-For systems acting as processors, CNIL emphasizes security, confidentiality, documentation, contractual framing, incident handling, data return/deletion and controls over subcontractors. citeturn0search8turn0search11turn0search15
+For systems acting as processors, security, confidentiality, documentation, incident handling, data return/deletion and subcontractor controls must be treated as architecture concerns and mapped to the applicable legal context.
 
 ## 15. What is already covered
 
