@@ -42,7 +42,11 @@ if (!targets.length) {
   const raw = execFileSync('gh', ['repo', 'list', OWNER, '--limit', '200',
     '--json', 'name,primaryLanguage', '--jq', '.[].name'], { encoding: 'utf8' });
   const names = raw.trim().split('\n').filter(Boolean);
-  console.log(`\n${names.length} dépôts trouvés sur ${OWNER} — clonage peu profond…\n`);
+  /* Sur stderr : avec --json, stdout doit rester du JSON pur. Une ligne de
+     progression écrite avant l'objet casse tout consommateur qui pipe la
+     sortie — `jq`, un tableur, un autre script. L'information reste
+     visible pour un humain, qui lit les deux flux. */
+  console.error(`\n${names.length} dépôts trouvés sur ${OWNER} — clonage peu profond…\n`);
   for (const name of names) targets.push({ label: `${OWNER}/${name}`, kind: 'repo', value: name });
 }
 
@@ -78,6 +82,25 @@ for (const t of targets) {
 /* ── Rendu ─────────────────────────────────────────────────────── */
 const judged = rows.filter((r) => r.pages > 0).sort((a, b) => a.density - b.density);
 const unjudged = rows.filter((r) => !r.pages);
+
+/* Sortie machine. Elle existe pour qu'un rapport écrit à partir d'un
+   sondage ne recopie aucun chiffre à la main : un total recopié est un
+   total qui peut mentir sans que personne ne s'en aperçoive. */
+if (args.includes('--json')) {
+  const ecrans = judged.reduce((n, r) => n + r.pages, 0);
+  const total = judged.reduce((n, r) => n + r.ecarts, 0);
+  process.stdout.write(JSON.stringify({
+    owner: OWNER,
+    juges: judged.length,
+    ecartes: unjudged.length,
+    ecrans,
+    ecarts: total,
+    densite_globale: ecrans ? Number((total / ecrans).toFixed(1)) : 0,
+    projets: judged,
+    non_diagnostiques: unjudged.map((r) => ({ label: r.label, raison: r.error || r.note })),
+  }, null, 2) + '\n');
+  process.exit(0);
+}
 
 const line = '─'.repeat(96);
 console.log(`\n${line}`);
