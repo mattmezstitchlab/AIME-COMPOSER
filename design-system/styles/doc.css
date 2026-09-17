@@ -175,6 +175,7 @@
 .ds-table td:first-child { color: var(--aime-color-text); font-family: var(--aime-font-mono); font-size: var(--aime-text-caption-size); }
 .ds-table tbody tr:hover { background: var(--aime-color-surface); }
 .ds-table-wrap { overflow-x: auto; border: var(--aime-border-subtle); border-radius: var(--aime-radius-medium); }
+.ds-table-wrap--scroll { max-block-size: 24rem; overflow: auto; }
 
 /* Cadre d'appareil pour les règles responsives */
 /* Boîte de démonstration d'un mouvement : cadre neutre, hauteur prévisible. */

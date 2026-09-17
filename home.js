@@ -1,14 +1,12 @@
 /**
  * AIME-COMPOSER — page d'accueil du dépôt.
  *
- * Trois responsabilités, aucune règle métier :
+ * Deux responsabilités, aucune règle métier :
  *   1. résoudre les icônes déclaratives `data-a-icon` (le châssis documentaire
  *      js/doc.js n'est pas chargé ici : l'accueil a son propre haut de page) ;
- *   2. brancher la conversation NOEMA, la Carte Universelle et la Timeline
- *      Universelle sur la boucle (loop/server.mjs) quand elle tourne — les
- *      règles restent dans les modules de la boucle, jamais recalculées ici ;
- *   3. rester lisible sans boucle : chaque démo porte un repli statique et
- *      l'indique honnêtement — une projection qui se tait plutôt que simuler.
+ *   2. brancher la conversation NOEMA sur la boucle (loop/server.mjs) quand
+ *      elle tourne — les règles restent dans les modules de la boucle, jamais
+ *      recalculées ici ; sans boucle, la conversation le dit honnêtement.
  *
  * Script classique (defer), pas un module : la vérification DOM exécute les
  * scripts classiques avant de contrôler les icônes, donc la résolution doit
@@ -72,14 +70,6 @@
     date: { label: 'Date', icon: 'time-calendar' },
     unknown: { label: 'Inconnu déclaré', icon: 'mem-card' },
     action_request: { label: 'Action demandée', icon: 'apr-approved' },
-  };
-  const STATE = {
-    observed: { label: 'Observé', icon: 'noe-observed' },
-    extracted: { label: 'Extrait', icon: 'noe-extracted' },
-    inferred: { label: 'Déduit', icon: 'noe-inferred' },
-    proposed: { label: 'Proposé', icon: 'noe-proposed' },
-    confirmed: { label: 'Confirmé', icon: 'noe-confirmed' },
-    superseded: { label: 'Remplacé', icon: 'noe-superseded' },
   };
   const CONF = { low: 'faible', medium: 'moyenne', high: 'élevée' };
 
@@ -170,10 +160,6 @@
         body: JSON.stringify(dry ? { text, dry_run: true } : { text, actor: 'visiteur' }),
       });
       renderCandidates(d, !dry);
-      if (!dry) {
-        /* Une écriture peut faire naître une proposition : on relit le monde. */
-        api('/api/state').then(renderCard).catch(() => {});
-      }
     } catch (e) {
       out.innerHTML = `<div class="a-state a-state--error">
         <span class="a-state__icon">${ic('com-alert', 'a-ic a-ic--lg')}</span>
@@ -185,72 +171,14 @@
   $('#h-noema-read')?.addEventListener('click', () => talk(true));
   $('#h-noema-submit')?.addEventListener('click', () => talk(false));
 
-  /* ── Carte Universelle — alimentée par la boucle ─────────────── */
-  function renderCard(st) {
-    const box = $('#h-card');
-    if (!box) return;
-    const prj = (st.entities || []).find((e) => e.kind === 'project') || (st.entities || []).find((e) => e.title);
-    if (!prj) return;
-    const title = prj.title || prj.display_name || prj.id;
-    const state = (prj.provenance && prj.provenance.state) || 'observed';
-    const stMeta = STATE[state] || STATE.observed;
-    const nb = (st.observation && st.observation.proposable && st.observation.proposable.length) || 0;
-    box.innerHTML = `<a class="ucard" href="loop/">
-      <div class="ucard__id"><span class="ucard__mark" data-type="project">${ic('prj-project', 'a-ic')}</span>
-        <span class="ucard__head"><span class="ucard__type">Projet · lu dans la boucle</span><span class="ucard__title">${esc(title)}</span>${prj.template ? `<span class="ucard__sub">${esc(prj.template)}</span>` : ''}</span></div>
-      <dl class="ucard__facts"><div class="ucard__fact"><dt>Référence</dt><dd class="u-mono">${esc(prj.id)}</dd></div><div class="ucard__fact"><dt>Confiance</dt><dd>${esc(CONF[prj.confidence] || prj.confidence || '—')}</dd></div></dl>
-      <div class="ucard__foot"><span class="nstate" data-state="${esc(state)}">${ic(stMeta.icon, 'a-ic a-ic--state')}${esc(stMeta.label)}</span>${nb ? `<span class="a-badge a-badge--accent">${nb} proposition(s)</span>` : ''}</div>
-    </a>`;
-    const cap = $('#h-card-cap');
-    if (cap) cap.textContent = `Entité vivante lue via GET /api/state — « ${title} », avec ${nb} proposition(s) en attente dans l'observation courante.`;
-    resolveIcons(box);
-  }
-
-  /* ── Timeline Universelle — projection vivante du flux canonique ── */
-  async function loadTimeline() {
-    const boxEl = $('#h-timeline');
-    if (!boxEl || !live) return;
-    const mode = $('#h-tl-mode')?.value || 'PLAN';
-    const gran = $('#h-tl-gran')?.value || 'JOUR';
-    try {
-      const d = await api(`/api/timeline?mode=${encodeURIComponent(mode)}&granularity=${encodeURIComponent(gran)}`);
-      const caps = (d.capabilities || []).join(' · ') || 'aucune — lecture seule';
-      const ordered = [];
-      for (const b of d.buckets || []) {
-        for (const id of b.ids) {
-          const it = (d.items || []).find((x) => x.id === id);
-          if (it) ordered.push(it);
-        }
-      }
-      boxEl.innerHTML = `<p class="t-caption u-muted">mode <span class="u-mono">${esc(d.mode)}</span> · granularité <span class="u-mono">${esc(d.granularity)}</span> · capacités actives <span class="u-mono">${esc(caps)}</span></p>
-        <div class="utl l-measure-xl"><div class="utl__list">${ordered.map((it) => {
-          const marker = it.late ? 'change' : (it.status === 'published' || it.status === 'completed' ? 'publication' : 'task');
-          return `<article class="utl__item"${it.status === 'proposed' ? ' data-state="proposed"' : ''}>
-            <span class="utl__marker" data-kind="${marker}" aria-hidden="true"></span>
-            <div class="utl__row"><span class="utl__when">${esc(it.start || 'sans date')}</span><span class="utl__title">${esc(it.title)}</span>
-              ${it.type ? `<span class="a-badge">${esc(it.type)}</span>` : ''}${it.late ? '<span class="a-badge a-badge--error">en retard</span>' : ''}</div>
-            <p class="utl__body">statut ${esc(it.status || '—')} · source ${esc(it.source || '—')}</p></article>`;
-        }).join('') || '<p class="t-body-sm u-muted">Aucun événement dans cette projection.</p>'}</div></div>`;
-      const cap = $('#h-timeline-cap');
-      if (cap) cap.textContent = 'Projection vivante via GET /api/timeline — changer de mode ou de granularité ré-interroge la boucle ; les actions restent dans la boucle.';
-    } catch {
-      /* Le repli statique reste affiché et sa légende l'indique honnêtement. */
-    }
-  }
-  for (const sel of ['#h-tl-mode', '#h-tl-gran']) {
-    $(sel)?.addEventListener('change', loadTimeline);
-  }
-
   /* ── Détection de la boucle ──────────────────────────────────── */
-  /* fetch est absent sous jsdom (vérification DOM) : on reste alors sur les
-     replis statiques, sans erreur — la page documente déjà comment brancher. */
+  /* fetch est absent sous jsdom (vérification DOM) : le badge reste alors
+     « hors ligne », sans erreur — la page documente déjà comment brancher. */
   if (typeof fetch === 'function') {
     api('/api/state')
-      .then((st) => {
+      .then(() => {
         live = true;
         setStatus();
-        renderCard(st);
-        loadTimeline();
       })
       .catch(() => setStatus());
   } else {

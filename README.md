@@ -77,8 +77,9 @@ Details: `diagnostic/README.md`.
 
 ## Médiathèque
 
-`atlas/` is the media library: every visual, video, audio track and vector recorded
-in the account's repositories, referenced where it lives — never copied here.
+`atlas/` is the **universal media library**: every visual, video, audio track and
+vector recorded in the account's repositories, referenced where it lives — never
+copied here — plus, on demand, the media of a **local folder** from your machine.
 The five pre-system Atlas screens were removed; the current page is built with the
 Design System and audited with it.
 
@@ -88,15 +89,36 @@ The catalogue is **generated, never handwritten**:
 node atlas/build-media.mjs   # scan the account's git trees via `gh api` → atlas/media.json
 ```
 
-The page reads `atlas/media.json` and shows each image's real file through a CDN
-(jsDelivr, raw fallback); a video is never played in-page (tile + source link);
-an unavailable file admits it with its type tile instead of a broken frame.
-Search, type filters (images / videos / vectors / audio) and per-repository
-filtering are all client-side. Every card can be **downloaded** or **checked**;
-the selection toolbar copies plain links, builds a structured **agent brief**
-(instructions + JSON manifest with CDN and fallback URLs), or downloads a `.sh`
-recovery script — transmitting stays an agent's job, validating stays human.
+The scan is **transversal**: it opens the default branch of every repository
+(38 today), walks each git tree recursively — descending subtrees if GitHub
+truncates, budget-capped and honestly flagged — and records a per-repository
+coverage table (media count, empty repos, errors, duplicates by blob sha) which
+the page displays under « Couverture du scan ». An absence is a finding, never
+a hidden corner: zero audio file is committed anywhere, because storage-heavy
+media (DISPOO's film/hero system resolved at runtime) live outside git —
+the local mode is precisely how those get classified.
+
+The page is a **viewer**: images show their real file (jsDelivr, raw fallback),
+videos and audio **play in-page** from their true source, and an unavailable
+file admits it with its type tile instead of a broken frame. In **local mode**,
+a picked folder is read, classified (photos / videos / audio / vectors), shown
+and playable entirely in the browser — originals preserved, relative paths kept
+as provenance, nothing uploaded or synced (the Bureau contract). Search, type
+filters, provenance filtering and source switch (GitHub / local) are all
+client-side. Every card can be **downloaded** or **checked**; the selection
+toolbar copies plain links, builds a structured **agent brief** (instructions +
+JSON manifest with CDN/fallback URLs, or transfer-by-hand clauses for local
+files), or downloads a `.sh` recovery script — transmitting stays an agent's
+job, validating stays human.
 
 The mechanisms this library converges (media registries, resolution layers,
-per-project storages) are audited in `AUDIT/MEDIA-ATLAS-01.md`.
-The old pre-system Atlas specification (`AUDIT/ATLAS-SPEC.md`) is superseded.
+per-project storages) are audited in `AUDIT/MEDIA-ATLAS-01.md`, with the
+transversal-scan addendum. The old pre-system Atlas specification
+(`AUDIT/ATLAS-SPEC.md`) is superseded.
+
+Behavioral smokes (viewer, local ingest, coverage, selection, exports) run in
+`design-system/qa/smoke-medias-v2.mjs`:
+
+```bash
+cd design-system && node qa/smoke-medias-v2.mjs
+```

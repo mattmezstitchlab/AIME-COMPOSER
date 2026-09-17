@@ -328,3 +328,16 @@ MediaRecord
 3. Inspect AIME Network media projections.
 4. Map verified media records into Project Viewer without copying source assets.
 5. Only then design global media replacement/composition operations.
+
+## Addendum — transversal scan of all 38 repos (2026-09-17)
+
+**CONFIRMED** by `atlas/build-media.mjs` (git trees API, recursive, subtree descent budgeted against truncation):
+
+- **366 media items** across **12 of 38** repositories; every repository was opened on its default branch, none was skipped.
+- Trees read **without truncation** at this scan date; if GitHub ever truncates a large tree, the scanner now descends each subtree and would mark the repository `truncated` in the catalogue instead of pretending full coverage.
+- **Audio: zero committed file.** This is a fact of the trees, not a scanner gap. DISPOO's narrative media (the `film-accueil` / `hero-*` keys above) resolve at runtime against **application storage outside git** (Supabase-backed registries), which is why no audio payload ever appears in a default branch.
+- **Videos: 7** (6 in byaime-one-page, 1 in nails-profile) — all playable from their raw/CDN URLs.
+- **119 content duplicates** detected by git blob sha (identical bytes, different paths — e.g. `img/` mirrored into `public/img/`, and `attached_assets/` duplicates of `artifacts/…/public/videos/`). Duplicates are content-level, not name-level.
+- Three repositories are **empty Git repositories** (no commit on the default branch): DISPOORED, aimeplay, byaimeapp — recorded as `vide` in the catalogue's coverage table, shown in the page.
+
+The atlas page (`atlas/`) renders this coverage per repository and plays video/audio inline; its **local mode** applies the Universal Bureau contract (LOCAL FILES/FOLDERS → READ → CLASSIFY → VIEW → ORGANIZE → PROCESS; originals preserved, provenance kept, nothing sent or synced, human validates — UNIVERSAL-BUREAU-DOCUMENTS-V1.md §12–13).

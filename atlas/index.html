@@ -39,7 +39,7 @@
     <nav aria-label="Fil d'ariane"><ol class="a-crumbs"><li><a href="../index.html">Accueil</a><span class="a-crumbs__sep" aria-hidden="true">/</span></li><li><span aria-current="page">Médiathèque</span></li></ol></nav>
     <div class="ohead__title-row">
       <span class="ohead__mark"><svg class="a-ic a-ic--lg" aria-hidden="true" width="24" height="24"><use data-a-icon="med-library"/></svg></span>
-      <div class="ohead__titles"><span class="t-meta" id="m-count">chargement du catalogue…</span><h1 class="t-h1">Médiathèque</h1></div>
+      <div class="ohead__titles"><span class="t-meta" id="m-count">chargement du catalogue…</span><h1 class="t-h1">Médiathèque universelle</h1></div>
       <span class="l-spacer"></span>
       <span class="ohead__actions">
         <a class="a-btn a-btn--sm" href="../design-system/experiences/media-library.html"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="med-library"/></svg>L'organe dans le Design System</a>
@@ -49,8 +49,24 @@
   </header>
 
   <section class="ds-block" aria-labelledby="catalogue">
-    <h2 class="t-h2" id="catalogue">Tous les médias de tous les dépôts</h2>
-    <p class="t-body u-muted">Chaque visuel, vidéo, piste audio et vecteur relevé dans les arbres git des dépôts du compte — référencé là où il vit, jamais copié ici. Les images montrent leur fichier réel ; une vidéo n'est jamais lue dans cette page, et un fichier inaccessible affiche sa tuile de type plutôt qu'une image simulée.</p>
+    <h2 class="t-h2" id="catalogue">Un seul catalogue — vos dépôts, et votre poste</h2>
+    <p class="t-body u-muted">Chaque visuel, vidéo, piste audio et vecteur relevé dans les arbres git des dépôts du compte — référencé là où il vit, jamais copié ici — plus, à la demande, le contenu d'un dossier de votre poste. Les images montrent leur fichier réel ; les vidéos et les pistes audio <span class="u-strong">se lisent dans la page</span> ; un fichier inaccessible affiche sa tuile de type plutôt qu'une image simulée.</p>
+
+    <div class="l-row" role="group" aria-label="Source des médias">
+      <button type="button" class="a-pill a-pill--button" data-m-source="github" aria-current="true">Dépôts GitHub</button>
+      <button type="button" class="a-pill a-pill--button" data-m-source="local">Dossier local</button>
+      <span class="l-spacer"></span>
+      <span class="l-row l-row--nowrap" id="m-local-tools" hidden>
+        <span class="t-caption u-muted" id="m-local-meta"></span>
+        <button type="button" class="a-btn a-btn--sm" id="m-local-pick"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="com-inbox"/></svg>Parcourir un dossier…</button>
+        <input id="m-local-input" type="file" multiple webkitdirectory aria-label="Choisir un dossier local à répertorier" tabindex="-1" class="u-sr">
+      </span>
+    </div>
+
+    <div class="ds-rule" id="m-local-rule" hidden>
+      <p class="ds-rule__title">Mode local — la règle du Bureau universel</p>
+      <p>Le dossier est une surface d'entrée, pas une base : les originaux sont préservés, rien n'est copié, rien n'est envoyé, rien n'est synchronisé. La provenance (le chemin relatif sur votre poste) reste attachée à chaque média. Lire, classer, voir, relier, proposer — puis <span class="u-strong">vous validez</span>.</p>
+    </div>
 
     <div class="l-row l-row--between">
       <div class="a-search l-measure-md">
@@ -59,8 +75,8 @@
         <input class="a-search__input" id="m-q" type="search" placeholder="Nom, dépôt, chemin…" autocomplete="off">
       </div>
       <div class="a-field">
-        <label class="a-field__label" for="m-repo">Dépôt</label>
-        <select class="a-select" id="m-repo"><option value="">Tous les dépôts</option></select>
+        <label class="a-field__label" for="m-repo">Provenance</label>
+        <select class="a-select" id="m-repo"><option value="">Toutes les provenances</option></select>
       </div>
     </div>
 
@@ -99,6 +115,22 @@
       <p class="ds-rule__title">Règle de la médiathèque</p>
       <p>Un média existe une fois, là où il vit. Cette surface référence et laisse voir — elle n'absorbe rien dans le dépôt d'audit. L'extraction d'assets vers le Composer reste une décision humaine, tracée.</p>
     </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="couverture">
+    <h2 class="t-h2" id="couverture">Couverture du scan — chaque dépôt, nommé</h2>
+    <p class="t-body u-muted">Le scan est <span class="u-strong">transversal</span> : il ouvre la branche par défaut de chaque dépôt du compte et relève tous les fichiers médias de tous les dossiers, sans exception (arbres lus en récursif, avec descente sous-arbre si GitHub tronquait). Ce tableau ne contourne pas une absence : un dépôt à « 0 » est un dépôt <span class="u-strong">sans média commité</span>, pas un dépôt oublié.</p>
+    <p class="t-body-sm" id="m-audio-note">Lecture de la couverture…</p>
+    <div class="ds-table-wrap ds-table-wrap--scroll">
+      <table class="a-table">
+        <caption class="u-sr">Médias relevés par dépôt du compte, avec l'état de lecture de chaque arbre</caption>
+        <thead><tr><th scope="col">Dépôt</th><th scope="col">Branche</th><th scope="col">Médias</th><th scope="col">État de lecture</th></tr></thead>
+        <tbody id="m-coverage">
+          <tr><td colspan="4">Chargement de la couverture…</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="ds-demo__caption"><span class="t-label">Provenance</span><span class="t-caption" id="m-coverage-caption">mêmes données que le catalogue ci-dessus.</span></p>
   </section>
 
 </main>
