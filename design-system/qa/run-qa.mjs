@@ -31,11 +31,18 @@ const cssFiles = walk(join(ROOT, 'styles'))
   .sort()
   .map((p) => ({ name: relative(ROOT, p), text: readFileSync(p, 'utf8') }));
 
-/* 2. Tous les écrans HTML du système (documentation + expériences) */
-const pages = walk(ROOT)
+/* 2. Tous les écrans construits avec le système.
+       Le périmètre n'est pas le dossier : c'est l'usage. Tout écran qui
+       charge les feuilles du Design System est audité comme les autres,
+       y compris ceux de la boucle NOEMA. Un écran exempté d'audit est un
+       écran qui finira par inventer un style. */
+const LOOP = join(ROOT, '..', 'loop');
+const roots = [ROOT, ...(existsSync(LOOP) ? [LOOP] : [])];
+const pages = roots
+  .flatMap((r) => walk(r))
   .filter((p) => p.endsWith('.html') && !p.includes('node_modules'))
   .sort()
-  .map((p) => ({ name: relative(ROOT, p), html: readFileSync(p, 'utf8') }));
+  .map((p) => ({ name: relative(join(ROOT, '..'), p), html: readFileSync(p, 'utf8') }));
 
 /* 3. Contraste : le contrat partagé, rejoué sur l'artefact livré */
 const contrast = evaluateContrast();

@@ -136,6 +136,18 @@ test('une confiance numérique est refusée', () => {
   throws(() => s.put('person', bad), 'le store a accepté une confiance numérique');
 });
 
+test('une horloge réelle est acceptée (secondes fractionnaires)', () => {
+  /* Régression : la regex ISO refusait new Date().toISOString(), et les
+     tests ne le voyaient pas parce qu'ils utilisaient une date fixe. */
+  const s = createStore(null);
+  const p = s.create('person', {
+    display_name: 'Horloge réelle', source: 'test',
+    provenance: provenance('test', 'observed'), created_by: 'test',
+  });
+  ok(/T\d{2}:\d{2}:\d{2}\.\d+Z$/.test(p.created_at), `created_at inattendu : ${p.created_at}`);
+  eq(validate('person', p).length, 0, 'un objet horodaté par une horloge réelle est rejeté');
+});
+
 test('les trois degrés de confiance sont exactement low, medium, high', () => {
   eq(CONFIDENCE_LEVELS, ['low', 'medium', 'high'], 'les degrés de confiance ont changé');
 });

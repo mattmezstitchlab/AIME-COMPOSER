@@ -90,7 +90,11 @@ export function fromDataModelConfidence(klass) {
 
 /* ── Validation ────────────────────────────────────────────────── */
 
-const ISO = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2})?(Z|[+-]\d{2}:?\d{2})?)?$/;
+/* ISO 8601, secondes fractionnaires comprises — c'est ce que produit
+   new Date().toISOString(). Une regex trop stricte ici rejetterait toute
+   horloge réelle : les tests passaient uniquement parce qu'ils utilisaient
+   une date fixe sans millisecondes. */
+const ISO = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2}(\.\d{1,9})?)?(Z|[+-]\d{2}:?\d{2})?)?$/;
 
 /**
  * Vérifie un objet avant écriture. Retourne la liste des violations ;

@@ -50,10 +50,11 @@ const pages = [];
 for (const f of readdirSync(DS).sort()) {
   if (f.endsWith('.html')) pages.push(path.join(DS, f));
 }
-const EXP = path.join(DS, 'experiences');
-if (existsSync(EXP)) {
-  for (const f of readdirSync(EXP).sort()) {
-    if (f.endsWith('.html')) pages.push(path.join(EXP, f));
+for (const sub of ['experiences', path.join('..', 'loop')]) {
+  const dir = path.join(DS, sub);
+  if (!existsSync(dir)) continue;
+  for (const f of readdirSync(dir).sort()) {
+    if (f.endsWith('.html') && !f.includes('node_modules')) pages.push(path.join(dir, f));
   }
 }
 
