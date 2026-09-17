@@ -18,6 +18,7 @@ import { observe, propose, decide, confidenceOf, worthProposing, PROPOSAL_THRESH
 import { validate, EPISTEMIC_KEYS, CONFIDENCE_LEVELS, fromDataModelConfidence, isEstablished, ACTION_VERBS } from '../src/schema.mjs';
 import { interpret, submit } from '../src/intention.mjs';
 import { draft, authorize, execute, posture } from '../src/action.mjs';
+import { voir, comprendre, corriger, supprimer, pauser, limiter, partager, revoquer, isPaused, droits, activeGrants } from '../src/governance.mjs';
 
 let pass = 0;
 const failures = [];
@@ -676,6 +677,222 @@ test('un échec de matérialisation n\u2019annule pas la décision humaine', () 
   eq(dec.decision, 'accepted', 'la décision a été défaite');
   eq(s.get(p.id).status, 'accepted', 'la proposition n\u2019est plus acceptée');
   ok(proof.proof_type === 'validation', 'aucune preuve de la décision');
+});
+
+/* ── GOUVERNANCE : la mémoire appartient à l'humain ────────────── */
+console.log('\nGOUVERNANCE DE LA MÉMOIRE');
+
+const LATER = '2026-12-31T23:59:59Z';
+
+test('les huit droits sont exposés, dans l\u2019ordre de la constitution', () => {
+  eq(droits().rights, ['voir', 'comprendre', 'corriger', 'supprimer', 'pauser', 'limiter', 'partager', 'révoquer'],
+    'les huit droits ne correspondent pas à la constitution §6');
+  eq(droits().categories, ['personnelle', 'projet', 'partagée', 'temporaire', 'sensible'],
+    'les catégories ne correspondent pas à la constitution §6');
+});
+
+test('aucun droit ne s\u2019exerce sans acteur', () => {
+  const s = seedWorld();
+  const who = s.byType('person')[0].id;
+  for (const [name, fn] of [
+    ['voir', () => voir(s, { subject_id: who })],
+    ['comprendre', () => comprendre(s, { id: who })],
+    ['corriger', () => corriger(s, { id: who, field: 'display_name', value: 'x' })],
+    ['supprimer', () => supprimer(s, { id: who })],
+    ['pauser', () => pauser(s, { subject_id: who, until: LATER })],
+    ['limiter', () => limiter(s, { id: who, category: 'sensible' })],
+    ['partager', () => partager(s, { id: who, grantee: 'x@y', purpose: 'p', expires_at: LATER })],
+    ['révoquer', () => revoquer(s, { grant_id: 'grt-0001' })],
+  ]) {
+    throws(fn, `le droit « ${name} » s\u2019exerce sans acteur`);
+  }
+});
+
+test('VOIR rend la provenance et la confiance de chaque information', () => {
+  const s = seedWorld();
+  const who = s.byType('person')[0].id;
+  const v = voir(s, { subject_id: who, actor: 'a.meunier' });
+  ok(v.known.length > 0, 'VOIR ne remonte rien sur une personne du monde');
+  for (const k of v.known) {
+    ok('state' in k && 'confidence' in k, `entrée sans provenance ni confiance : ${k.id}`);
+    ok('origin' in k, `entrée sans origine : ${k.id}`);
+  }
+  ok(s.journal.some((j) => j.op === 'right:voir'), 'VOIR n\u2019a pas été tracé');
+});
+
+test('COMPRENDRE remonte la chaîne et dit où elle s\u2019arrête', () => {
+  const s = seedWorld();
+  const { written } = submit(s, 'Iris Fontaine est clarinettiste', { actor: 'noema', now: NOW });
+  const p = written[0];
+  const { materialization } = decide(s, { proposal_id: p.id, decision: 'accepted', actor: 'a.meunier', now: NOW });
+  const c = comprendre(s, { id: materialization.id, actor: 'a.meunier' });
+  ok(c.chain.length >= 1, 'aucune chaîne remontée');
+  ok(c.terminates_on, 'la chaîne ne dit pas où elle s\u2019arrête');
+  ok(s.journal.some((j) => j.op === 'right:comprendre'), 'COMPRENDRE n\u2019a pas été tracé');
+});
+
+test('CORRIGER ne remplace jamais en silence', () => {
+  const s = seedWorld();
+  const who = s.byType('person')[0].id;
+  const avant = s.get(who).display_name;
+  const r = corriger(s, { id: who, field: 'display_name', value: 'Camille V.-Ferrand', actor: 'a.meunier', reason: 'usage', now: NOW });
+  ok(r.corrected, 'la correction n\u2019a pas eu lieu');
+  eq(r.before, avant, 'l\u2019ancienne valeur n\u2019est pas conservée');
+  const dec = s.get(r.decision.id);
+  eq(dec.before.display_name, avant, 'la décision ne retient pas l\u2019ancienne valeur');
+  eq(dec.actor, 'a.meunier', 'la correction n\u2019est pas attribuée');
+  eq(s.get(who).display_name, 'Camille V.-Ferrand', 'la nouvelle valeur n\u2019est pas écrite');
+  eq(s.get(who).provenance.state, 'confirmed', 'une correction humaine n\u2019est pas confirmée');
+});
+
+test('corriger vers la même valeur ne fabrique pas de décision', () => {
+  const s = seedWorld();
+  const who = s.byType('person')[0].id;
+  const avant = s.byType('decision').length;
+  const r = corriger(s, { id: who, field: 'display_name', value: s.get(who).display_name, actor: 'a.meunier', now: NOW });
+  eq(r.corrected, false, 'une correction identique a été enregistrée');
+  eq(s.byType('decision').length, avant, 'une décision inutile a été créée');
+});
+
+test('SUPPRIMER efface le contenu et laisse une pierre tombale', () => {
+  const s = seedWorld();
+  const who = s.byType('person')[0].id;
+  const r = supprimer(s, { id: who, actor: 'a.meunier', reason: 'demande de la personne', now: NOW });
+  eq(s.get(who), null, 'le contenu a survécu à la suppression');
+  const tomb = s.get(r.tombstone.id);
+  eq(tomb.target_id, who, 'la pierre tombale ne désigne pas l\u2019objet supprimé');
+  eq(tomb.deleted_by, 'a.meunier', 'la suppression n\u2019est pas attribuée');
+  for (const interdit of ['content', 'display_name', 'title', 'body', 'value']) {
+    eq(tomb[interdit], undefined, `la pierre tombale conserve « ${interdit} »`);
+  }
+  ok(validate('tombstone', tomb).length === 0, 'la pierre tombale est invalide');
+});
+
+test('le schéma refuse une pierre tombale qui conserverait le contenu', () => {
+  const errs = validate('tombstone', {
+    id: 'tmb-0001', target_id: 'ppl-0001', target_type: 'person', deleted_by: 'a', deleted_at: NOW,
+    display_name: 'Camille', source: 's', provenance: provenance('o', 'confirmed'),
+    created_by: 'a', created_at: NOW,
+  });
+  ok(errs.some((e) => e.includes('display_name')), 'une pierre tombale avec contenu est passée');
+});
+
+test('supprimer révoque les partages de l\u2019objet', () => {
+  const s = seedWorld();
+  const who = s.byType('person')[0].id;
+  partager(s, { id: who, grantee: 'client@atelier', purpose: 'suivi de projet', expires_at: LATER, actor: 'a.meunier', now: NOW });
+  eq(activeGrants(s, who).length, 1, 'le partage n\u2019est pas actif');
+  const r = supprimer(s, { id: who, actor: 'a.meunier', now: NOW });
+  eq(r.revoked_grants.length, 1, 'le partage a survécu à la suppression');
+  eq(activeGrants(s, who).length, 0, 'un partage reste actif sur un objet supprimé');
+});
+
+test('PAUSER exclut le sujet de l\u2019observation', () => {
+  const s = seedWorld();
+  const avant = observe(s, { now: NOW });
+  const cible = avant.proposable[0]?.target_id || avant.drafts[0]?.target_id;
+  ok(cible, 'le monde de démonstration ne produit aucune observation');
+  pauser(s, { subject_id: cible, until: LATER, actor: 'a.meunier', reason: 'demande explicite', now: NOW });
+  ok(isPaused(s.get(cible), NOW), 'le sujet n\u2019est pas marqué en pause');
+  const apres = observe(s, { now: NOW });
+  ok(apres.drafts.every((d) => d.target_id !== cible), 'un sujet en pause continue d\u2019être observé');
+  ok(apres.silenced >= 1, 'les ébauches écartées ne sont pas comptées');
+});
+
+test('une pause expirée ne bloque plus rien', () => {
+  const s = seedWorld();
+  const cible = observe(s, { now: NOW }).drafts[0].target_id;
+  pauser(s, { subject_id: cible, until: '2026-01-01T00:00:00Z', actor: 'a.meunier', now: NOW });
+  eq(isPaused(s.get(cible), NOW), false, 'une pause expirée bloque encore');
+  ok(observe(s, { now: NOW }).drafts.some((d) => d.target_id === cible), 'le sujet n\u2019est pas réobservé après échéance');
+});
+
+test('une pause sans échéance vérifiable est refusée', () => {
+  const s = seedWorld();
+  const cible = observe(s, { now: NOW }).drafts[0].target_id;
+  throws(() => pauser(s, { subject_id: cible, until: 'bientôt', actor: 'a.meunier', now: NOW }),
+    'une pause à échéance invalide est passée');
+});
+
+test('LIMITER impose le plafond de la catégorie', () => {
+  const s = seedWorld();
+  const who = s.byType('person')[0].id;
+  throws(() => limiter(s, { id: who, category: 'sensible', visibility: 'publique', actor: 'a.meunier', now: NOW }),
+    'une information sensible a pu être rendue publique');
+  const r = limiter(s, { id: who, category: 'projet', visibility: 'projet', actor: 'a.meunier', now: NOW });
+  eq(r.object.category, 'projet', 'la catégorie n\u2019a pas été appliquée');
+});
+
+test('passer en privé révoque les partages', () => {
+  const s = seedWorld();
+  const who = s.byType('person')[0].id;
+  partager(s, { id: who, grantee: 'client@atelier', purpose: 'suivi', expires_at: LATER, actor: 'a.meunier', now: NOW });
+  const r = limiter(s, { id: who, category: 'personnelle', visibility: 'privée', actor: 'a.meunier', now: NOW });
+  eq(r.revoked_grants.length, 1, 'les partages ont survécu au passage en privé');
+});
+
+test('PARTAGER exige une finalité et une échéance', () => {
+  const s = seedWorld();
+  const who = s.byType('person')[0].id;
+  throws(() => partager(s, { id: who, grantee: 'x@y', expires_at: LATER, actor: 'a.meunier', now: NOW }),
+    'un partage sans finalité est passé');
+  throws(() => partager(s, { id: who, grantee: 'x@y', purpose: 'suivi', actor: 'a.meunier', now: NOW }),
+    'un partage perpétuel est passé');
+});
+
+test('une information sensible ne se partage pas', () => {
+  const s = seedWorld();
+  const who = s.byType('person')[0].id;
+  limiter(s, { id: who, category: 'sensible', visibility: 'privée', actor: 'a.meunier', now: NOW });
+  throws(() => partager(s, { id: who, grantee: 'client@atelier', purpose: 'suivi', expires_at: LATER, actor: 'a.meunier', now: NOW }),
+    'une information sensible a été partagée');
+});
+
+test('rien ne sort d\u2019un sujet en pause', () => {
+  const s = seedWorld();
+  const who = s.byType('person')[0].id;
+  pauser(s, { subject_id: who, until: LATER, actor: 'a.meunier', now: NOW });
+  throws(() => partager(s, { id: who, grantee: 'client@atelier', purpose: 'suivi', expires_at: LATER, actor: 'a.meunier', now: NOW }),
+    'un partage est sorti d\u2019un sujet en pause');
+});
+
+test('RÉVOQUER retire l\u2019accès sans effacer le partage', () => {
+  const s = seedWorld();
+  const who = s.byType('person')[0].id;
+  const { grant } = partager(s, { id: who, grantee: 'client@atelier', purpose: 'suivi', expires_at: LATER, actor: 'a.meunier', now: NOW });
+  eq(activeGrants(s, who).length, 1, 'le partage n\u2019est pas actif');
+  const r = revoquer(s, { grant_id: grant.id, actor: 'a.meunier', reason: 'fin de mission', now: NOW });
+  ok(r.revoked, 'la révocation n\u2019a pas eu lieu');
+  eq(s.get(grant.id).status, 'revoked', 'le partage n\u2019est pas marqué révoqué');
+  ok(s.get(grant.id), 'le partage a été effacé au lieu d\u2019être révoqué');
+  eq(activeGrants(s, who).length, 0, 'un partage révoqué reste actif');
+  eq(s.get(who).shared_with.length, 0, 'le bénéficiaire figure encore sur l\u2019objet');
+});
+
+test('révoquer deux fois ne produit qu\u2019une révocation', () => {
+  const s = seedWorld();
+  const who = s.byType('person')[0].id;
+  const { grant } = partager(s, { id: who, grantee: 'client@atelier', purpose: 'suivi', expires_at: LATER, actor: 'a.meunier', now: NOW });
+  revoquer(s, { grant_id: grant.id, actor: 'a.meunier', now: NOW });
+  const seconde = revoquer(s, { grant_id: grant.id, actor: 'a.meunier', now: NOW });
+  eq(seconde.revoked, false, 'une seconde révocation a été enregistrée');
+});
+
+test('chaque droit exercé laisse une trace attribuée', () => {
+  const s = seedWorld();
+  const who = s.byType('person')[0].id;
+  voir(s, { subject_id: who, actor: 'a.meunier' });
+  comprendre(s, { id: who, actor: 'a.meunier' });
+  corriger(s, { id: who, field: 'roles', value: ['saxophone'], actor: 'a.meunier', now: NOW });
+  pauser(s, { subject_id: who, until: LATER, actor: 'a.meunier', now: NOW });
+  limiter(s, { id: who, category: 'projet', actor: 'a.meunier', now: NOW });
+  const ops = s.journal.filter((j) => j.op.startsWith('right:')).map((j) => j.op);
+  for (const attendu of ['right:voir', 'right:comprendre', 'right:corriger', 'right:pauser', 'right:limiter']) {
+    ok(ops.includes(attendu), `trace manquante : ${attendu}`);
+  }
+  for (const j of s.journal.filter((x) => x.op.startsWith('right:'))) {
+    eq(j.actor, 'a.meunier', `trace de droit sans acteur : ${j.op}`);
+  }
 });
 
 /* ── Bilan ─────────────────────────────────────────────────────── */

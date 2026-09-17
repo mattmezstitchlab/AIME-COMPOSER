@@ -10,6 +10,15 @@
  *   POST /api/intend           une phrase humaine → propositions (jamais des faits)
  *   POST /api/authorize        un humain autorise ou refuse une action
  *   POST /api/execute          exécute une action autorisée (simulé, tracé)
+ *   GET  /api/rights           les huit droits et leur vocabulaire
+ *   POST /api/memory/voir      ce que le système sait d'un sujet
+ *   POST /api/memory/comprendre  pourquoi NOEMA croit ce qu'elle croit
+ *   POST /api/memory/corriger  correction humaine attribuée
+ *   POST /api/memory/supprimer suppression réelle + pierre tombale
+ *   POST /api/memory/pauser    suspendre la collecte sur un sujet
+ *   POST /api/memory/limiter   catégorie et plafond de visibilité
+ *   POST /api/memory/partager  accord d'accès borné
+ *   POST /api/memory/revoquer  retrait d'un accès accordé
  *   POST /api/reset            repart du monde de démonstration
  *
  * Trois règles côté serveur, les mêmes que dans les modules :
@@ -26,6 +35,9 @@ import { createStore } from './src/store.mjs';
 import { observe, propose, decide } from './src/noema.mjs';
 import { interpret, submit } from './src/intention.mjs';
 import { draft, authorize, execute, posture } from './src/action.mjs';
+import {
+  voir, comprendre, corriger, supprimer, pauser, limiter, partager, revoquer, droits,
+} from './src/governance.mjs';
 import { seed } from './seed.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -142,6 +154,39 @@ const server = createServer(async (req, res) => {
 
       if (path === '/api/posture' && req.method === 'GET') {
         return json(res, 200, posture());
+      }
+
+      /* ── Gouvernance de la mémoire ───────────────────────────
+         Huit droits, une seule règle transversale : aucun ne s'exerce
+         sans acteur. Le serveur refuse avant d'appeler le module, pour
+         que le refus soit identique quel que soit le droit.
+         ──────────────────────────────────────────────────────── */
+      if (path === '/api/rights' && req.method === 'GET') {
+        return json(res, 200, droits());
+      }
+
+      if (path.startsWith('/api/memory/') && req.method === 'POST') {
+        const right = path.slice('/api/memory/'.length);
+        const body = await readBody(req);
+        if (!body.actor) {
+          return json(res, 400, { error: `le droit « ${right} » exige un acteur — un droit anonyme n'est pas vérifiable` });
+        }
+        const HANDLERS = {
+          voir: () => voir(store, { subject_id: body.subject_id, actor: body.actor }),
+          comprendre: () => comprendre(store, { id: body.id, actor: body.actor }),
+          corriger: () => corriger(store, body),
+          supprimer: () => supprimer(store, body),
+          pauser: () => pauser(store, { subject_id: body.subject_id, until: body.until, actor: body.actor, reason: body.reason }),
+          limiter: () => limiter(store, body),
+          partager: () => partager(store, body),
+          revoquer: () => revoquer(store, { grant_id: body.grant_id, actor: body.actor, reason: body.reason }),
+        };
+        if (!HANDLERS[right]) {
+          return json(res, 404, { error: `droit inconnu : « ${right} » (${Object.keys(HANDLERS).join(', ')})` });
+        }
+        const out = HANDLERS[right]();
+        store.save();
+        return json(res, 200, { ...out, state: snapshot() });
       }
 
       if (path === '/api/reset' && req.method === 'POST') {

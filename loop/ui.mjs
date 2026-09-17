@@ -233,6 +233,7 @@ function render(d) {
     ? `<div class="viz-proof">${proofs.map(renderProof).join('')}</div>`
     : '<p class="t-body-sm u-muted">Aucune décision prise pour l’instant.</p>';
 
+  fillSubjects(d);
   resolveIcons(document);
 }
 
@@ -349,6 +350,123 @@ document.addEventListener('click', (e) => {
       if (d?.result) window.AIME?.toast?.({ title: 'Exécutée', body: d.result.detail, tone: 'success' });
     });
   }
+});
+
+/* ── Gouvernance de la mémoire ─────────────────────────────────
+   Les huit droits de la constitution §6, exercés sur le serveur :
+   l'écran ne calcule rien, il montre ce que le droit a produit.
+   ──────────────────────────────────────────────────────────── */
+const RIGHTS = [
+  { key: 'voir', label: 'Voir' },
+  { key: 'comprendre', label: 'Comprendre' },
+  { key: 'corriger', label: 'Corriger' },
+  { key: 'supprimer', label: 'Supprimer' },
+  { key: 'pauser', label: 'Pauser' },
+  { key: 'limiter', label: 'Limiter' },
+  { key: 'partager', label: 'Partager' },
+  { key: 'révoquer', label: 'Révoquer' },
+];
+
+/** Sujets sur lesquels les droits s'exercent : personnes et projets. */
+function fillSubjects(d) {
+  const sel = document.querySelector('#m-subject');
+  if (!sel) return;
+  const keep = sel.value;
+  const subjects = (d.entities || []).filter((e) =>
+    e.id?.startsWith('ppl-') || e.id?.startsWith('prj-') || e.id?.startsWith('obj-'));
+  sel.innerHTML = subjects.map((e) =>
+    `<option value="${esc(e.id)}">${esc(e.display_name || e.title || e.content?.missing || e.id)} — ${esc(e.id)}</option>`).join('');
+  if (keep && subjects.some((s) => s.id === keep)) sel.value = keep;
+
+  const rights = document.querySelector('#m-rights');
+  if (rights && !rights.childElementCount) {
+    rights.innerHTML = RIGHTS.map((r) =>
+      `<button type="button" class="a-btn a-btn--sm" data-right="${esc(r.key)}">${esc(r.label)}</button>`).join('');
+  }
+}
+
+/** Rendu du résultat d'un droit — sans règle métier, seulement ce qui est revenu. */
+function renderRight(right, r) {
+  const out = document.querySelector('#m-out');
+  const row = (k, v) => `<div class="ucard__fact"><dt>${esc(k)}</dt><dd>${v}</dd></div>`;
+  let html = '';
+
+  if (right === 'voir' && r.subject) {
+    html = `<div class="u-pad u-surface"><p class="t-body-sm u-strong">${esc(r.subject.label)} ${r.subject.paused_until ? `· en pause jusqu\u2019au ${esc(r.subject.paused_until)}` : ''}</p>
+      <dl class="ucard__facts">
+        ${row('catégorie', `<span class="u-mono">${esc(r.subject.category || '—')}</span>`)}
+        ${row('visibilité', `<span class="u-mono">${esc(r.subject.visibility || '—')}</span>`)}
+        ${row('partagé avec', `<span class="u-mono">${esc((r.shared_with || []).map((g) => g.grantee).join(', ') || 'personne')}</span>`)}
+      </dl></div>
+      <p class="t-caption u-muted">Ce que le système sait — ${r.known.length} information(s), chacune avec sa provenance et sa confiance.</p>
+      <div class="l-stack">${r.known.map((k) => `<div class="l-row l-row--between u-pad u-surface">
+        <span class="t-body-sm">${esc(k.label)} <span class="t-caption u-mono">${esc(k.id)}</span></span>
+        <span class="l-row">${state(k.state)}${k.confidence ? conf(k.confidence) : ''}</span>
+      </div>`).join('') || '<p class="t-body-sm u-muted">Rien.</p>'}</div>`;
+  } else if (right === 'comprendre' && r.chain) {
+    html = `<p class="t-caption ${r.uncertain ? 'u-strong' : 'u-muted'}">${r.uncertain
+      ? 'Cette chaîne contient des maillons non confirmés : ce n\u2019est pas un fait établi.'
+      : 'Tous les maillons sont confirmés.'}</p>
+      <div class="viz-proof">${r.chain.map((c) => `<div class="viz-proof__step" data-state="${esc(c.state || 'proposed')}">
+        <span class="viz-proof__dot" aria-hidden="true"></span>
+        <span class="viz-proof__body">
+          <span class="t-body-sm u-strong">${esc(c.label || c.id)} <span class="t-caption u-mono">${esc(c.id)}</span></span>
+          <span class="t-caption u-mono">${esc(c.origin || '—')} · ${esc(c.state || '—')} · ${esc(c.confidence || '—')}</span>
+        </span></div>`).join('')}</div>
+      <p class="t-caption u-muted">La chaîne s\u2019arrête sur <span class="u-mono">${esc(r.terminates_on)}</span>.</p>`;
+  } else {
+    /* CORRIGER · SUPPRIMER · PAUSER · LIMITER · PARTAGER · RÉVOQUER :
+       le module dit toujours ce qu'il a fait ou refusé de faire. */
+    const lines = Object.entries(r)
+      .filter(([k]) => !['state', 'chain', 'known', 'subject', 'shared_with'].includes(k))
+      .map(([k, v]) => row(k, `<span class="u-mono">${esc(typeof v === 'object' ? JSON.stringify(v) : String(v))}</span>`)).join('');
+    html = `<div class="u-pad u-surface"><dl class="ucard__facts">${lines}</dl></div>`;
+  }
+
+  out.innerHTML = html;
+  resolveIcons(out);
+}
+
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('[data-right]');
+  if (!btn) return;
+  const right = btn.dataset.right;
+  const subject = document.querySelector('#m-subject').value;
+  if (!subject) { window.AIME?.toast?.({ title: 'Aucun sujet', body: 'Choisissez d\u2019abord un sujet.', tone: 'warning' }); return; }
+
+  /* Corps propre à chaque droit. Rien n'est inventé côté écran : ce qui
+     n'est pas fourni est refusé par le serveur, et le refus est affiché. */
+  const bodies = {
+    voir: { subject_id: subject },
+    comprendre: { id: subject },
+    corriger: { id: subject, field: 'roles', value: ['saxophone'], reason: 'correction depuis l\u2019écran' },
+    supprimer: { id: subject, reason: 'suppression demandée depuis l\u2019écran' },
+    pauser: { subject_id: subject, until: new Date(Date.now() + 30 * 864e5).toISOString(), reason: 'pause demandée depuis l\u2019écran' },
+    limiter: { id: subject, category: 'projet', visibility: 'projet', reason: 'limitation depuis l\u2019écran' },
+    partager: { id: subject, grantee: 'client@atelier-nord.fr', purpose: 'suivi de projet', expires_at: new Date(Date.now() + 90 * 864e5).toISOString() },
+    'révoquer': { grant_id: null },
+  };
+  const body = { ...bodies[right], actor: 'a.meunier' };
+
+  /* RÉVOQUER agit sur un partage existant, pas sur le sujet. */
+  if (right === 'révoquer') {
+    const st = await (await fetch('/api/state')).json();
+    const grant = (st.entities || []).find((g) => g.id?.startsWith('grt-') && g.status === 'active');
+    if (!grant) { window.AIME?.toast?.({ title: 'Rien à révoquer', body: 'Aucun partage actif.', tone: 'warning' }); return; }
+    body.grant_id = grant.id;
+  }
+
+  const res = await fetch(`/api/memory/${right}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+  const d = await res.json();
+  if (!res.ok) {
+    document.querySelector('#m-out').innerHTML = `<div class="a-state a-state--error">
+      <span class="a-state__icon">${ic('com-alert', 'a-ic a-ic--lg')}</span>
+      <p class="t-h3">Droit refusé</p><p class="t-body-sm u-muted">${esc(d.error)}</p></div>`;
+    resolveIcons(document);
+    return;
+  }
+  renderRight(right, d);
+  if (d.state) render(d.state);
 });
 
 load(); });

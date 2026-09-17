@@ -18,6 +18,7 @@
  */
 import { EPISTEMIC_KEYS } from './schema.mjs';
 import { materialize } from './intention.mjs';
+import { isPaused } from './governance.mjs';
 
 /* ── Confiance ─────────────────────────────────────────────────── */
 
@@ -294,11 +295,27 @@ export const RULES = [ruleReschedule, ruleRightsExpiry, ruleMissingBlocker, rule
  */
 export function observe(store, { now = new Date().toISOString() } = {}) {
   const drafts = RULES.flatMap((rule) => rule(store, now));
+
+  /* ── PAUSER est un droit, pas un drapeau décoratif ─────────────
+     Un sujet en pause est exclu de l'observation : NOEMA ne produit
+     aucune ébauche le concernant, pas même une ébauche retenue. Une
+     pause qui continuerait d'observer en silence ne serait pas une
+     pause. Les ébauches écartées sont comptées, jamais affichées
+     comme des propositions.
+     ─────────────────────────────────────────────────────────── */
+  const paused = (targetId) => {
+    const e = store.get(targetId);
+    return e ? isPaused(e, now) : false;
+  };
+  const active = drafts.filter((d) => !d.target_id || !paused(d.target_id));
+  const silenced = drafts.length - active.length;
+
   return {
     now,
-    drafts,
-    proposable: drafts.filter((d) => d.worth),
-    withheld: drafts.filter((d) => !d.worth),
+    drafts: active,
+    proposable: active.filter((d) => d.worth),
+    withheld: active.filter((d) => !d.worth),
+    silenced,
   };
 }
 

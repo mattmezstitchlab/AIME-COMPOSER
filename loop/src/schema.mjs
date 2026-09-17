@@ -33,13 +33,43 @@ export const ID_PREFIX = {
   decision: 'dec',
   proof: 'prf',
   action: 'act',
+  grant: 'grt',
+  tombstone: 'tmb',
 };
 
 /** Champs transverses, d'après DATA-MODEL-V1 §3. */
 export const CROSS_CUTTING = [
   'id', 'source', 'provenance', 'confidence', 'status',
   'created_at', 'updated_at', 'created_by', 'project_id',
+  /* Gouvernance de la mémoire — constitution §6. Absents du data model :
+     ces champs l'étendent, ils ne le contredisent pas. */
+  'category', 'visibility', 'shared_with', 'paused_until',
 ];
+
+/**
+ * Catégories de mémoire, d'après la constitution §6.
+ * Une catégorie n'est pas décorative : elle borne ce qui peut être
+ * partagé, et ce que NOEMA peut collecter quand la collecte est en pause.
+ */
+export const MEMORY_CATEGORIES = ['personnelle', 'projet', 'partagée', 'temporaire', 'sensible'];
+
+/** Portée de visibilité d'une information. */
+export const VISIBILITY = ['privée', 'projet', 'partagée', 'publique'];
+
+/** Les huit droits de la personne sur sa mémoire (constitution §6). */
+export const MEMORY_RIGHTS = [
+  'voir', 'comprendre', 'corriger', 'supprimer',
+  'pauser', 'limiter', 'partager', 'révoquer',
+];
+
+/** Une information sensible ne sort jamais du périmètre privé par défaut. */
+export const CATEGORY_VISIBILITY_CEILING = {
+  personnelle: 'privée',
+  projet: 'projet',
+  partagée: 'partagée',
+  temporaire: 'projet',
+  sensible: 'privée',
+};
 
 /** Champs propres à chaque entité, au-delà des transverses. */
 export const ENTITY_FIELDS = {
@@ -60,6 +90,13 @@ export const ENTITY_FIELDS = {
      Périmètre, risque, réversibilité et permission y sont obligatoires. */
   action: ['verb', 'label', 'object', 'scope', 'risk', 'reversible',
            'permission_required', 'authorized_by', 'executed_at'],
+  /* Un partage est un droit accordé : il porte un bénéficiaire, une
+     finalité et une échéance. Un partage sans échéance n'existe pas. */
+  grant: ['target_id', 'grantee', 'purpose', 'scope', 'expires_at', 'revoked_at'],
+  /* Une pierre tombale prouve qu'une suppression a eu lieu sans conserver
+     le contenu supprimé. C'est ce qui rend SUPPRIMER à la fois réel et
+     auditable. */
+  tombstone: ['target_id', 'target_type', 'deleted_by', 'deleted_at', 'reason'],
 };
 
 export const ENTITY_TYPES = Object.keys(ENTITY_FIELDS);
@@ -85,6 +122,9 @@ export const PROPOSAL_STATUS = ['open', 'accepted', 'rejected', 'deferred', 'sup
  * qui permette de contourner l'autorisation.
  */
 export const ACTION_STATUS = ['pending_authorization', 'authorized', 'refused', 'executed'];
+
+/** Un partage est actif, expiré ou révoqué — jamais « oublié ». */
+export const GRANT_STATUS = ['active', 'expired', 'revoked'];
 
 /**
  * Types de changement qui créent un objet nouveau. Ce sont les seuls pour
@@ -179,6 +219,7 @@ export function validate(type, obj) {
   if (obj.status !== undefined) {
     const allowed = type === 'proposal' ? PROPOSAL_STATUS
                   : type === 'action' ? ACTION_STATUS
+                  : type === 'grant' ? GRANT_STATUS
                   : LIFECYCLE;
     if (!allowed.includes(obj.status)) {
       errors.push(`${type}.status — « ${obj.status} » hors du cycle (${allowed.join(', ')})`);
@@ -188,6 +229,19 @@ export function validate(type, obj) {
   /* Champs propres */
   for (const f of ENTITY_FIELDS[type]) {
     if (REQUIRED_FIELDS[type]?.includes(f)) need(f, 'champ propre obligatoire');
+  }
+
+  /* Gouvernance de la mémoire */
+  if (obj.category !== undefined && obj.category !== null
+      && !MEMORY_CATEGORIES.includes(obj.category)) {
+    errors.push(`${type}.category — « ${obj.category} » hors des catégories de mémoire (${MEMORY_CATEGORIES.join(', ')})`);
+  }
+  if (obj.visibility !== undefined && obj.visibility !== null) {
+    if (!VISIBILITY.includes(obj.visibility)) {
+      errors.push(`${type}.visibility — « ${obj.visibility} » hors (${VISIBILITY.join(', ')})`);
+    } else if (obj.category && VISIBILITY.indexOf(obj.visibility) > VISIBILITY.indexOf(CATEGORY_VISIBILITY_CEILING[obj.category])) {
+      errors.push(`${type}.visibility — « ${obj.visibility} » dépasse le plafond de la catégorie « ${obj.category} » (${CATEGORY_VISIBILITY_CEILING[obj.category]})`);
+    }
   }
 
   /* Règles métier */
@@ -207,6 +261,23 @@ export function validate(type, obj) {
     }
     if (obj.status === 'executed' && !obj.executed_at) {
       errors.push('action.executed_at — une action exécutée sans horodatage est intraçable');
+    }
+  }
+  if (type === 'grant') {
+    /* Un partage perpétuel n'est pas un droit, c'est un abandon. */
+    if (!obj.expires_at) errors.push('grant.expires_at — un partage sans échéance n\'est pas révocable');
+    else if (!ISO.test(String(obj.expires_at))) errors.push('grant.expires_at — date ISO attendue');
+    if (obj.revoked_at !== undefined && obj.revoked_at !== null && !ISO.test(String(obj.revoked_at))) {
+      errors.push('grant.revoked_at — date ISO attendue');
+    }
+    if (!obj.purpose) errors.push('grant.purpose — un partage sans finalité ne peut pas être évalué');
+  }
+  if (type === 'tombstone') {
+    /* Le contenu supprimé ne doit pas survivre sous un autre nom. */
+    for (const forbidden of ['content', 'display_name', 'title', 'body', 'value']) {
+      if (obj[forbidden] !== undefined) {
+        errors.push(`tombstone.${forbidden} — une pierre tombale ne conserve pas le contenu supprimé`);
+      }
     }
   }
   if (type === 'relation') {
@@ -270,6 +341,8 @@ const REQUIRED_FIELDS = {
   decision: ['target_id', 'decision', 'actor'],
   proof: ['target_id', 'proof_type'],
   action: ['verb', 'scope', 'risk', 'permission_required'],
+  grant: ['target_id', 'grantee', 'purpose'],
+  tombstone: ['target_id', 'target_type', 'deleted_by', 'deleted_at'],
 };
 
 /** Types de relation, d'après DATA-MODEL-V1 §2 (PERSON / ORGANIZATION). */
