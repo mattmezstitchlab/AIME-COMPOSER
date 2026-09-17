@@ -187,6 +187,29 @@ test('les écrans les plus touchés sont classés', () => {
   ok(byName['dense.html'] > 0, 'l\'écran dense ne remonte aucun écart');
 });
 
+test('aucun écart ne se perd entre le total et le classement par écran', () => {
+  /* Régression gardée. Le moteur QA borne par défaut la liste détaillée
+     à 40 écarts par famille pour garder son rapport lisible, tandis que
+     `count` reste le total. Ce module rattache chaque écart à son écran
+     en parcourant cette liste : sur une liste amputée, il sous-déclarait
+     — mesuré sur cet écran de test, 44 écarts rattachés pour 405 mesurés,
+     et un classement par écran qui ne sommait pas au total publié.
+
+     L'écran « dense » dépasse volontairement le plafond de 40 : c'est
+     lui qui fait apparaître le défaut. Sans lui, le test passerait même
+     avec la liste tronquée. */
+  const dir = makeProject();
+  const d = diagnose(collect(dir), REF);
+
+  const somme = d.worst_pages.reduce((n, p) => n + p.count, 0);
+  eq(somme, d.ecarts,
+    `le classement par écran somme à ${somme} alors que le rapport publie ${d.ecarts} écarts`);
+
+  const spacing = d.families.find((f) => f.family === 'SPACING');
+  ok(spacing && spacing.count > 40,
+    `la fixture ne dépasse plus le plafond de 40 (SPACING=${spacing ? spacing.count : 'absent'}) : ce test ne prouverait plus rien`);
+});
+
 test('le rapport déclare ce qu\'il ne mesure pas', () => {
   const dir = makeProject();
   const d = diagnose(collect(dir), REF);

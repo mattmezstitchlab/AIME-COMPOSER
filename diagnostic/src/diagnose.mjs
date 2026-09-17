@@ -80,6 +80,14 @@ export function diagnose(collected, reference) {
     tokensJson: reference.tokensJson,
     pages,
     sprite: reference.sprite,
+    /* Indispensable : par défaut le moteur borne la liste détaillée à 40
+       écarts par famille pour garder son rapport lisible, tandis que
+       `count` reste le total. Or ce module compte à partir de la liste —
+       pour rattacher chaque écart à son écran et pour écarter ceux qui
+       viennent des feuilles du système. Sur une liste amputée, les deux
+       calculs sous-déclaraient : mesuré sur un projet de test, 44 écarts
+       rattachés pour 405 réellement mesurés. */
+    issueLimit: Infinity,
   });
 
   /* ── Écarts par famille, sur le périmètre du projet ─────────── */

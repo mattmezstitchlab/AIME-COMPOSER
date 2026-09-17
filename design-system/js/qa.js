@@ -161,7 +161,13 @@ const ARROW = /[\u{2190}-\u{21FF}\u{2794}\u{27F0}-\u{27FF}]/u;
  *   live        résultat optionnel de auditLive()
  */
 export function audit(input) {
-  const { cssFiles = [], tokenCss, tokensJson, pages = [], sprite = '', live = null } = input;
+  /* `issueLimit` borne la liste détaillée rendue par famille, pas le
+     compte : `count` reste toujours le total réel. 40 par défaut, pour
+     que le rapport écrit sur disque reste lisible. Un appelant qui
+     doit *compter* à partir de la liste — comme le diagnostic, qui
+     rattache chaque écart à un écran — passe `issueLimit: Infinity`,
+     sinon il compte sur une liste amputée et sous-déclare. */
+  const { cssFiles = [], tokenCss, tokensJson, pages = [], sprite = '', live = null, issueLimit = 40 } = input;
   /* ── Les blocs <style> d'une page sont du CSS comme un autre ──────
      Sans ceci, une page peut embarquer toute sa feuille dans un <style>
      et passer l'audit : les familles CSS ne lisaient que `cssFiles`, et
@@ -481,13 +487,17 @@ export function audit(input) {
   const families = ['ALIGNMENT', 'SPACING', 'TYPOGRAPHY', 'COLOR', 'CONTRAST', 'ICONOGRAPHY', 'HIERARCHY', 'RESPONSIVE', 'OVERFLOW', 'FOCUS', 'MOTION', 'CONSISTENCY'];
   const checks = families.map((family) => {
     const own = issues.filter((i) => i.family === family);
+    /* Le plafond borne la liste détaillée, jamais `count` : un appelant
+       qui compte à partir de `issues` doit pouvoir demander la liste
+       entière, sinon il mesure une liste amputée. */
+    const cap = Number.isFinite(issueLimit) ? issueLimit : own.length;
     return {
       id: family.toLowerCase(),
       family,
       result: own.length ? 'fail' : 'pass',
       count: own.length,
-      issues: own.slice(0, 40),
-      truncated: own.length > 40 ? own.length - 40 : 0,
+      issues: own.slice(0, cap),
+      truncated: Math.max(0, own.length - cap),
     };
   });
 
