@@ -163,7 +163,7 @@ A check that cannot fail checks nothing, so every family has been proven to fail
 - real behaviour — no browser engine, so no real keyboard, screen reader or zoom test;
 - performance.
 
-`npm run verify` adds a DOM pass with jsdom: it executes the scripts of all 30 screens, confirming the chrome is injected, icons resolve, token-driven containers fill, and `auditLive()` runs on the living document. Its limit is declared by the script itself: jsdom has no layout engine, so the geometric parts of `auditLive` — real overflow and target size — remain unverified and require a real browser.
+`npm run verify` adds a DOM pass with jsdom: it executes the scripts of all 31 audited screens — the 30 of `design-system/` plus `loop/index.html` — confirming the chrome is injected, icons resolve, token-driven containers fill, and `auditLive()` runs on the living document. Its limit is declared by the script itself: jsdom has no layout engine, so the geometric parts of `auditLive` — real overflow and target size — remain unverified and require a real browser.
 
 ## 10. Closing rule
 

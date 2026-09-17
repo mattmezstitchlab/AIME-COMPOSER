@@ -14,7 +14,7 @@ TOKENS → FOUNDATIONS → COMPONENTS → PATTERNS → LAYOUTS → EXPERIENCES
 cd design-system
 npm run build   # generate tokens + icons; refuses any colour that misses its contrast target
 npm run qa      # build + audit the 12 QA families over the shipped system
-npm run verify  # execute the scripts of all 30 screens in a DOM (needs the jsdom devDependency)
+npm run verify  # execute the scripts of all 31 audited screens in a DOM (needs the jsdom devDependency)
 npm run check   # qa then verify
 npm run serve   # serve the repository on http://0.0.0.0:8080/design-system/
 ```
