@@ -1,0 +1,459 @@
+{
+  "$schema": "aime-iconography/v1",
+  "contract": {
+    "viewBox": "0 0 24 24",
+    "keyline": 20,
+    "strokeWidth": 1.5,
+    "linecap": "round",
+    "linejoin": "round",
+    "fill": "none",
+    "color": "currentColor"
+  },
+  "categories": [
+    "NAVIGATION",
+    "MEMORY",
+    "PEOPLE",
+    "PROJECT",
+    "TIMELINE",
+    "MEDIA",
+    "GRID",
+    "COMPOSER",
+    "DOCUMENT",
+    "ACTION",
+    "SEARCH",
+    "RELATION",
+    "APPROVAL",
+    "PROOF",
+    "SETTINGS",
+    "COMMUNICATION",
+    "NOEMA"
+  ],
+  "icons": [
+    {
+      "id": "i-nav-home",
+      "category": "NAVIGATION",
+      "label": "Accueil"
+    },
+    {
+      "id": "i-nav-arrow-right",
+      "category": "NAVIGATION",
+      "label": "Suivant"
+    },
+    {
+      "id": "i-nav-arrow-left",
+      "category": "NAVIGATION",
+      "label": "Précédent"
+    },
+    {
+      "id": "i-nav-chevron-down",
+      "category": "NAVIGATION",
+      "label": "Déplier"
+    },
+    {
+      "id": "i-nav-chevron-right",
+      "category": "NAVIGATION",
+      "label": "Ouvrir"
+    },
+    {
+      "id": "i-nav-menu",
+      "category": "NAVIGATION",
+      "label": "Menu"
+    },
+    {
+      "id": "i-nav-close",
+      "category": "NAVIGATION",
+      "label": "Fermer"
+    },
+    {
+      "id": "i-nav-external",
+      "category": "NAVIGATION",
+      "label": "Lien externe"
+    },
+    {
+      "id": "i-nav-back",
+      "category": "NAVIGATION",
+      "label": "Retour"
+    },
+    {
+      "id": "i-mem-card",
+      "category": "MEMORY",
+      "label": "Carte universelle"
+    },
+    {
+      "id": "i-mem-memory",
+      "category": "MEMORY",
+      "label": "Mémoire"
+    },
+    {
+      "id": "i-mem-archive",
+      "category": "MEMORY",
+      "label": "Archive"
+    },
+    {
+      "id": "i-mem-vault",
+      "category": "MEMORY",
+      "label": "Coffre sensible"
+    },
+    {
+      "id": "i-mem-bookmark",
+      "category": "MEMORY",
+      "label": "Repère"
+    },
+    {
+      "id": "i-ppl-person",
+      "category": "PEOPLE",
+      "label": "Personne"
+    },
+    {
+      "id": "i-ppl-people",
+      "category": "PEOPLE",
+      "label": "Personnes"
+    },
+    {
+      "id": "i-ppl-org",
+      "category": "PEOPLE",
+      "label": "Organisation"
+    },
+    {
+      "id": "i-ppl-role",
+      "category": "PEOPLE",
+      "label": "Rôle"
+    },
+    {
+      "id": "i-prj-project",
+      "category": "PROJECT",
+      "label": "Projet"
+    },
+    {
+      "id": "i-prj-brief",
+      "category": "PROJECT",
+      "label": "Brief"
+    },
+    {
+      "id": "i-prj-target",
+      "category": "PROJECT",
+      "label": "Objectif"
+    },
+    {
+      "id": "i-prj-flag",
+      "category": "PROJECT",
+      "label": "Jalon"
+    },
+    {
+      "id": "i-time-timeline",
+      "category": "TIMELINE",
+      "label": "Timeline"
+    },
+    {
+      "id": "i-time-clock",
+      "category": "TIMELINE",
+      "label": "Heure"
+    },
+    {
+      "id": "i-time-calendar",
+      "category": "TIMELINE",
+      "label": "Date"
+    },
+    {
+      "id": "i-time-playhead",
+      "category": "TIMELINE",
+      "label": "Tête de lecture"
+    },
+    {
+      "id": "i-time-history",
+      "category": "TIMELINE",
+      "label": "Historique"
+    },
+    {
+      "id": "i-med-image",
+      "category": "MEDIA",
+      "label": "Image"
+    },
+    {
+      "id": "i-med-video",
+      "category": "MEDIA",
+      "label": "Vidéo"
+    },
+    {
+      "id": "i-med-audio",
+      "category": "MEDIA",
+      "label": "Audio"
+    },
+    {
+      "id": "i-med-library",
+      "category": "MEDIA",
+      "label": "Médiathèque"
+    },
+    {
+      "id": "i-med-qr",
+      "category": "MEDIA",
+      "label": "QR"
+    },
+    {
+      "id": "i-grd-grid",
+      "category": "GRID",
+      "label": "Grille"
+    },
+    {
+      "id": "i-grd-guides",
+      "category": "GRID",
+      "label": "Repères"
+    },
+    {
+      "id": "i-grd-snap",
+      "category": "GRID",
+      "label": "Magnétisme"
+    },
+    {
+      "id": "i-grd-ruler",
+      "category": "GRID",
+      "label": "Mesure"
+    },
+    {
+      "id": "i-grd-format",
+      "category": "GRID",
+      "label": "Format"
+    },
+    {
+      "id": "i-cmp-compose",
+      "category": "COMPOSER",
+      "label": "Composer"
+    },
+    {
+      "id": "i-cmp-layers",
+      "category": "COMPOSER",
+      "label": "Calques"
+    },
+    {
+      "id": "i-cmp-node",
+      "category": "COMPOSER",
+      "label": "Objet"
+    },
+    {
+      "id": "i-cmp-connect",
+      "category": "COMPOSER",
+      "label": "Relation"
+    },
+    {
+      "id": "i-cmp-cursor",
+      "category": "COMPOSER",
+      "label": "Sélection"
+    },
+    {
+      "id": "i-cmp-move",
+      "category": "COMPOSER",
+      "label": "Déplacer"
+    },
+    {
+      "id": "i-doc-document",
+      "category": "DOCUMENT",
+      "label": "Document"
+    },
+    {
+      "id": "i-doc-contract",
+      "category": "DOCUMENT",
+      "label": "Contrat"
+    },
+    {
+      "id": "i-doc-clipboard",
+      "category": "DOCUMENT",
+      "label": "Exigences"
+    },
+    {
+      "id": "i-doc-proof",
+      "category": "DOCUMENT",
+      "label": "Preuve"
+    },
+    {
+      "id": "i-doc-version",
+      "category": "DOCUMENT",
+      "label": "Version"
+    },
+    {
+      "id": "i-act-execute",
+      "category": "ACTION",
+      "label": "Exécuter"
+    },
+    {
+      "id": "i-act-check",
+      "category": "ACTION",
+      "label": "Valider"
+    },
+    {
+      "id": "i-act-play",
+      "category": "ACTION",
+      "label": "Lecture"
+    },
+    {
+      "id": "i-act-export",
+      "category": "ACTION",
+      "label": "Exporter"
+    },
+    {
+      "id": "i-act-publish",
+      "category": "ACTION",
+      "label": "Publier"
+    },
+    {
+      "id": "i-act-undo",
+      "category": "ACTION",
+      "label": "Annuler"
+    },
+    {
+      "id": "i-src-search",
+      "category": "SEARCH",
+      "label": "Rechercher"
+    },
+    {
+      "id": "i-src-filter",
+      "category": "SEARCH",
+      "label": "Filtrer"
+    },
+    {
+      "id": "i-src-sort",
+      "category": "SEARCH",
+      "label": "Trier"
+    },
+    {
+      "id": "i-rel-relation",
+      "category": "RELATION",
+      "label": "Relation"
+    },
+    {
+      "id": "i-rel-network",
+      "category": "RELATION",
+      "label": "Réseau"
+    },
+    {
+      "id": "i-rel-share",
+      "category": "RELATION",
+      "label": "Partager"
+    },
+    {
+      "id": "i-rel-group",
+      "category": "RELATION",
+      "label": "Groupe"
+    },
+    {
+      "id": "i-apr-approved",
+      "category": "APPROVAL",
+      "label": "Approuvé"
+    },
+    {
+      "id": "i-apr-rejected",
+      "category": "APPROVAL",
+      "label": "Refusé"
+    },
+    {
+      "id": "i-apr-sign",
+      "category": "APPROVAL",
+      "label": "Signer"
+    },
+    {
+      "id": "i-apr-pending",
+      "category": "APPROVAL",
+      "label": "En attente"
+    },
+    {
+      "id": "i-prf-shield",
+      "category": "PROOF",
+      "label": "Garanti"
+    },
+    {
+      "id": "i-prf-evidence",
+      "category": "PROOF",
+      "label": "Évidence"
+    },
+    {
+      "id": "i-prf-fingerprint",
+      "category": "PROOF",
+      "label": "Empreinte"
+    },
+    {
+      "id": "i-prf-verified",
+      "category": "PROOF",
+      "label": "Vérifié"
+    },
+    {
+      "id": "i-set-sliders",
+      "category": "SETTINGS",
+      "label": "Réglages"
+    },
+    {
+      "id": "i-set-preferences",
+      "category": "SETTINGS",
+      "label": "Préférences"
+    },
+    {
+      "id": "i-set-theme",
+      "category": "SETTINGS",
+      "label": "Thème"
+    },
+    {
+      "id": "i-set-permission",
+      "category": "SETTINGS",
+      "label": "Permission"
+    },
+    {
+      "id": "i-com-message",
+      "category": "COMMUNICATION",
+      "label": "Commentaire"
+    },
+    {
+      "id": "i-com-mail",
+      "category": "COMMUNICATION",
+      "label": "Courriel"
+    },
+    {
+      "id": "i-com-alert",
+      "category": "COMMUNICATION",
+      "label": "Alerte"
+    },
+    {
+      "id": "i-com-broadcast",
+      "category": "COMMUNICATION",
+      "label": "Diffusion"
+    },
+    {
+      "id": "i-com-inbox",
+      "category": "COMMUNICATION",
+      "label": "Boîte"
+    },
+    {
+      "id": "i-noe-mark",
+      "category": "NOEMA",
+      "label": "Marque NOEMA"
+    },
+    {
+      "id": "i-noe-observed",
+      "category": "NOEMA",
+      "label": "Observé"
+    },
+    {
+      "id": "i-noe-extracted",
+      "category": "NOEMA",
+      "label": "Extrait"
+    },
+    {
+      "id": "i-noe-inferred",
+      "category": "NOEMA",
+      "label": "Déduit"
+    },
+    {
+      "id": "i-noe-proposed",
+      "category": "NOEMA",
+      "label": "Proposé"
+    },
+    {
+      "id": "i-noe-confirmed",
+      "category": "NOEMA",
+      "label": "Confirmé"
+    },
+    {
+      "id": "i-noe-superseded",
+      "category": "NOEMA",
+      "label": "Remplacé"
+    }
+  ],
+  "count": 85
+}

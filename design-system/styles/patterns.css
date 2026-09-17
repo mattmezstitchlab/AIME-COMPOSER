@@ -1,0 +1,158 @@
+/* ══════════════════════════════════════════════════════════════
+   AIME DESIGN SYSTEM V1 — PATTERNS
+   Un pattern est un assemblage de composants déjà définis.
+   Un pattern n'introduit JAMAIS de nouveau token ni de nouvelle couleur.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── P1 COMMAND BAR — l'entrée clavier du système */
+.cmdbar {
+  display: grid; grid-template-rows: auto auto auto;
+  width: min(640px, calc(100vw - var(--aime-space-8)));
+  max-height: min(480px, 70vh);
+  border: var(--aime-border-default); border-radius: var(--aime-radius-large);
+  background: var(--aime-color-surface-overlay);
+  box-shadow: var(--aime-shadow-raise);
+  overflow: hidden;
+}
+.cmdbar__field { display: flex; align-items: center; gap: var(--aime-space-3); padding: var(--aime-space-4); border-bottom: var(--aime-border-subtle); }
+.cmdbar__input {
+  flex: 1; min-width: 0; border: 0; background: transparent; color: var(--aime-color-text);
+  font-size: var(--aime-text-h3-size); font-weight: var(--aime-font-medium); letter-spacing: var(--aime-text-h3-ls);
+}
+.cmdbar:focus-within { border-color: var(--aime-color-accent); box-shadow: var(--aime-focus-ring); }
+.cmdbar__input:focus { outline: none; }
+.cmdbar__input::placeholder { color: var(--aime-color-text-subtle); font-weight: var(--aime-font-regular); }
+.cmdbar__results { overflow: auto; padding: var(--aime-space-2); display: grid; gap: var(--aime-space-1); align-content: start; }
+.cmdbar__group {
+  padding: var(--aime-space-2) var(--aime-space-3) var(--aime-space-1);
+  font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size);
+  letter-spacing: var(--aime-text-meta-ls); text-transform: uppercase; color: var(--aime-color-text-subtle);
+}
+.cmdbar__item {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--aime-space-3);
+  width: 100%; padding: var(--aime-space-2) var(--aime-space-3);
+  border-radius: var(--aime-radius-small); text-align: start;
+  color: var(--aime-color-text); font-size: var(--aime-text-body-small-size);
+}
+.cmdbar__item:hover, .cmdbar__item[aria-selected='true'] { background: var(--aime-color-accent-subtle); }
+.cmdbar__item[aria-selected='true'] { color: var(--aime-color-text); box-shadow: inset 2px 0 0 var(--aime-color-accent); }
+.cmdbar__foot {
+  display: flex; align-items: center; gap: var(--aime-space-4); flex-wrap: wrap;
+  padding: var(--aime-space-2) var(--aime-space-4);
+  border-top: var(--aime-border-subtle);
+  font-size: var(--aime-text-meta-size); letter-spacing: var(--aime-text-meta-ls);
+  text-transform: uppercase; font-family: var(--aime-font-mono); color: var(--aime-color-text-subtle);
+}
+.cmdbar__hint { display: inline-flex; align-items: center; gap: var(--aime-space-2); }
+
+/* ── P2 OBJECT HEADER — anatomie fixe de tout objet AIME
+   1 fil d'ariane · 2 type · 3 titre · 4 états · 5 actions · 6 provenance */
+.ohead { display: grid; gap: var(--aime-space-3); padding-block-end: var(--aime-space-4); border-bottom: var(--aime-border-default); }
+.ohead__top { display: flex; align-items: center; gap: var(--aime-space-3); flex-wrap: wrap; }
+.ohead__title-row { display: flex; align-items: center; gap: var(--aime-space-4); flex-wrap: wrap; }
+.ohead__mark {
+  display: grid; place-items: center; flex: none;
+  width: var(--aime-control-lg); height: var(--aime-control-lg);
+  border: var(--aime-border-default); border-radius: var(--aime-radius-medium);
+  background: var(--aime-color-surface); color: var(--aime-color-text-muted);
+}
+.ohead__titles { display: grid; gap: var(--aime-space-1); min-width: 0; }
+.ohead__states { display: flex; align-items: center; gap: var(--aime-space-2); flex-wrap: wrap; }
+.ohead__actions { display: flex; align-items: center; gap: var(--aime-space-2); flex-wrap: wrap; }
+.ohead__meta { display: flex; align-items: center; gap: var(--aime-space-4); flex-wrap: wrap; }
+
+/* ── P3 SEARCH RESULTS — groupés, jamais une liste plate */
+.sresults { display: grid; gap: var(--aime-space-6); }
+.sresults__group { display: grid; gap: var(--aime-space-2); }
+.sresults__head { display: flex; align-items: baseline; gap: var(--aime-space-3); padding-block-end: var(--aime-space-2); border-bottom: var(--aime-border-subtle); }
+.sresults__count { font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size); color: var(--aime-color-text-subtle); font-variant-numeric: tabular-nums; }
+.sresults__item { display: grid; gap: var(--aime-space-1); padding: var(--aime-space-3); border-radius: var(--aime-radius-medium); transition: background-color var(--aime-motion-fast) var(--aime-ease-out); }
+.sresults__item:hover { background: var(--aime-color-surface); }
+.sresults__item:focus-visible { outline: var(--aime-border-width-strong) solid var(--aime-color-focus-ring); outline-offset: var(--aime-focus-offset); }
+/* La correspondance est soulignée, pas surlignée en couleur */
+.sresults__item mark { background: transparent; color: var(--aime-color-text); text-decoration: underline; text-decoration-color: var(--aime-color-accent); text-underline-offset: 3px; }
+
+/* ── P4 RELATION VIEW — sujet · prédicat · objet, toujours dans cet ordre */
+.rview { display: grid; gap: 0; }
+.rview__row {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center; gap: var(--aime-space-3);
+  padding: var(--aime-space-3) 0;
+  border-top: var(--aime-border-subtle);
+}
+.rview__row:first-child { border-top: 0; }
+.rview__pred {
+  font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size);
+  letter-spacing: var(--aime-text-meta-ls); text-transform: uppercase;
+  color: var(--aime-color-text-subtle); white-space: nowrap;
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis;
+  padding-inline: var(--aime-space-2);
+  border: var(--aime-border-subtle); border-radius: var(--aime-radius-small);
+}
+.rview__pred[data-certainty='proposed'] { border-style: dashed; border-color: var(--aime-color-accent); color: var(--aime-color-accent-text); }
+.rview__end { display: flex; align-items: center; gap: var(--aime-space-3); min-width: 0; }
+.rview__end--out { justify-content: flex-end; text-align: end; }
+.rview__name { font-size: var(--aime-text-body-small-size); font-weight: var(--aime-font-medium); overflow-wrap: anywhere; }
+.rview__type { font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size); letter-spacing: var(--aime-text-meta-ls); text-transform: uppercase; color: var(--aime-color-text-subtle); }
+
+/* ── P5 VERSION COMPARISON — le changement est marqué par un signe */
+.vdiff { display: grid; gap: var(--aime-space-4); }
+.vdiff__head { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--aime-space-4); padding-block-end: var(--aime-space-3); border-bottom: var(--aime-border-default); }
+.vdiff__cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--aime-space-4); }
+.vdiff__line { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--aime-space-3); padding-block: var(--aime-space-2); border-top: var(--aime-border-subtle); font-size: var(--aime-text-body-small-size); }
+.vdiff__sign { font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size); color: var(--aime-color-text-subtle); }
+.vdiff__line[data-change='added'] .vdiff__sign { color: var(--aime-color-success-text); }
+.vdiff__line[data-change='added'] { background: var(--aime-color-success-surface); }
+.vdiff__line[data-change='removed'] .vdiff__sign { color: var(--aime-color-error-text); }
+.vdiff__line[data-change='removed'] .vdiff__text { text-decoration: line-through; color: var(--aime-color-text-muted); }
+.vdiff__line[data-change='same'] { color: var(--aime-color-text-subtle); }
+@media (max-width: 639px) {
+  .vdiff__head, .vdiff__cols { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ── P6 BEFORE / AFTER — même cadre, même mesure, seul le contenu change */
+.ba { position: relative; overflow: hidden; border: var(--aime-border-default); border-radius: var(--aime-radius-medium); background: var(--aime-color-surface-sunken); }
+.ba__layer { display: block; width: 100%; }
+.ba__layer--after { position: absolute; inset: 0; clip-path: inset(0 0 0 50%); }
+.ba__handle {
+  position: absolute; inset-block: 0; inset-inline-start: 50%;
+  width: 2px; background: var(--aime-color-accent);
+  cursor: ew-resize;
+}
+.ba__handle::after {
+  content: ''; position: absolute; top: 50%; inset-inline-start: 50%;
+  width: var(--aime-control-sm); height: var(--aime-control-sm);
+  transform: translate(-50%, -50%);
+  border: var(--aime-border-width-strong) solid var(--aime-color-accent);
+  border-radius: var(--aime-radius-pill);
+  background: var(--aime-color-background);
+}
+.ba__tag {
+  position: absolute; inset-block-start: var(--aime-space-3);
+  display: inline-flex; align-items: center; height: 20px;
+  padding-inline: var(--aime-space-2); border-radius: var(--aime-radius-small);
+  background: var(--aime-color-background); color: var(--aime-color-text-muted);
+  font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size);
+  letter-spacing: var(--aime-text-meta-ls); text-transform: uppercase;
+}
+.ba__tag--before { inset-inline-start: var(--aime-space-3); }
+.ba__tag--after { inset-inline-end: var(--aime-space-3); }
+
+/* ── P7 MEDIA SLOT — la place est certaine, l'asset peut être à confirmer */
+.mslot { display: grid; gap: var(--aime-space-2); }
+.mslot__frame { position: relative; }
+.mslot__spec {
+  display: flex; align-items: center; gap: var(--aime-space-3); flex-wrap: wrap;
+  font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size);
+  letter-spacing: var(--aime-text-meta-ls); text-transform: uppercase; color: var(--aime-color-text-subtle);
+}
+
+/* ── P8 SPEC TABLE — la mesure est toujours en mono, alignée à droite */
+.spec { display: grid; gap: 0; }
+.spec__row {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--aime-space-4);
+  align-items: baseline; padding-block: var(--aime-space-2); border-top: var(--aime-border-subtle);
+}
+.spec__row:first-child { border-top: 0; }
+.spec__key { font-size: var(--aime-text-body-small-size); color: var(--aime-color-text-muted); }
+.spec__val { font-family: var(--aime-font-mono); font-size: var(--aime-text-caption-size); font-variant-numeric: tabular-nums; color: var(--aime-color-text); text-align: end; }

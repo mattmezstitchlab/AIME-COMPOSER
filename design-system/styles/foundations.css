@@ -1,0 +1,217 @@
+/* ══════════════════════════════════════════════════════════════
+   AIME DESIGN SYSTEM V1 — COUCHE 2 : FOUNDATIONS
+   Consomme UNIQUEMENT les tokens. Aucun littéral couleur, aucune
+   taille hors échelle. Vérifié par npm run qa.
+   ══════════════════════════════════════════════════════════════ */
+
+/* 2.1 RESET — neutre, sans opinion visuelle */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--aime-color-background);
+  color: var(--aime-color-text);
+  font-family: var(--aime-font-sans);
+  font-size: var(--aime-text-body-size);
+  line-height: var(--aime-text-body-lh);
+  font-weight: var(--aime-font-regular);
+  letter-spacing: var(--aime-text-body-ls);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, p, figure, blockquote, dl, dd, ul, ol { margin: 0; }
+ul[class], ol[class] { list-style: none; padding: 0; }
+img, svg, video, canvas { display: block; max-width: 100%; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; background: none; border: 0; padding: 0; }
+a { color: inherit; text-decoration: none; }
+table { border-collapse: collapse; width: 100%; }
+hr { border: 0; border-top: var(--aime-border-subtle); margin: 0; }
+/* L'outline n'est retiré qu'au pointeur : au clavier, il reste toujours visible. */
+:focus:not(:focus-visible) { outline: none; }
+
+/* 2.2 FOCUS — un seul système, jamais supprimé.
+       L'anneau est un outline : il survit au zoom, au mode kontrasélevé
+       et ne modifie jamais la géométrie. */
+:where(a, button, input, select, textarea, summary, [tabindex], [role='button']):focus-visible {
+  outline: var(--aime-border-width-strong) solid var(--aime-color-focus-ring);
+  outline-offset: var(--aime-focus-offset);
+}
+
+::selection { background: var(--aime-color-accent-subtle); color: var(--aime-color-text); }
+
+/* Défilement discret, sans décor */
+* { scrollbar-width: thin; scrollbar-color: var(--aime-color-border) transparent; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-thumb {
+  background: var(--aime-color-border);
+  border: 3px solid transparent;
+  background-clip: content-box;
+  border-radius: var(--aime-radius-pill);
+}
+*::-webkit-scrollbar-thumb:hover { background-color: var(--aime-color-border-strong); }
+
+/* 2.3 TYPOGRAPHIE — 9 rôles. La classe porte le rôle ; la taille vient du token. */
+.t-display, .t-h1, .t-h2, .t-h3, .t-body, .t-body-sm, .t-caption, .t-label, .t-meta {
+  font-family: var(--aime-text-body-family);
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.t-display {
+  font-size: var(--aime-text-display-size);
+  line-height: var(--aime-text-display-lh);
+  letter-spacing: var(--aime-text-display-ls);
+  font-weight: var(--aime-text-display-weight);
+  max-width: var(--aime-text-display-measure);
+  text-wrap: balance;
+}
+.t-h1 {
+  font-size: var(--aime-text-h1-size);
+  line-height: var(--aime-text-h1-lh);
+  letter-spacing: var(--aime-text-h1-ls);
+  font-weight: var(--aime-text-h1-weight);
+  max-width: var(--aime-text-h1-measure);
+  text-wrap: balance;
+}
+.t-h2 {
+  font-size: var(--aime-text-h2-size);
+  line-height: var(--aime-text-h2-lh);
+  letter-spacing: var(--aime-text-h2-ls);
+  font-weight: var(--aime-text-h2-weight);
+  max-width: var(--aime-text-h2-measure);
+}
+.t-h3 {
+  font-size: var(--aime-text-h3-size);
+  line-height: var(--aime-text-h3-lh);
+  letter-spacing: var(--aime-text-h3-ls);
+  font-weight: var(--aime-text-h3-weight);
+  max-width: var(--aime-text-h3-measure);
+}
+.t-body {
+  font-size: var(--aime-text-body-size);
+  line-height: var(--aime-text-body-lh);
+  letter-spacing: var(--aime-text-body-ls);
+  font-weight: var(--aime-text-body-weight);
+  max-width: var(--aime-text-body-measure);
+}
+.t-body-sm {
+  font-size: var(--aime-text-body-small-size);
+  line-height: var(--aime-text-body-small-lh);
+  letter-spacing: var(--aime-text-body-small-ls);
+  font-weight: var(--aime-text-body-small-weight);
+  max-width: var(--aime-text-body-small-measure);
+}
+.t-caption {
+  font-size: var(--aime-text-caption-size);
+  line-height: var(--aime-text-caption-lh);
+  letter-spacing: var(--aime-text-caption-ls);
+  font-weight: var(--aime-text-caption-weight);
+  max-width: var(--aime-text-caption-measure);
+  color: var(--aime-color-text-muted);
+}
+/* LABEL et META sont écrits en minuscules dans le DOM et capitalisés par CSS :
+   les lecteurs d'écran et la traduction restent corrects. */
+.t-label {
+  font-size: var(--aime-text-label-size);
+  line-height: var(--aime-text-label-lh);
+  letter-spacing: var(--aime-text-label-ls);
+  font-weight: var(--aime-text-label-weight);
+  max-width: var(--aime-text-label-measure);
+  text-transform: uppercase;
+  color: var(--aime-color-text-muted);
+}
+.t-meta {
+  font-family: var(--aime-font-mono);
+  font-size: var(--aime-text-meta-size);
+  line-height: var(--aime-text-meta-lh);
+  letter-spacing: var(--aime-text-meta-ls);
+  font-weight: var(--aime-text-meta-weight);
+  max-width: var(--aime-text-meta-measure);
+  text-transform: uppercase;
+  color: var(--aime-color-text-subtle);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Le mono est réservé à ce qui est mesurable ou traçable :
+   identifiants, horodatages, dimensions, provenance, tokens. */
+.u-mono {
+  font-family: var(--aime-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+.u-num { font-variant-numeric: tabular-nums; }
+.u-strong { font-weight: var(--aime-font-semibold); }
+.u-muted { color: var(--aime-color-text-muted); }
+.u-subtle { color: var(--aime-color-text-subtle); }
+.u-accent { color: var(--aime-color-accent-text); }
+.u-accent-signal { color: var(--aime-color-accent-text); font-weight: var(--aime-font-medium); }
+.u-sr {
+  position: absolute; width: 1px; height: 1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; margin: 0;
+}
+.u-ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.u-wrap-anywhere { overflow-wrap: anywhere; }
+
+/* 2.3bis ESPACEMENT — utilitaires liés à l'échelle, aucune valeur libre */
+.u-pad-sm { padding: var(--aime-space-2); }
+.u-pad { padding: var(--aime-space-4); }
+.u-pad-lg { padding: var(--aime-space-6); }
+.u-pad-xl { padding: var(--aime-space-8); }
+
+/* 2.4 SURFACES — la profondeur vient de la surface, pas de l'ombre.
+       background < surface < surface-elevated < surface-overlay */
+.u-surface { background: var(--aime-color-surface); }
+.u-surface-elevated { background: var(--aime-color-surface-elevated); }
+.u-surface-overlay { background: var(--aime-color-surface-overlay); }
+.u-sunken { background: var(--aime-color-surface-sunken); }
+.u-float { box-shadow: var(--aime-shadow-raise); }
+
+/* 2.5 BORDURES — cinq états logiques, jamais un rayon ou une couleur libre */
+.u-hairline { border-bottom: var(--aime-border-subtle); }
+.u-edge { border: var(--aime-border-default); }
+.u-edge-subtle { border: var(--aime-border-subtle); }
+.u-edge-strong { border: var(--aime-border-strong); }
+.u-edge-active { border: var(--aime-border-active); }
+
+/* 2.6 MOTION — sept primitives. Aucune n'est nécessaire à la compréhension. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+:root[data-aime-motion='reduced'] *,
+:root[data-aime-motion='reduced'] *::before,
+:root[data-aime-motion='reduced'] *::after {
+  animation-duration: 1ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 1ms !important;
+}
+
+@keyframes a-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes a-slide-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes a-scale-in { from { opacity: 0; transform: scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes a-expand { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@keyframes a-collapse { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(-4px); } }
+
+/* 2.6bis APPLICATION — une primitive devient un utilitaire réutilisable.
+   Aucune durée ni courbe littérale : tout vient des jetons. */
+.u-anim-fade     { animation: a-fade var(--aime-motion-base) var(--aime-ease-out) both; }
+.u-anim-slide    { animation: a-slide-up var(--aime-motion-base) var(--aime-ease-out) both; }
+.u-anim-scale    { animation: a-scale-in var(--aime-motion-fast) var(--aime-ease-out) both; }
+.u-anim-expand   { animation: a-expand var(--aime-motion-base) var(--aime-ease-out) both; }
+.u-anim-collapse { animation: a-collapse var(--aime-motion-fast) var(--aime-ease-in) both; }
+.u-anim-stagger > * { animation-delay: calc(var(--a-i, 0) * var(--aime-motion-stagger)); }
+
+/* 2.7 ÉTATS SÉMANTIQUES de texte — couleur + forme, jamais couleur seule */
+.u-success { color: var(--aime-color-success-text); }
+.u-warning { color: var(--aime-color-warning-text); }
+.u-error { color: var(--aime-color-error-text); }
+.u-info { color: var(--aime-color-info-text); }

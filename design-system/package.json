@@ -1,0 +1,15 @@
+{
+  "name": "aime-design-system",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AIME DESIGN SYSTEM V1 — tokens, foundations, components, patterns, QA. Documentation-only, dependency-free at runtime.",
+  "type": "module",
+  "scripts": {
+    "build": "node src/build.mjs",
+    "qa": "node src/build.mjs && node qa/run-qa.mjs",
+    "serve": "node qa/serve.mjs"
+  },
+  "devDependencies": {
+    "jsdom": "^25.0.1"
+  }
+}
