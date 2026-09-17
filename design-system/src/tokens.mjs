@@ -312,6 +312,55 @@ export const layers = { base: 0, sticky: 100, dropdown: 400, drawer: 600, overla
  * Le build la refuse à la génération ; le QA la revérifie sur l'artefact
  * livré. Si les deux divergent, c'est un bug du système, pas une opinion.
  * ------------------------------------------------------------------ */
+/* ══════════════════════════════════════════════════════════════
+   VOCABULAIRE ÉPISTÉMIQUE — contrat partagé
+   ══════════════════════════════════════════════════════════════
+   UNE seule définition pour tout le projet. Le Design System la
+   transforme en jetons visuels (forme + couleur + glyphe) ; la boucle
+   NOEMA l'utilise comme type de donnée. Ni l'un ni l'autre ne peut
+   inventer un état sans faire échouer la compilation.
+
+   AUDIT/DATA-MODEL-V1.md §5 proposait un vocabulaire différent
+   (CONFIRMED · DECLARED · EXTRACTED · INFERRED · SUGGESTED · UNKNOWN).
+   La table DATA_MODEL_CONFIDENCE_MAP le rattache à celui-ci : les deux
+   couches ne peuvent plus diverger.
+
+   key    — identifiant, utilisé dans les jetons et les données
+   role   — famille de couleur sémantique
+   style  — LA forme qui porte le sens : pointillé, tireté, plein
+   glyph  — pictogramme obligatoire, vérifié à la compilation
+   label  — libellé français
+   established — vrai si l'état désigne un fait établi
+*/
+export const EPISTEMIC_STATES = [
+  { key: 'observed', role: 'info', style: 'dotted', glyph: 'noe-observed', label: 'Observé', established: false },
+  { key: 'extracted', role: 'info', style: 'dashed', glyph: 'noe-extracted', label: 'Extrait', established: false },
+  { key: 'inferred', role: 'warning', style: 'dashed', glyph: 'noe-inferred', label: 'Déduit', established: false },
+  { key: 'proposed', role: 'accent', style: 'dashed', glyph: 'noe-proposed', label: 'Proposé', established: false },
+  { key: 'confirmed', role: 'success', style: 'solid', glyph: 'noe-confirmed', label: 'Confirmé', established: true },
+  { key: 'superseded', role: 'muted', style: 'solid', glyph: 'noe-superseded', label: 'Remplacé', established: true },
+];
+
+export const EPISTEMIC_KEYS = EPISTEMIC_STATES.map((s) => s.key);
+
+/** Le seul état « établi » qui vaille : un fait confirmé par un humain. */
+export const ESTABLISHED_STATES = EPISTEMIC_STATES.filter((s) => s.established).map((s) => s.key);
+
+/* La confiance s'exprime en trois degrés. Jamais en pourcentage :
+   un nombre inventé est une fausse précision. */
+export const CONFIDENCE_LEVELS = ['low', 'medium', 'high'];
+
+/* Rattachement du vocabulaire de AUDIT/DATA-MODEL-V1.md §5.
+   UNKNOWN n'est pas un état : c'est une absence, affichée par .is-unknown. */
+export const DATA_MODEL_CONFIDENCE_MAP = {
+  CONFIRMED: 'confirmed',
+  DECLARED: 'observed',
+  EXTRACTED: 'extracted',
+  INFERRED: 'inferred',
+  SUGGESTED: 'proposed',
+  UNKNOWN: null,
+};
+
 export const SURFACES = ['background', 'surface', 'surface-elevated', 'surface-overlay'];
 
 export const SURFACE_LABEL = {

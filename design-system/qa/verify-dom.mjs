@@ -20,7 +20,22 @@
  * Sort en code 1 si un script échoue, si une icône ne se résout pas ou si un
  * conteneur token-driven reste vide.
  */
-import { JSDOM, ResourceLoader, VirtualConsole } from 'jsdom';
+let JSDOM, ResourceLoader, VirtualConsole;
+try {
+  ({ JSDOM, ResourceLoader, VirtualConsole } = await import('jsdom'));
+} catch {
+  console.error(`
+AIME DESIGN SYSTEM V1 — VÉRIFICATION DOM
+  jsdom est absent. C'est la seule dépendance de ce script, et elle n'est
+  requise que par lui : build, QA et serveur fonctionnent sans elle.
+
+      cd design-system && npm install
+
+  Sans jsdom cette vérification ne peut PAS être simulée : elle consiste
+  précisément à exécuter les scripts des écrans dans un DOM réel.
+`);
+  process.exit(1);
+}
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';

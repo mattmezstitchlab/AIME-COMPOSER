@@ -37,6 +37,7 @@ import {
   TYPE_RATIO,
   SURFACES,
   SURFACE_LABEL,
+  EPISTEMIC_STATES,
   contrastPairs,
   STATUS_PAIRS,
   evaluateContrast,
@@ -135,19 +136,11 @@ const layerBlock = Object.entries(layers)
   .join('\n');
 
 /* États de connaissance NOEMA — le sens est porté par la forme, jamais par la seule couleur. */
-const knowledgeStates = [
-  ['observed', 'info', 'dotted', 'noe-observed', 'Observé'],
-  ['extracted', 'info', 'dashed', 'noe-extracted', 'Extrait'],
-  ['inferred', 'warning', 'dashed', 'noe-inferred', 'Déduit'],
-  ['proposed', 'accent', 'dashed', 'noe-proposed', 'Proposé'],
-  ['confirmed', 'success', 'solid', 'noe-confirmed', 'Confirmé'],
-  ['superseded', 'muted', 'solid', 'noe-superseded', 'Remplacé'],
-];
-const knowledgeBlock = knowledgeStates
-  .map(([key, role, style, glyph, label]) => {
+const knowledgeBlock = EPISTEMIC_STATES
+  .map(({ key, role, style, glyph, label, established }) => {
     const fg = role === 'accent' ? 'var(--aime-color-accent-text)' : role === 'muted' ? 'var(--aime-color-text-subtle)' : `var(--aime-color-${role}-text)`;
     const bd = role === 'accent' ? 'var(--aime-color-accent)' : role === 'muted' ? 'var(--aime-color-border)' : `var(--aime-color-${role}-border)`;
-    return `  /* ${label} — ${style === 'solid' ? 'fait établi' : 'non établi'} */
+    return `  /* ${label} — ${established ? 'fait établi' : 'non établi'} */
   --aime-state-${key}-fg: ${fg};
   --aime-state-${key}-bd: ${bd};
   --aime-state-${key}-style: ${style};
@@ -290,8 +283,12 @@ const tokensJson = {
   breakpoints,
   deviceProfiles,
   layers,
+  /* Même contrat, même forme JSON : role · borderStyle · glyph · label.
+     `established` s'y ajoute — c'est ce qui distingue un fait d'une hypothèse. */
   knowledgeStates: Object.fromEntries(
-    knowledgeStates.map(([key, role, style, glyph, label]) => [key, { role, borderStyle: style, glyph, label }]),
+    EPISTEMIC_STATES.map(({ key, role, style, glyph, label, established }) => [
+      key, { role, borderStyle: style, glyph, label, established },
+    ]),
   ),
   contrastTargets: TARGETS,
 };
@@ -361,9 +358,13 @@ if (dupes.length) failures.push(`icônes en double : ${dupes.join(', ')}`);
 const missingCat = categories.filter((c) => !icons.some((i) => i.cat === c));
 if (missingCat.length) failures.push(`catégories sans icône : ${missingCat.join(', ')}`);
 
-/* Chaque état de connaissance doit exister comme icône. */
-for (const [, , , glyph] of knowledgeStates) {
+/* Chaque état de connaissance doit exister comme icône, et son style de
+   bordure doit rester lisible : c'est la forme qui porte le sens. */
+for (const { key, glyph, style } of EPISTEMIC_STATES) {
   if (!ids.includes(glyph)) failures.push(`état NOEMA sans icône : ${glyph}`);
+  if (!['dotted', 'dashed', 'solid'].includes(style)) {
+    failures.push(`état NOEMA « ${key} » sans forme de bordure reconnue : ${style}`);
+  }
 }
 
 /* Les alias d'espace doivent pointer sur une étape réelle. */
