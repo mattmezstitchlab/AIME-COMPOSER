@@ -42,14 +42,18 @@ const REPO = join(ROOT, '..');
 const pages = roots
   .flatMap((r) => walk(r))
   .filter((p) => p.endsWith('.html') && !p.includes('node_modules'))
-  /* La page d'accueil du dépôt est ajoutée fichier par fichier, et non en
-     faisant de la racine un dossier parcouru : la racine contient aussi
-     `atlas/` — écrit avant le système, non conforme — et
-     `diagnostic/.work/`, des clones jetables de dépôts tiers. Les aspirer
-     noierait le rapport du système sous des écarts qui ne sont pas les
-     siens. Un écran exempté d'audit finit par inventer un style ; un
-     périmètre trop large, lui, rend le rapport illisible. */
-  .concat(existsSync(join(REPO, 'index.html')) ? [join(REPO, 'index.html')] : [])
+  /* La page d'accueil du dépôt et la Médiathèque sont ajoutées fichier par
+     fichier, et non en faisant de la racine un dossier parcouru : celle-ci
+     contient aussi `diagnostic/.work/`, des clones jetables de dépôts tiers.
+     L'aspirer noierait le rapport du système sous des écarts qui ne sont
+     pas les siens. (Les cinq écrans pré-système d'`atlas/`, eux, ont été
+     supprimés : la Médiathèque actuelle est construite avec le système et
+     entre donc dans son audit — un écran exempté finit par inventer un
+     style ; un périmètre trop large rend le rapport illisible.) */
+  .concat(
+    [join(REPO, 'index.html'), join(REPO, 'atlas', 'index.html')]
+      .filter((p) => existsSync(p)),
+  )
   .sort()
   .map((p) => ({ name: relative(join(ROOT, '..'), p), html: readFileSync(p, 'utf8') }));
 

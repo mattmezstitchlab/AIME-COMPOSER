@@ -47,11 +47,22 @@
     applyTheme();
   });
 
-  /* ── Grille Universelle — le format pilote le vrai composant ── */
-  const gridSel = $('#h-grid-format');
-  gridSel?.addEventListener('change', () => {
-    const page = $('#h-grid-page');
-    if (page) page.dataset.format = gridSel.value;
+  /* ── Menu « + » : une intention choisie remplit le champ ────── */
+  document.addEventListener('click', (e) => {
+    const item = e.target.closest('[data-h-intent]');
+    if (!item) return;
+    const fieldEl = $('#h-noema-text');
+    if (fieldEl) {
+      fieldEl.value = item.dataset.hIntent;
+      fieldEl.focus();
+    }
+    /* Referme le menu : le popover DS se gère au clic extérieur, ici le
+       choix est fait — on le replie explicitement. */
+    const pop = item.closest('.a-pop');
+    if (pop) {
+      pop.hidden = true;
+      document.querySelector(`[data-a-pop="#${pop.id}"]`)?.setAttribute('aria-expanded', 'false');
+    }
   });
 
   /* ── Vocabulaire partagé avec l'écran de la boucle ───────────── */

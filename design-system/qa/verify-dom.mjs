@@ -57,12 +57,15 @@ for (const sub of ['experiences', path.join('..', 'loop')]) {
     if (f.endsWith('.html') && !f.includes('node_modules')) pages.push(path.join(dir, f));
   }
 }
-/* La page d'accueil du dépôt, fichier par fichier — et non en parcourant
-   la racine, qui contient aussi `atlas/` (écrit avant le système) et
-   `diagnostic/.work/` (des clones jetables de dépôts tiers). Même raison
-   que pour run-qa.mjs : les deux périmètres doivent rester identiques,
-   sinon un écran exécuté n'est pas audité, ou l'inverse. */
-if (existsSync(path.join(ROOT, 'index.html'))) pages.push(path.join(ROOT, 'index.html'));
+/* La page d'accueil du dépôt et la Médiathèque, fichier par fichier — et
+   non en parcourant la racine, qui contient aussi `diagnostic/.work/` (des
+   clones jetables de dépôts tiers). Même raison que pour run-qa.mjs : les
+   deux périmètres doivent rester identiques, sinon un écran exécuté n'est
+   pas audité, ou l'inverse. */
+for (const f of ['index.html', path.join('atlas', 'index.html')]) {
+  const p = path.join(ROOT, f);
+  if (existsSync(p)) pages.push(p);
+}
 
 /* ── Chargement des ressources depuis le disque ───────────────── */
 class Disk extends ResourceLoader {
