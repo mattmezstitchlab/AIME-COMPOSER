@@ -1,5 +1,17 @@
 # AIME-COMPOSER
 
+## Page d'accueil
+
+`index.html` is the repository's front door — an AIME screen like any other, audited
+by Design QA with the other 31. It is where the concept is shown working: a
+conversation field with NOEMA, the Universal Card, the Universal Timeline (both
+fed live by the loop when `node loop/server.mjs` runs), the Universal Grid with a
+working format selector, the Composer, and the diagnostic applied to external
+projects. Served statically it stays readable and says so — nothing simulates.
+
+`home.js` owns that wiring and nothing else: no business rule is recomputed in
+the page, the loop's modules stay the only source of truth.
+
 ## Design System
 
 `design-system/` holds **AIME DESIGN SYSTEM V1** — the universal visual system for

@@ -14,22 +14,37 @@
 <link rel="stylesheet" href="design-system/styles/patterns.css">
 <link rel="stylesheet" href="design-system/styles/dataviz.css">
 <link rel="stylesheet" href="design-system/styles/doc.css">
-<script src="design-system/js/doc.js" defer></script>
 <script src="design-system/js/aime-ui.js" defer></script>
+<script src="home.js" defer></script>
 </head>
 <body>
-<noscript><p class="t-body-sm">Cet écran utilise JavaScript pour la navigation. <a class="a-text-btn" href="index.html">Recharger la page</a>.</p></noscript>
-<div class="ds-shell">
-<main class="ds-main l-page">
+<noscript><p class="t-body-sm">Cette page utilise JavaScript pour la conversation avec NOEMA et les organes vivants. <a class="a-text-btn" href="index.html">Recharger la page</a>.</p></noscript>
+
+<header class="ds-top">
+  <a class="ds-brand" href="index.html"><span>AIME<i>·</i>COMPOSER</span><small>V1</small></a>
+  <nav class="l-row l-row--nowrap l-hide-mobile" aria-label="Surfaces">
+    <a class="a-text-btn" href="loop/">Boucle NOEMA</a>
+    <a class="a-text-btn" href="atlas/">Atlas visuel</a>
+    <a class="a-text-btn" href="diagnostic/README.md">Diagnostic</a>
+  </nav>
+  <span class="l-spacer"></span>
+  <span class="ds-top__tools">
+    <span class="a-badge" id="h-noema-status">NOEMA : connexion…</span>
+    <button type="button" class="a-icon-btn" id="h-theme" aria-label="Changer de thème"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="set-theme"/></svg></button>
+    <a class="a-btn a-btn--sm a-btn--primary" href="design-system/index.html"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-document"/></svg>Design System</a>
+  </span>
+</header>
+
+<main class="ds-main l-page" id="contenu">
 
   <header class="ds-hero">
     <div class="ds-eyebrow">
       <span class="noema-mark"><svg class="a-ic a-ic--sm noema-mark__glyph" aria-hidden="true" width="16" height="16"><use data-a-icon="noe-mark"/></svg><span class="noema-mark__word">AIME-COMPOSER</span></span>
       <span class="a-badge a-badge--accent">V1</span>
-      <span class="a-badge">Proposé</span>
+      <span class="a-badge">La couche qui audite et fait converger</span>
     </div>
-    <h1 class="t-display">La couche qui audite et fait converger.</h1>
-    <p class="t-body u-muted">AIME-COMPOSER n'est pas une application de plus : c'est la couche de mesure et de convergence au-dessus des projets existants. Elle ne les fusionne pas et ne les remplace pas. Elle dit ce qui s'écarte du système, et propose — la validation reste humaine.</p>
+    <h1 class="t-display">Le système, montré en train de fonctionner.</h1>
+    <p class="t-body u-muted">AIME-COMPOSER n'est pas une application de plus : c'est la couche de mesure et de convergence au-dessus de vos projets. Cette page n'est pas une brochure — la conversation, la carte, la timeline, la grille et le composer ci-dessous sont les vrais organes du Design System, branchés sur la boucle NOEMA quand elle tourne.</p>
     <div class="l-row">
       <a class="a-btn a-btn--primary" href="design-system/index.html"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-document"/></svg>Ouvrir le Design System</a>
       <a class="a-btn" href="loop/"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="cmp-compose"/></svg>Ouvrir la boucle NOEMA</a>
@@ -37,40 +52,65 @@
     </div>
   </header>
 
-  <section class="ds-block" aria-labelledby="surfaces">
-    <h2 class="t-h2" id="surfaces">Trois surfaces, un seul système</h2>
-    <p class="t-body u-muted">Chacune est une projection du Design System, jamais un système parallèle. Aucune n'invente une valeur : elle la reçoit.</p>
+  <section class="ds-block" aria-labelledby="parler">
+    <h2 class="t-h2" id="parler">Parler à NOEMA</h2>
+    <p class="t-body u-muted">Une phrase dans vos mots, pas un formulaire. « Lire sans écrire » montre ce que NOEMA extrait et ce qu'elle n'a pas compris — rien n'est enregistré. « Proposer à la validation » dépose les candidats à l'état <span class="u-strong">proposed</span> ; seule une décision humaine, dans la boucle, en fait des faits.</p>
     <div class="ds-demo">
-      <div class="ds-demo__stage ds-demo__stage--col" role="list" aria-label="Les trois surfaces du dépôt">
-        <div class="l-row l-row--between" role="listitem">
-          <span class="l-row"><span class="a-badge">01</span><span class="t-body u-strong">Design System</span></span>
-          <a class="a-text-btn" href="design-system/index.html"><span class="t-caption">design-system/</span><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-arrow-right"/></svg></a>
+      <div class="ds-demo__stage ds-demo__stage--col">
+        <div class="a-field">
+          <label class="a-field__label" for="h-noema-text">Votre intention</label>
+          <textarea class="a-textarea" id="h-noema-text" placeholder="Camille Vasseur est saxophoniste ; il me faut la capacité de la salle ; envoyer l'annonce pour le 24 septembre"></textarea>
+          <span class="a-field__hint">Extraction par motifs, pas compréhension magique : la confiance reste basse tant que vous n'avez pas validé.</span>
         </div>
-        <div class="l-row l-row--between" role="listitem">
-          <span class="l-row"><span class="a-badge">02</span><span class="t-body u-strong">Boucle NOEMA</span></span>
-          <a class="a-text-btn" href="loop/"><span class="t-caption">loop/</span><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-arrow-right"/></svg></a>
+        <div class="l-row">
+          <button type="button" class="a-btn a-btn--sm" id="h-noema-read">Lire sans écrire</button>
+          <button type="button" class="a-btn a-btn--sm a-btn--primary" id="h-noema-submit">Proposer à la validation</button>
+          <span class="l-spacer"></span>
+          <a class="a-text-btn" href="loop/"><span class="t-caption">La boucle complète</span><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-arrow-right"/></svg></a>
         </div>
-        <div class="l-row l-row--between" role="listitem">
-          <span class="l-row"><span class="a-badge">03</span><span class="t-body u-strong">Atlas visuel</span></span>
-          <a class="a-text-btn" href="atlas/"><span class="t-caption">atlas/</span><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-arrow-right"/></svg></a>
+        <div class="l-stack" id="h-noema-out" aria-live="polite">
+          <p class="t-body-sm u-muted">Dites quelque chose à NOEMA. Si le badge « NOEMA en ligne » s'affiche en haut de page, la réponse vient du vrai moteur ; sinon l'écran vous donne la commande pour la brancher.</p>
         </div>
       </div>
-      <p class="ds-demo__caption"><span class="t-label">Lecture</span><span class="t-caption">Le Design System est la grammaire ; la boucle et l'Atlas sont des écrans qui la parlent.</span></p>
+      <p class="ds-demo__caption"><span class="t-label">Règle</span><span class="t-caption">NOEMA propose. L'humain valide. Une proposition n'a jamais l'apparence d'un fait, et ce qu'elle ne comprend pas vous est dit — jamais deviné.</span></p>
     </div>
   </section>
 
-  <section class="ds-block" aria-labelledby="design-system">
-    <h2 class="t-h2" id="design-system">Le Design System</h2>
-    <p class="t-body u-muted">Une grammaire à six couches : tokens, fondations, composants, patterns, layouts, expériences. Chaque couche ne consomme que celle du dessous. Un écran est une projection du système — jamais l'inverse.</p>
+  <section class="ds-block" aria-labelledby="ce-site">
+    <h2 class="t-h2" id="ce-site">Ce que ce site est</h2>
+    <p class="t-body u-muted">Trois surfaces, un seul système. Chacune est une projection du Design System, jamais un système parallèle : aucune n'invente une valeur, elle la reçoit.</p>
     <div class="ds-demo">
-      <div class="ds-demo__stage ds-demo__stage--col" role="list" aria-label="Ce que contient le Design System">
-        <div class="l-row l-row--between" role="listitem"><span class="t-body">Couleurs primitives et rôles</span><span class="t-caption u-muted">23 primitives · 21 rôles × 2 thèmes</span></div>
-        <div class="l-row l-row--between" role="listitem"><span class="t-body">Rôles typographiques</span><span class="t-caption u-muted">9 rôles · ratio 1.25</span></div>
-        <div class="l-row l-row--between" role="listitem"><span class="t-body">Échelle d'espacement</span><span class="t-caption u-muted">10 étapes fermées</span></div>
-        <div class="l-row l-row--between" role="listitem"><span class="t-body">Pictogrammes</span><span class="t-caption u-muted">85 glyphes · 17 catégories · aucun emoji</span></div>
-        <div class="l-row l-row--between" role="listitem"><span class="t-body">Familles Design QA</span><span class="t-caption u-muted">12 familles automatiques</span></div>
+      <div class="ds-demo__stage ds-demo__stage--col" role="list" aria-label="Les trois surfaces du dépôt">
+        <div class="l-row l-row--between" role="listitem">
+          <span class="l-row"><span class="a-badge">01</span><span class="t-body u-strong">Design System</span><span class="t-caption u-muted">la grammaire — tokens, composants, patterns, QA</span></span>
+          <a class="a-text-btn" href="design-system/index.html"><span class="t-caption">design-system/</span><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-arrow-right"/></svg></a>
+        </div>
+        <div class="l-row l-row--between" role="listitem">
+          <span class="l-row"><span class="a-badge">02</span><span class="t-body u-strong">Boucle NOEMA</span><span class="t-caption u-muted">le serveur et l'écran — proposer, valider, se souvenir</span></span>
+          <a class="a-text-btn" href="loop/"><span class="t-caption">loop/</span><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-arrow-right"/></svg></a>
+        </div>
+        <div class="l-row l-row--between" role="listitem">
+          <span class="l-row"><span class="a-badge">03</span><span class="t-body u-strong">Atlas visuel</span><span class="t-caption u-muted">les 64 projets sources, leurs primitives et leur preuve</span></span>
+          <a class="a-text-btn" href="atlas/"><span class="t-caption">atlas/</span><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-arrow-right"/></svg></a>
+        </div>
       </div>
-      <p class="ds-demo__caption"><span class="t-label">Contrat</span><span class="t-caption">Aucune couleur n'entre dans le système sans atteindre sa cible de contraste. Le build refuse.</span></p>
+      <p class="ds-demo__caption"><span class="t-label">Lecture</span><span class="t-caption">Le Design System est la grammaire ; la boucle et l'Atlas sont des écrans qui la parlent. Cette page d'accueil aussi — elle est auditée au même titre.</span></p>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="mecanisme">
+    <h2 class="t-h2" id="mecanisme">Le mécanisme du concept</h2>
+    <p class="t-body u-muted">Une grammaire à six couches. Chaque couche ne consomme que celle du dessous ; aucune couleur n'entre dans le système sans atteindre sa cible de contraste, et le build refuse ce qui s'écarte. Un écran est une projection du système — jamais l'inverse.</p>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--col" role="list" aria-label="Les six couches du système">
+        <div class="l-row l-row--between" role="listitem"><span class="t-body">Tokens</span><span class="t-caption u-muted">23 couleurs primitives · 21 rôles × 2 thèmes · 9 rôles typographiques</span></div>
+        <div class="l-row l-row--between" role="listitem"><span class="t-body">Foundations</span><span class="t-caption u-muted">échelle d'espacement fermée à 10 étapes · surfaces</span></div>
+        <div class="l-row l-row--between" role="listitem"><span class="t-body">Components</span><span class="t-caption u-muted">29 fondamentaux · la couche NOEMA et ses six états épistémiques</span></div>
+        <div class="l-row l-row--between" role="listitem"><span class="t-body">Patterns</span><span class="t-caption u-muted">13 patterns · les cinq organes AIME</span></div>
+        <div class="l-row l-row--between" role="listitem"><span class="t-body">Layouts</span><span class="t-caption u-muted">dispositions, mesures, points de rupture</span></div>
+        <div class="l-row l-row--between" role="listitem"><span class="t-body">Experiences</span><span class="t-caption u-muted">des écrans réels — dont celui que vous lisez</span></div>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Contrat</span><span class="t-caption">12 familles Design QA traversent les 32 écrans livrés, dont cette page. Règle de clôture : aucun style ne peut exister que le système ne sait expliquer.</span></p>
     </div>
     <div class="l-row">
       <a class="a-btn a-btn--sm" href="design-system/foundations.html"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="grd-grid"/></svg>Fondations</a>
@@ -80,39 +120,194 @@
     </div>
   </section>
 
-  <section class="ds-block" aria-labelledby="boucle">
-    <h2 class="t-h2" id="boucle">La boucle NOEMA</h2>
-    <p class="t-body u-muted">Vous écrivez une intention dans vos mots. NOEMA en tire des candidats, les classe par degré de confiance, et vous les montre. Elle n'enregistre rien tant que vous n'avez pas validé. Ce qu'elle ne comprend pas vous est dit, jamais deviné.</p>
+  <section class="ds-block" aria-labelledby="organes">
+    <h2 class="t-h2" id="organes">Les organes, en réel</h2>
+    <p class="t-body u-muted">Ce ne sont pas des maquettes figées : carte et timeline lisent la boucle dès que le serveur tourne, la grille applique vos choix au vrai composant, le composer assemble les mêmes briques. Les chapitres du Design System documentent chaque organe.</p>
+  </section>
+
+  <section class="ds-block" aria-labelledby="carte">
+    <h2 class="t-h2" id="carte">Carte Universelle</h2>
+    <p class="t-body u-muted">Une entité du monde, ses faits, son état épistémique. Une proposition n'a jamais l'apparence d'une observation, une observation jamais celle d'un fait confirmé.</p>
     <div class="ds-demo">
-      <div class="ds-demo__stage ds-demo__stage--col" role="list" aria-label="Les maillons de la boucle">
-        <div class="l-row l-row--between" role="listitem"><span class="t-body">Intention</span><span class="t-caption u-muted">une phrase, pas un formulaire</span></div>
-        <div class="l-row l-row--between" role="listitem"><span class="t-body">Proposition</span><span class="t-caption u-muted">état <span class="u-strong">proposed</span> — jamais un fait</span></div>
-        <div class="l-row l-row--between" role="listitem"><span class="t-body">Validation</span><span class="t-caption u-muted">seul chemin vers un fait confirmé</span></div>
-        <div class="l-row l-row--between" role="listitem"><span class="t-body">Action</span><span class="t-caption u-muted">autorisation et exécution distinctes, tracées</span></div>
-        <div class="l-row l-row--between" role="listitem"><span class="t-body">Mémoire</span><span class="t-caption u-muted">les huit droits : voir, comprendre, corriger, supprimer, pauser, limiter, partager, révoquer</span></div>
+      <div class="ds-demo__stage">
+        <div id="h-card" class="l-row">
+          <a class="ucard" href="loop/">
+            <div class="ucard__id"><span class="ucard__mark" data-type="project"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="prj-project"/></svg></span><span class="ucard__head"><span class="ucard__type">Projet</span><span class="ucard__title">Atelier Nord</span><span class="ucard__sub">Identité · site · imprimés</span></span></div>
+            <dl class="ucard__facts"><div class="ucard__fact"><dt>Version</dt><dd class="u-mono">v1.0.4</dd></div><div class="ucard__fact"><dt>Avancement</dt><dd>78 %</dd></div></dl>
+            <div class="ucard__foot"><span class="nstate" data-state="confirmed"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-confirmed"/></svg>Confirmé</span><span class="a-badge a-badge--accent">1 proposition</span></div>
+          </a>
+        </div>
       </div>
-      <p class="ds-demo__caption"><span class="t-label">Principe</span><span class="t-caption">NOEMA propose. L'humain valide. Une proposition n'a jamais l'apparence d'un fait.</span></p>
+      <p class="ds-demo__caption"><span class="t-label">Source</span><span class="t-caption" id="h-card-cap">Exemple statique — branchez la boucle et la carte lit une entité du monde via l'API.</span></p>
     </div>
     <div class="l-row">
-      <a class="a-btn a-btn--sm a-btn--primary" href="loop/">Ouvrir la boucle</a>
-      <a class="a-btn a-btn--sm a-btn--ghost" href="design-system/universal-timeline.html"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="time-timeline"/></svg>Timeline universelle</a>
+      <a class="a-btn a-btn--sm a-btn--ghost" href="design-system/universal-card.html"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="mem-card"/></svg>Chapitre Carte Universelle</a>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="timeline">
+    <h2 class="t-h2" id="timeline">Timeline Universelle</h2>
+    <p class="t-body u-muted">Une projection du flux canonique, jamais une seconde source de vérité : un seul moteur, six modes — d'un mode à l'autre, ce sont les capacités actives qui changent, pas les données.</p>
+    <div class="l-row">
+      <div class="a-field">
+        <label class="a-field__label" for="h-tl-mode">Mode</label>
+        <select class="a-select" id="h-tl-mode">
+          <option value="PLAN" selected>PLAN — organisation</option>
+          <option value="READ">READ — lecture</option>
+          <option value="COMPOSE">COMPOSE — montage</option>
+          <option value="REVIEW">REVIEW — annotation</option>
+          <option value="LIVE">LIVE — jour J</option>
+          <option value="HISTORY">HISTORY — versions</option>
+        </select>
+      </div>
+      <div class="a-field">
+        <label class="a-field__label" for="h-tl-gran">Granularité</label>
+        <select class="a-select" id="h-tl-gran">
+          <option>ANNÉE</option><option>MOIS</option><option>SEMAINE</option>
+          <option selected>JOUR</option><option>HEURE</option><option>MINUTE</option><option>SECONDE</option>
+        </select>
+      </div>
+    </div>
+    <div class="ds-demo">
+      <div class="ds-demo__stage">
+        <div id="h-timeline">
+          <div class="utl l-measure-xl">
+            <div class="utl__list">
+              <article class="utl__item"><span class="utl__marker" data-kind="change" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">14:02</span><span class="utl__title">Titre de la page d'accueil modifié</span><span class="a-badge">v1.0.4</span></div><p class="utl__body">Analyse d'impact sur 4 sections avant validation.</p></article>
+              <article class="utl__item"><span class="utl__marker" data-kind="communication" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">11:38</span><span class="utl__title">Annonce envoyée à trois canaux</span><span class="a-badge a-badge--success">publié</span></div></article>
+              <article class="utl__item" data-state="proposed"><span class="utl__marker" data-kind="proposal" aria-hidden="true"></span><div class="utl__row"><span class="utl__when">09:15</span><span class="utl__title">NOEMA propose de décaler la répétition</span><span class="nstate" data-state="proposed"><svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="noe-proposed"/></svg>Proposé</span></div></article>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Source</span><span class="t-caption" id="h-timeline-cap">Projection statique — branchez la boucle et la timeline lit le flux canonique via l'API, dans le mode choisi.</span></p>
+    </div>
+    <div class="l-row">
+      <a class="a-btn a-btn--sm a-btn--ghost" href="design-system/universal-timeline.html"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="time-timeline"/></svg>Chapitre Timeline Universelle</a>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="grille">
+    <h2 class="t-h2" id="grille">Grille Universelle</h2>
+    <p class="t-body u-muted">Un format, ses colonnes, sa zone sûre et ses tiers — les mêmes repères pour l'imprimé et l'écran. Choisissez un format : il s'applique au vrai composant, sans aucun style inventé.</p>
+    <div class="l-row">
+      <div class="a-field">
+        <label class="a-field__label" for="h-grid-format">Format</label>
+        <select class="a-select" id="h-grid-format">
+          <option value="a4" selected>A4</option>
+          <option value="a5">A5</option>
+          <option value="web">Web</option>
+          <option value="card">Carte</option>
+          <option value="16-9">16:9</option>
+          <option value="1-1">1:1</option>
+        </select>
+      </div>
+    </div>
+    <div class="ds-demo">
+      <div class="ds-demo__stage">
+        <div class="ugrid">
+          <div class="ugrid__page" data-format="a4" data-cols="6" id="h-grid-page">
+            <div class="ugrid__cols" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="ugrid__safe" aria-hidden="true"></div>
+            <div class="ugrid__bleed" aria-hidden="true"></div>
+            <div class="ugrid__thirds" aria-hidden="true"></div>
+            <div class="ugrid__snap" data-a-snap="colonne 3 · 12 mm" aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Réel</span><span class="t-caption">Le sélecteur pilote l'attribut du composant, pas une image : colonnes, fond perdu et zone sûre se recalculent avec les jetons du système.</span></p>
+    </div>
+    <div class="l-row">
+      <a class="a-btn a-btn--sm a-btn--ghost" href="design-system/universal-grid.html"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="grd-grid"/></svg>Chapitre Grille Universelle</a>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="composer">
+    <h2 class="t-h2" id="composer">Composer</h2>
+    <p class="t-body u-muted">L'écran de travail : palette de primitives, canvas de nœuds et de liens, timeline ancrée. Ce que la carte mémorise et ce que la timeline projette se composent ici.</p>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--plain">
+        <div class="l-canvas ds-demo__canvas">
+          <svg class="l-guide l-guide--v" style="--a-x:288" aria-hidden="true"></svg>
+          <svg width="100%" height="100%" aria-hidden="true" style="position:absolute;inset:0"><path class="clink is-connecting" style="--a-len:220" d="M232 96 C 280 96, 300 152, 352 152"/></svg>
+          <div class="cnode is-selected" style="--a-x:24;--a-y:56">
+            <span class="cnode__type">Personne</span>
+            <span class="cnode__title">Camille Vasseur</span>
+            <span class="cnode__desc">Saxophoniste · Lyon</span>
+            <span class="cnode__port cnode__port--out" aria-hidden="true"></span>
+          </div>
+          <div class="cnode" style="--a-x:352;--a-y:120">
+            <span class="cnode__type">Événement</span>
+            <span class="cnode__title">Concert du 24</span>
+            <span class="cnode__desc">Salle des Fêtes · 20 h 30</span>
+            <span class="cnode__port cnode__port--in" aria-hidden="true"></span>
+          </div>
+          <div class="cnode" style="--a-x:24;--a-y:184" data-state="proposed">
+            <span class="cnode__type">Lieu · proposé</span>
+            <span class="cnode__title">Salle des Fêtes</span>
+            <span class="cnode__desc">Capacité inconnue</span>
+          </div>
+        </div>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Lecture</span><span class="t-caption">La même phrase passée à NOEMA plus haut produit ces briques : une personne, un événement, un lieu dont la capacité reste à confirmer.</span></p>
+    </div>
+    <div class="l-row">
+      <a class="a-btn a-btn--sm a-btn--ghost" href="design-system/composer.html"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="cmp-compose"/></svg>Chapitre Composer</a>
+      <a class="a-btn a-btn--sm a-btn--ghost" href="design-system/experiences/composer.html"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-external"/></svg>L'écran complet</a>
     </div>
   </section>
 
   <section class="ds-block" aria-labelledby="diagnostic">
-    <h2 class="t-h2" id="diagnostic">Le diagnostic</h2>
-    <p class="t-body u-muted">Un projet existant peut être jugé par le système sans être modifié. Le moteur est celui qui valide les écrans du Design System — pas une copie. Le diagnostic mesure et nomme ; il ne répare rien, la réparation reste une décision humaine.</p>
-    <div class="ds-demo">
-      <div class="ds-demo__stage ds-demo__stage--col" role="list" aria-label="Ce que publie le diagnostic">
-        <div class="l-row l-row--between" role="listitem"><span class="t-body">Densité d'écarts par écran</span><span class="t-caption u-muted">jamais un score inventé sur 100</span></div>
-        <div class="l-row l-row--between" role="listitem"><span class="t-body">Familles concernées</span><span class="t-caption u-muted">et les écrans les plus touchés</span></div>
-        <div class="l-row l-row--between" role="listitem"><span class="t-body">Ordre de réparation</span><span class="t-caption u-muted">par effet obtenu pour effort dépensé</span></div>
-      </div>
-      <p class="ds-demo__caption"><span class="t-label">Portée</span><span class="t-caption">Mesure publiée dans <span class="u-strong">AUDIT/DIAGNOSTIC-SURVEY-V1.md</span>, générée par la mesure et non recopiée.</span></p>
+    <h2 class="t-h2" id="diagnostic">Le diagnostic — vos projets sous le même juge</h2>
+    <p class="t-body u-muted">Le moteur qui valide ces écrans peut juger n'importe quel projet — un dossier local ou un dépôt GitHub — sans jamais y écrire. Il publie une densité d'écarts, les familles concernées, les écrans les plus touchés et un ordre de réparation ; jamais un score inventé sur 100. Il mesure et nomme : réparer reste une décision humaine.</p>
+    <div class="ds-table-wrap">
+      <table class="ds-table">
+        <caption>Mesure du compte GitHub, générée le 17 septembre 2026 — aucun chiffre n'est écrit à la main.</caption>
+        <tbody>
+          <tr><th scope="row">Dépôts du compte</th><td class="u-mono">38</td></tr>
+          <tr><th scope="row">Projets jugés</th><td class="u-mono">18</td></tr>
+          <tr><th scope="row">Écrans mesurés</th><td class="u-mono">80</td></tr>
+          <tr><th scope="row">Écarts relevés</th><td class="u-mono">8 398</td></tr>
+          <tr><th scope="row">Densité globale</th><td class="u-mono">105 écarts par écran</td></tr>
+        </tbody>
+      </table>
     </div>
+    <pre class="ds-code">node diagnostic/diagnose.mjs ../un-projet        <i># un dossier local</i>
+node diagnostic/diagnose.mjs --owner O --repo R   <i># un dépôt GitHub</i>
+node diagnostic/survey.mjs                        <i># tous les dépôts du compte, classés</i></pre>
     <div class="l-row">
       <a class="a-btn a-btn--sm" href="diagnostic/README.md"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-document"/></svg>Mode d'emploi</a>
       <a class="a-btn a-btn--sm a-btn--ghost" href="AUDIT/DIAGNOSTIC-SURVEY-V1.md"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-proof"/></svg>Rapport mesuré</a>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="accessibilite">
+    <h2 class="t-h2" id="accessibilite">Accessibilité — mettre un site en conformité EAA / WCAG</h2>
+    <p class="t-body u-muted">Un site existant peut être mesuré à partir de son URL ou de ses fichiers, puis reconstruit écran par écran comme projection du Design System. Pas un badge : un moteur d'audit et de remédiation, qui commence par l'applicabilité et ne confond jamais un scan automatique avec une certification.</p>
+    <div class="l-row">
+      <span class="a-badge">EAA — Directive (UE) 2019/882</span>
+      <span class="a-badge">RGAA — France</span>
+      <span class="a-badge">WCAG 2.2 AA</span>
+      <span class="a-badge">EN 301 549</span>
+    </div>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--col" role="list" aria-label="Le parcours du moteur d'accessibilité">
+        <div class="l-row l-row--between" role="listitem"><span class="l-row"><span class="a-badge">01</span><span class="t-body u-strong">Le point d'entrée</span></span><span class="t-caption u-muted">URL publique ou fichiers du projet · crawl borné au périmètre défini</span></div>
+        <div class="l-row l-row--between" role="listitem"><span class="l-row"><span class="a-badge">02</span><span class="t-body u-strong">L'applicabilité d'abord</span></span><span class="t-caption u-muted">organisation, juridiction, service — avant tout verdict technique</span></div>
+        <div class="l-row l-row--between" role="listitem"><span class="l-row"><span class="a-badge">03</span><span class="t-body u-strong">Le profil de référence</span></span><span class="t-caption u-muted">EAA_SERVICE · RGAA_FR · WCAG_2_2_AA · EN_301_549 — jamais un simple oui/non</span></div>
+        <div class="l-row l-row--between" role="listitem"><span class="l-row"><span class="a-badge">04</span><span class="t-body u-strong">L'audit</span></span><span class="t-caption u-muted">rendu et code si disponible · clavier, zoom, reflow, sémantique des technologies d'assistance</span></div>
+        <div class="l-row l-row--between" role="listitem"><span class="l-row"><span class="a-badge">05</span><span class="t-body u-strong">Le rapport traçable</span></span><span class="t-caption u-muted">chaque écart localisé, son chemin de remédiation — la correction automatique reste hors contrat</span></div>
+        <div class="l-row l-row--between" role="listitem"><span class="l-row"><span class="a-badge">06</span><span class="t-body u-strong">La re-mesure</span></span><span class="t-caption u-muted">re-scan après correction, historique conservé — la preuve prime sur la promesse</span></div>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Statut</span><span class="t-caption">Moteur à l'état de spécification (PROPOSED) dans ARCHITECTURE/NOEMA-ACCESSIBILITY-ENGINE-EAA-V1.md — la boucle de mesure, elle, tourne déjà dans le diagnostic.</span></p>
+    </div>
+    <div class="ds-rule">
+      <p class="ds-rule__title">Déjà appliqué ici</p>
+      <p>La famille CONTRAST refuse toute couleur sous sa cible aux deux thèmes, au build — les 12 familles QA parcourent chaque écran livré, dont cette page. Le référentiel WCAG du système est documenté dans le chapitre Accessibilité.</p>
+    </div>
+    <div class="l-row">
+      <a class="a-btn a-btn--sm" href="ARCHITECTURE/NOEMA-ACCESSIBILITY-ENGINE-EAA-V1.md"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-contract"/></svg>La spécification du moteur</a>
+      <a class="a-btn a-btn--sm a-btn--ghost" href="design-system/accessibility.html"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="prf-shield"/></svg>Chapitre Accessibilité</a>
     </div>
   </section>
 
@@ -123,7 +318,15 @@
     </div>
   </section>
 
+  <footer class="l-row l-row--between">
+    <span class="t-caption u-muted">AIME-COMPOSER · la couche qui audite et fait converger</span>
+    <span class="l-row">
+      <a class="a-text-btn" href="#contenu">Haut de page</a>
+      <a class="a-text-btn" href="design-system/index.html">Design System</a>
+      <a class="a-text-btn" href="loop/">Boucle NOEMA</a>
+    </span>
+  </footer>
+
 </main>
-</div>
 </body>
 </html>

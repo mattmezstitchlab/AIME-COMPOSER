@@ -76,6 +76,7 @@
       <button type="button" class="a-icon-btn" id="a-density" aria-label="Changer la densité de cibles" data-a-tip="Densité">${icon('grd-ruler')}</button>
       <button type="button" class="a-icon-btn" id="a-motion" aria-label="Réduire le mouvement" aria-pressed="false" data-a-tip="Mouvement">${icon('time-clock')}</button>
       <a class="a-btn a-btn--sm a-btn--ghost l-hide-mobile" href="${root}qa.html">Design QA</a>
+      <a class="a-btn a-btn--sm a-btn--ghost l-hide-mobile" href="${root}../index.html" title="Accueil du site AIME-COMPOSER">${icon('nav-home')}Accueil du site</a>
     </div>`;
 
   /* ── Navigation latérale ──────────────────────────────────── */
