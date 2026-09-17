@@ -162,7 +162,33 @@ const ARROW = /[\u{2190}-\u{21FF}\u{2794}\u{27F0}-\u{27FF}]/u;
  */
 export function audit(input) {
   const { cssFiles = [], tokenCss, tokensJson, pages = [], sprite = '', live = null } = input;
-  const allCss = tokenCss ? [tokenCss, ...cssFiles] : cssFiles;
+  /* ── Les blocs <style> d'une page sont du CSS comme un autre ──────
+     Sans ceci, une page peut embarquer toute sa feuille dans un <style>
+     et passer l'audit : les familles CSS ne lisaient que `cssFiles`, et
+     les familles HTML retiraient justement les <style> avant de lire.
+     Les deux se neutralisaient, et ~120 couleurs littérales d'atlas/
+     étaient invisibles.
+
+     Ces blocs sont donc ajoutés à la liste des feuilles, sous un nom qui
+     dit d'où ils viennent. Conséquence voulue : leurs classes comptent
+     comme définies, et leurs valeurs passent par COLOR, SPACING,
+     TYPOGRAPHY, ALIGNMENT et MOTION.
+     ───────────────────────────────────────────────────────────────── */
+  const pageStyles = [];
+  for (const p of pages) {
+    const blocks = [...String(p.html).matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)];
+    blocks.forEach((m, i) => {
+      pageStyles.push({
+        name: blocks.length > 1 ? `${p.name} <style #${i + 1}>` : `${p.name} <style>`,
+        text: m[1],
+        /* Ligne de départ dans la page, pour que le rapport pointe juste. */
+        pageLine: lineOf(p.html, m.index),
+      });
+    });
+  }
+
+  const sheets = tokenCss ? [tokenCss, ...cssFiles] : [...cssFiles];
+  const allCss = [...sheets, ...pageStyles];
   const issues = [];
   const add = (family, file, line, message) => issues.push({ family, file, line, message });
 
