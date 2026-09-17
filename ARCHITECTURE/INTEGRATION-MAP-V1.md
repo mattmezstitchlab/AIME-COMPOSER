@@ -424,7 +424,7 @@ COMPOSITION / SITE / DOCUMENT
         HUMAN REVIEW
 ```
 
-Automated scanning is a signal and remediation aid. It does not by itself establish complete accessibility conformance; W3C explicitly notes that human evaluation remains necessary. citeturn0search1turn0search8
+Automated scanning is a signal and remediation aid. It does not by itself establish complete accessibility conformance; W3C explicitly notes that human evaluation remains necessary.
 
 ## 16. Proof and governance integration
 
