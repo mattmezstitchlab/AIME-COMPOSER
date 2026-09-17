@@ -32,7 +32,7 @@ MEMORY
 
 The human remains the authority over identity, memory, permissions, sensitive information, publication, and consequential actions.
 
-> CERISE PROPOSE. L’HUMAIN VALIDE.
+> NOEMA PROPOSE. L'HUMAIN VALIDE.
 
 ## 2. Canonical layers
 

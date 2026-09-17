@@ -13,7 +13,7 @@ The first contact is **La Gardienne**: a conversational, multimodal threshold th
 
 Core rule:
 
-> **CERISE PROPOSE. L'HUMAIN VALIDE.**
+> **NOEMA PROPOSE. L'HUMAIN VALIDE.**
 
 ## 2. Entry without forms
 

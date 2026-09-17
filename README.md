@@ -24,7 +24,7 @@ contract · 9 typographic roles · a closed 10-step spacing scale · 85 glyphs i
 categories, no emoji · 29 fundamental components · the five AIME organs (Universal
 Card, Universal Media, Universal Timeline, Universal Grid, Composer) · the NOEMA
 layer with its six epistemic states · 13 patterns · a data-visualization language ·
-12 automatic Design QA families · 30 shipped screens (19 documentation chapters and
+12 automatic Design QA families · 31 audited screens (19 documentation chapters and
 10 experience screens).
 
 Normative specification: `ARCHITECTURE/AIME-DESIGN-SYSTEM-V1.md`.

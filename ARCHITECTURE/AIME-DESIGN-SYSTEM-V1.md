@@ -2,7 +2,7 @@
 
 **Status:** PROPOSED / CONVERGENCE  
 **Depends on:** Universal Card, Universal Timeline, Universal Grid, Composition Model, NOEMA Constitution, NOEMA Accessibility Engine (EAA)  
-**Primary implementation:** `design-system/` — tokens, icon family, CSS layers 2–5, Design QA, 30 shipped screens.  
+**Primary implementation:** `design-system/` — tokens, icon family, CSS layers 2–5, Design QA, 30 shipped screens plus `loop/index.html`, which the same QA audits.  
 **Primary evidence:** the running system itself. `npm run qa` and `npm run verify` are the proof, not this document.
 
 ## 1. Purpose

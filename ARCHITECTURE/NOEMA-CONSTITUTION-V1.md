@@ -36,7 +36,7 @@ NOEMA peut avoir une personnalité dans son interaction sans prétendre être hu
 
 ## 3. Principe fondamental
 
-> **CERISE PROPOSE. L'HUMAIN VALIDE.**
+> **NOEMA PROPOSE. L'HUMAIN VALIDE.**
 
 Et :
 
