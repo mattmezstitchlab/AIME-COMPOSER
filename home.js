@@ -74,6 +74,7 @@
   const CONF = { low: 'faible', medium: 'moyenne', high: 'élevée' };
 
   let live = false; /* la boucle répond-elle ? */
+  let runtimeMode = null; /* 'server' | 'serverless' | null — la vérité de l'hôte */
 
   async function api(path, opts) {
     const r = await fetch(path, opts);
@@ -85,7 +86,15 @@
   function setStatus() {
     const b = $('#h-noema-status');
     if (!b) return;
-    b.textContent = live ? 'NOEMA en ligne' : 'NOEMA hors ligne';
+    /* Serverless sans disque : la boucle répond, mais son monde est une
+       démo réinitialisée à froid — le badge le dit au lieu de promettre
+       une persistance que l'hôte ne tient pas. */
+    b.textContent = live
+      ? runtimeMode === 'serverless' ? 'NOEMA en ligne · démo' : 'NOEMA en ligne'
+      : 'NOEMA hors ligne';
+    b.title = live && runtimeMode === 'serverless'
+      ? 'Monde de démonstration en mémoire, réinitialisé à froid — la persistance disque vit sur le serveur local complet.'
+      : '';
     b.className = live ? 'a-badge a-badge--success' : 'a-badge';
   }
 
@@ -95,7 +104,7 @@
 
   function offlineNote() {
     if (!out) return;
-    out.innerHTML = `<p class="t-body-sm u-muted">La boucle NOEMA n'est pas branchée sur cet hébergement — la page reste consultable, la conversation demande le serveur de la boucle :</p>
+    out.innerHTML = `<p class="t-body-sm u-muted">La boucle NOEMA n'a pas répondu depuis cet hébergement — la page reste consultable, la conversation demande le serveur de la boucle :</p>
       <pre class="ds-code">node loop/server.mjs\n<i>puis recharger cette page — le badge passera « NOEMA en ligne ».</i></pre>
       <p class="t-caption u-muted">En attendant, la boucle complète — propositions, validation, mémoire, journal — s'ouvre <a class="a-text-btn" href="loop/">sur l'écran de la boucle</a>.</p>`;
   }
@@ -176,8 +185,9 @@
      « hors ligne », sans erreur — la page documente déjà comment brancher. */
   if (typeof fetch === 'function') {
     api('/api/state')
-      .then(() => {
+      .then((d) => {
         live = true;
+        runtimeMode = d.runtime?.mode || null;
         setStatus();
       })
       .catch(() => setStatus());

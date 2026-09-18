@@ -202,6 +202,7 @@ function render(d) {
     <span class="a-badge a-badge--accent">${open.length} en attente</span>
     <span class="a-badge">${d.entities.length} entités</span>
     <span class="a-badge">${proofs.length} preuve(s)</span>
+    ${d.runtime?.mode === 'serverless' ? `<span class="a-badge a-badge--warning" title="Monde de démonstration en mémoire : réinitialisé à chaque cold start. La persistance disque vit sur le serveur local complet (node loop/server.mjs).">démo · réinitialisée à froid</span>` : ''}
     ${(d.entities || []).some((e) => e.id?.startsWith('act-')) ? `<span class="a-badge a-badge--warning">${(d.entities || []).filter((e) => e.id?.startsWith('act-') && e.status !== 'executed').length} action(s)</span>` : ''}`;
   $('#h-stamp').textContent = `observation du ${new Date(d.now).toLocaleString('fr-FR', { dateStyle: 'long', timeStyle: 'short' })}`;
 
