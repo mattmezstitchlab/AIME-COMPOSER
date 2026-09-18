@@ -195,6 +195,15 @@
   box-shadow: var(--aime-focus-ring);
 }
 .pz-place img { display: block; inline-size: 100%; block-size: auto; }
+.pz-place.is-dragging { box-shadow: var(--aime-shadow-drag); cursor: grabbing; z-index: 4; }
+
+/* Couverture publiée d'un import local (P4). */
+.pz-cov {
+  padding: var(--aime-space-4);
+  border: var(--aime-border-default);
+  border-radius: var(--aime-radius-large);
+  background: var(--aime-color-surface-elevated);
+}
 .pz-place__label {
   display: block;
   font-size: var(--aime-text-caption-size);

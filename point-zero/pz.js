@@ -18,10 +18,13 @@
  *      /api/state), ＋ Import universel.
  *
  * Ce module ne contient aucune règle métier : tout vient des moteurs
- * (loop API, atlas media.json, QA-REPORT.json). Un écran qui recalculerait
- * créerait une seconde source de vérité. Script module — une phrase
- * incomplète devient un état, jamais une erreur console.
+ * (loop API, atlas media.json, QA-REPORT.json, pz-import.mjs pour les
+ * lectures locales). Un écran qui recalculerait créerait une seconde
+ * source de vérité. Script module — une phrase incomplète devient un
+ * état, jamais une erreur console.
  */
+import { classifyName, zipIndex, pdfTriage, summarizeImport } from './pz-import.mjs';
+import { auditLive } from '../design-system/js/qa.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -202,8 +205,9 @@ function select(kind, ref, el) {
   if (meta) {
     meta.textContent = kind === null
       ? 'une sélection, quatre projections'
-      : `sélection : ${kind === 'place' ? 'placement' : kind === 'media' ? 'média du bureau' : 'carte mémoire'}`;
+      : `sélection : ${kind === 'place' ? 'placement' : kind === 'media' ? 'média du bureau' : kind === 'eaa' ? 'contrôle d\u2019accessibilité' : 'carte mémoire'}`;
   }
+  $('#pz-eaa')?.setAttribute('aria-pressed', kind === 'eaa' ? 'true' : 'false');
   renderInspector();
 }
 
@@ -235,7 +239,11 @@ function renderInspector() {
         ${row('type', `${esc(it.kind)} · ${esc(it.ext || '')}`)}
         ${row('taille', it.size ? `${Math.round(it.size / 1024)} Ko` : 'inconnue', !it.size)}
         ${row('origine', it.local ? `local · ${esc(it.rel || '')}` : esc(it.repo || ''), false)}
-        ${row('empreinte', it.sha ? `<span class="u-mono">${esc(it.sha.slice(0, 8))}</span>` : 'locale', false)}
+        ${row('empreinte', it.sha256 ? `<span class="u-mono">SHA-256 ${esc(it.sha256.slice(0, 12))}…</span>` : it.sha ? `<span class="u-mono">${esc(it.sha.slice(0, 8))}</span>` : it.whyUnhashed ? esc(it.whyUnhashed) : 'non calculée', !it.sha256 && !it.sha)}
+        ${it.zip ? row('archive', `${it.zip.count} entrées indexées localement — les originaux restent intacts`) : ''}
+        ${it.zipError ? row('archive', esc(it.zipError), true) : ''}
+        ${it.pdf ? row('pdf', `${esc(it.pdf.version)} · ${it.pdf.pages} page(s)${it.pdf.title ? ` · « ${esc(it.pdf.title)} »` : ''} — le texte intégral reste une étape dédiée`) : ''}
+        ${it.pdfError ? row('pdf', esc(it.pdfError), true) : ''}
       </div>
       <div class="inspector__group">
         <p class="t-label">Provenance</p>
@@ -286,6 +294,40 @@ function renderInspector() {
           ? row('origine', esc(e.provenance.origin || '')) + row('état', stateBadge(e.provenance.state))
           : row('origine', 'inconnue', true)}
       </div>`;
+  } else if (Selection.kind === 'eaa') {
+    const r = Eaa.run;
+    const fmtFind = (arr, key) => arr.slice(0, 3).map((g) => esc(`${g.selector}${g[key] != null ? ` (${g[key]})` : ''}`)).join(' · ');
+    html = r ? `
+      <div class="inspector__group">
+        <p class="t-label">Pack de contrôle EAA — signaux automatiques</p>
+        ${row('exécuté', esc(r.at))}
+        ${row('moteur', esc(r.engine))}
+      </div>
+      <div class="inspector__group">
+        <p class="t-label">Géométrie & cibles — auditLive du Design System</p>
+        ${row('débordements horizontaux', r.geometry.length ? `${r.geometry.length} — ${fmtFind(r.geometry, 'overflow')}${r.geometry.length > 3 ? '…' : ''}` : 'aucun détecté')}
+        ${row('cibles < 24 px', r.targets.length ? `${r.targets.length} — ${fmtFind(r.targets, 'size')}${r.targets.length > 3 ? '…' : ''}` : 'aucune détectée')}
+      </div>
+      <div class="inspector__group">
+        <p class="t-label">Noms accessibles</p>
+        ${row('contrôles sans nom', r.unnamed.length ? r.unnamed.map(esc).join(' · ') : 'aucun détecté dans l\u2019arbre visible')}
+      </div>
+      <div class="inspector__group">
+        <p class="t-label">Contraste & mouvement — rapport QA du dernier run</p>
+        ${r.contrast
+          ? row('contrastes mesurés', `${r.contrast.pass}/${r.contrast.total} conformes — pire : ${esc(r.contrast.worst?.why || '?')} (${r.contrast.worst?.ratio ?? '?'}:1)`)
+          : row('contrastes', 'rapport QA non chargé', true)}
+        ${row('mouvement réduit', 'pris en charge par le Design System (data-aime-motion)')}
+      </div>
+      <div class="inspector__group">
+        <p class="t-body-sm u-muted">Ces signaux automatiques ne remplacent ni un audit humain ni une certification : ils portent ce que les moteurs mesurent, rien de plus.</p>
+        <button type="button" class="a-btn a-btn--sm" data-eaa-rerun>Relancer les signaux</button>
+      </div>` : `
+      <div class="inspector__group">
+        <p class="t-label">Pack de contrôle EAA</p>
+        <p class="t-body-sm u-muted">Aucun contrôle exécuté pour l'instant.</p>
+        <button type="button" class="a-btn a-btn--sm" data-eaa-rerun>Lancer les signaux</button>
+      </div>`;
   } else {
     html = `
       <div class="inspector__group">
@@ -332,27 +374,43 @@ function bindInspectorFields() {
 }
 
 /* ── Z2 · BUREAU — la médiathèque réelle, projetée en panneau ── */
-const Bureau = { data: null, source: 'github', mode: 'tout', q: '', repoFilter: '', local: [] };
+const Bureau = { data: null, source: 'github', mode: 'tout', q: '', repoFilter: '', local: [], dossier: 'tous' };
 
 const KIND_ICON = {
   image: 'med-image', video: 'med-video', audio: 'med-audio',
-  vecteur: 'med-qr', document: 'doc-document', autre: 'mem-archive',
+  vecteur: 'med-qr', document: 'doc-document', archive: 'mem-vault', autre: 'mem-archive',
 };
-const EXT_KIND = [
-  [/^(png|jpe?g|webp|gif|avif|bmp|ico)$/, 'image'],
-  [/^(mp4|webm|mov|m4v)$/, 'video'],
-  [/^(mp3|wav|ogg|flac|aac|m4a)$/, 'audio'],
-  [/^(svg)$/, 'vecteur'],
-  [/^(pdf|md|txt|docx?|odt|csv|rtf)$/, 'document'],
-];
 
 function visibleMediaCount() {
   return Bureau.source === 'github' ? (Bureau.data?.items?.length || 0) : Bureau.local.length;
 }
 
+const allItems = () => (Bureau.source === 'github' ? (Bureau.data?.items || []) : Bureau.local);
+
+/* Dossiers contextuels : des vues dynamiques, jamais des copies
+   (MASTER-ARCHITECTURE §11 — Magic Folder). */
+function duplicateShas(items) {
+  const seen = new Set();
+  const dup = new Set();
+  for (const i of items) {
+    const k = i.sha256 || i.sha;
+    if (!k) continue;
+    if (seen.has(k)) dup.add(k);
+    else seen.add(k);
+  }
+  return dup;
+}
+
 function filteredItems() {
-  let items = Bureau.source === 'github' ? (Bureau.data?.items || []) : Bureau.local;
+  let items = allItems();
   if (Bureau.repoFilter) items = items.filter((i) => i.repo === Bureau.repoFilter);
+  if (Bureau.dossier === 'doublons') {
+    const dup = duplicateShas(items);
+    items = items.filter((i) => dup.has(i.sha256 || i.sha));
+  } else if (Bureau.dossier === 'places') {
+    const ids = new Set(places.map((p) => p.media.id));
+    items = items.filter((i) => ids.has(i.id));
+  }
   if (Bureau.mode !== 'tout') items = items.filter((i) => i.kind === Bureau.mode);
   if (Bureau.q) items = items.filter((i) => i.name.toLowerCase().includes(Bureau.q));
   return items;
@@ -481,33 +539,100 @@ $('#pz-bureau-q')?.addEventListener('input', (e) => {
   renderBureau();
 });
 
+$$('#pz-bureau [data-dossier]').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    Bureau.dossier = btn.dataset.dossier;
+    $$('#pz-bureau [data-dossier]').forEach((b) => b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'));
+    renderBureau();
+  });
+});
+
 /* ── ＋ · IMPORT UNIVERSEL ───────────────────────────────────── */
 const fileDir = $('#pz-file-dir');
 const fileMulti = $('#pz-file-multi');
 const importField = $('#pz-uimport-field');
 const importText = $('#pz-uimport-text');
 
-function ingestFiles(files) {
-  const created = [];
-  for (const f of files) {
+async function fileBuffer(f) {
+  try { return typeof f.arrayBuffer === 'function' ? await f.arrayBuffer() : null; }
+  catch { return null; }
+}
+
+async function sha256hex(buf) {
+  try {
+    if (!window.crypto?.subtle || !buf) return null;
+    const h = await window.crypto.subtle.digest('SHA-256', buf);
+    return [...new Uint8Array(h)].map((b) => b.toString(16).padStart(2, '0')).join('');
+  } catch { return null; }
+}
+
+/* Lecture locale réelle (pz-import.mjs, zéro dépendance) : chaque fichier
+   est classé, empreinté SHA-256, les archives et PDF sont indexés — la
+   couverture de l'import est publiée dans le Bureau, jamais envoyée. */
+const BIG_FILE = 67108864; /* 64 Mio — au-delà, l'empreinte est déclarée non calculée */
+const ImportCov = { last: null, zip: null };
+
+async function ingestFiles(files) {
+  const list = Array.from(files || []);
+  if (!list.length) return;
+  const canBlob = typeof URL !== 'undefined' && typeof URL.createObjectURL === 'function';
+  const lots = [];
+  let topZip = null;
+  for (const f of list) {
     const ext = (f.name.split('.').pop() || '').toLowerCase();
-    const kind = EXT_KIND.find(([re]) => re.test(ext))?.[1] || 'autre';
-    const canBlob = typeof URL !== 'undefined' && typeof URL.createObjectURL === 'function';
+    const kind = classifyName(f.name);
+    const inspect = kind === 'archive' || ext === 'pdf';
+    const want = inspect || (f.size || 0) <= BIG_FILE;
+    const buf = want ? await fileBuffer(f) : null;
+    const sha = buf ? await sha256hex(buf) : null;
     const blob = canBlob && ['image', 'video', 'audio', 'vecteur'].includes(kind) ? URL.createObjectURL(f) : null;
-    created.push({
-      id: `loc-${Bureau.local.length + created.length}`,
-      name: f.name,
-      kind, ext,
-      size: f.size || null,
-      local: true,
-      rel: f.webkitRelativePath || f.name,
-      url: blob || '',
-      source: '',
-    });
+    const rec = {
+      id: `loc-${Date.now().toString(36)}-${Bureau.local.length}`,
+      name: f.name, kind, ext, size: f.size || null,
+      local: true, rel: f.webkitRelativePath || f.name,
+      url: blob || '', source: '', sha256: sha,
+      whyUnhashed: buf || !want ? null : 'fichier volumineux — empreinte non calculée',
+    };
+    let skipped = null;
+    if (kind === 'archive' && buf) {
+      const z = zipIndex(buf);
+      if (z.ok) {
+        rec.zip = { count: z.count, files: z.files.slice(0, 40) };
+        if (!topZip) topZip = rec;
+      } else { skipped = { name: f.name, reason: z.error }; rec.zipError = z.error; }
+    }
+    if (ext === 'pdf' && buf) {
+      const p = pdfTriage(buf);
+      if (p.ok) rec.pdf = p;
+      else { skipped = skipped || { name: f.name, reason: p.error }; rec.pdfError = p.error; }
+    }
+    Bureau.local.push(rec);
+    lots.push({ name: f.name, ext, kind, sha256: sha, kept: true, skipped });
   }
-  Bureau.local.push(...created);
+  ImportCov.last = summarizeImport(lots);
+  ImportCov.zip = topZip;
   setSource('local');
-  toast?.({ title: `${created.length} fichier(s) classé(s)`, text: 'Lecture locale — rien n\u2019a été envoyé. Validez avant toute mémorisation.', tone: 'accent' });
+  renderImportCoverage();
+}
+
+function renderImportCoverage() {
+  const box = $('#pz-bureau-cov');
+  const sum = ImportCov.last;
+  if (!box || !sum) return;
+  box.hidden = false;
+  const kinds = Object.entries(sum.byKind).map(([k, n]) => `${n} ${k}`).join(' · ') || 'aucun type reconnu';
+  box.innerHTML = `
+    <div class="pz-cov l-stack">
+      <p class="t-h3">Couverture de l'import — ${sum.kept}/${sum.total} conservés</p>
+      <p class="t-body-sm u-muted">${esc(kinds)}${sum.hashed ? ` · ${sum.hashed} empreinte(s) SHA-256` : ''}${sum.unhashed ? ` · ${sum.unhashed} non calculée(s)` : ''}</p>
+      ${sum.skipped.length ? `<p class="t-body-sm">Écartés honnêtement : ${sum.skipped.map((s) => `${esc(s.name)} — ${esc(s.reason)}`).join(' · ')}</p>` : ''}
+      ${sum.dupes.length ? `<p class="t-body-sm">Doublons d'empreinte : ${sum.dupes.map((d) => `${esc(d.names.join(' = '))} <span class="u-mono">${esc(d.sha)}</span>`).join(' · ')}</p>` : ''}
+      ${ImportCov.zip?.zip ? `<p class="t-body-sm u-muted">Archive « ${esc(ImportCov.zip.name)} » : ${ImportCov.zip.zip.count} entrées — ${ImportCov.zip.zip.files.slice(0, 3).map(esc).join(', ')}${ImportCov.zip.zip.files.length > 3 ? '…' : ''}</p>` : ''}
+      <div class="l-row">
+        <button type="button" class="a-btn a-btn--sm" data-cov-noema>Transmettre à NOEMA en intention</button>
+        <button type="button" class="a-btn a-btn--sm a-btn--ghost" data-cov-close>Masquer</button>
+      </div>
+    </div>`;
 }
 fileDir?.addEventListener('change', () => ingestFiles([...(fileDir.files || [])]));
 fileMulti?.addEventListener('change', () => ingestFiles([...(fileMulti.files || [])]));
@@ -594,6 +719,108 @@ function removePlace() {
   select(null, null);
 }
 
+/* ── Glisser magnétique : la grille propose, jamais n'impose ────
+   STOP 24 px (constante du système), CENTRE/BORD à ±8 px ; pendant le
+   glisser, l'étiquette d'accrochage porte la règle réellement appliquée. */
+const SNAP_STEP = 24;
+const SNAP_HIT = 8;
+const snapOn = () => $('#pz-snap')?.getAttribute('aria-pressed') === 'true';
+let drag = null;
+
+function applyDragSnap(x, w, hostW) {
+  let v = Math.round(x / SNAP_STEP) * SNAP_STEP;
+  let label = `STOP ${SNAP_STEP}`;
+  if (hostW > w && Math.abs(x - (hostW - w) / 2) <= SNAP_HIT) { v = Math.round((hostW - w) / 2); label = 'CENTRE'; }
+  else if (Math.abs(x) <= SNAP_HIT) { v = 0; label = 'BORD'; }
+  else if (hostW > w && Math.abs(x - (hostW - w)) <= SNAP_HIT) { v = Math.round(hostW - w); label = 'BORD'; }
+  return { v, label };
+}
+
+function showSnapMark(x, label) {
+  const m = $('#pz-snap-mark');
+  if (!m) return;
+  m.style.setProperty('inline-start', `${Math.round(x)}px`);
+  m.setAttribute('data-a-snap', label);
+  m.hidden = false;
+}
+function hideSnapMark() {
+  const m = $('#pz-snap-mark');
+  if (m) m.hidden = true;
+}
+
+function syncPlaceInputs(p) {
+  if (Selection.kind !== 'place' || Selection.ref !== p) return;
+  const px = $('#pz-px'); const py = $('#pz-py');
+  if (px) px.value = String(p.x);
+  if (py) py.value = String(p.y);
+}
+
+document.addEventListener('pointerdown', (e) => {
+  const el = e.target.closest?.('.pz-place');
+  if (!el) return;
+  const p = places.find((x) => x.el === el);
+  const host = $('#pz-places');
+  if (!p || !host || typeof host.getBoundingClientRect !== 'function') return;
+  const rect = host.getBoundingClientRect();
+  drag = { p, el, rect, ox: e.clientX - rect.left - p.x, oy: e.clientY - rect.top - p.y };
+  el.classList.add('is-dragging');
+  try { el.setPointerCapture(e.pointerId); } catch { /* capture indisponible */ }
+});
+
+document.addEventListener('pointermove', (e) => {
+  if (!drag) return;
+  const { p, el, rect, ox, oy } = drag;
+  let nx = Math.max(0, e.clientX - rect.left - ox);
+  const ny = Math.max(0, e.clientY - rect.top - oy);
+  if (snapOn()) {
+    const s = applyDragSnap(nx, p.w, rect.width);
+    nx = s.v;
+    showSnapMark(nx, s.label);
+  } else {
+    hideSnapMark();
+  }
+  p.x = Math.round(nx);
+  p.y = Math.round(ny);
+  el.style.setProperty('--pz-x', String(p.x));
+  el.style.setProperty('--pz-y', String(p.y));
+  syncPlaceInputs(p);
+});
+
+function endDrag() {
+  if (!drag) return;
+  drag.el.classList.remove('is-dragging');
+  hideSnapMark();
+  if (Selection.kind === 'place' && Selection.ref === drag.p) renderInspector();
+  drag = null;
+}
+document.addEventListener('pointerup', endDrag);
+document.addEventListener('pointercancel', endDrag);
+
+/* Clavier : flèches ±4 px, Maj ±24 px (STOP), Suppr retire le placement. */
+document.addEventListener('keydown', (e) => {
+  const el = e.target.closest?.('.pz-place');
+  if (!el) return;
+  const p = places.find((x) => x.el === el);
+  if (!p) return;
+  const step = e.shiftKey ? SNAP_STEP : 4;
+  const mv = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[e.key];
+  if (mv) {
+    e.preventDefault();
+    if (Selection.ref !== p) select('place', p, el);
+    p.x = Math.max(0, p.x + mv[0]);
+    p.y = Math.max(0, p.y + mv[1]);
+    el.style.setProperty('--pz-x', String(p.x));
+    el.style.setProperty('--pz-y', String(p.y));
+    syncPlaceInputs(p);
+    return;
+  }
+  if (e.key === 'Delete' || e.key === 'Backspace') {
+    e.preventDefault();
+    select('place', p, el);
+    removePlace();
+  }
+});
+
 /* ── Actions déléguées : copie, sélection, placement, bureau ─── */
 document.addEventListener('click', (e) => {
   const cp = e.target.closest('[data-copy]');
@@ -612,12 +839,12 @@ document.addEventListener('click', (e) => {
   }
   const pl = e.target.closest('[data-place]');
   if (pl) {
-    place(filteredItems().find((i) => i.id === pl.dataset.place));
+    place(allItems().find((i) => i.id === pl.dataset.place));
     return;
   }
   const ms = e.target.closest('[data-media-select]');
   if (ms) {
-    const it = filteredItems().find((i) => i.id === ms.dataset.mediaSelect);
+    const it = allItems().find((i) => i.id === ms.dataset.mediaSelect);
     if (it) select('media', it);
     return;
   }
@@ -633,6 +860,31 @@ document.addEventListener('click', (e) => {
     return;
   }
   if (e.target.closest('[data-ins-remove]')) removePlace();
+  const covClose = e.target.closest('[data-cov-close]');
+  if (covClose) {
+    const b = $('#pz-bureau-cov');
+    if (b) b.hidden = true;
+    return;
+  }
+  if (e.target.closest('[data-cov-noema]')) {
+    const sum = ImportCov.last;
+    const ta = $('#pz-noema-text');
+    if (ta && sum) {
+      const kinds = Object.entries(sum.byKind).map(([k, n]) => `${n} ${k}`).join(', ');
+      ta.value = `Import local lu dans la fenêtre : ${sum.kept}/${sum.total} fichiers conservés (${kinds}). `
+        + `${sum.hashed} empreinte(s) SHA-256 calculée(s), ${sum.dupes.length} groupe(s) de doublons, ${sum.skipped.length} écarté(s). `
+        + 'Que proposes-tu pour les classer en mémoire ?';
+      closeLayers();
+      const pane = $('#pz-pane-end');
+      if (pane?.hidden) $('#pz-toggle-inspector')?.click();
+      ta.focus();
+      toast?.({ title: 'Intention pré-remplie', text: 'Rien n\u2019est envoyé — relisez, puis « Lire sans écrire » ou « Proposer ».', tone: 'accent' });
+    }
+    return;
+  }
+  if (e.target.closest('[data-eaa-rerun]')) {
+    eaaExecute();
+  }
 });
 
 /* ── Magnétisme / repères / point zéro ────────────────────────── */
@@ -648,10 +900,10 @@ function bindToggle(sel, key, apply) {
   btn.addEventListener('click', () => set(btn.getAttribute('aria-pressed') !== 'true'));
   return set;
 }
-bindToggle('#pz-snap', 'snap', (on) => {
-  const mark = $('#pz-snap-mark');
-  if (mark) mark.hidden = !on;
-  if ($('#pz-snap')) $('#pz-snap').setAttribute('aria-pressed', on ? 'true' : 'false');
+bindToggle('#pz-snap', 'snap', () => {
+  /* L'étiquette d'accrochage n'apparaît que pendant un glisser — le
+     toggle règle l'aimantation, il ne prétend pas montrer une règle
+     appliquée à rien. */
   if (Selection.kind === null) renderInspector();
 });
 bindToggle('#pz-guides', 'guides', (on) => {
@@ -843,7 +1095,8 @@ async function loadTimeline() {
       const when = fmtWhen(it.start);
       const kind = TL_KIND[it.type] || 'event';
       const state = it.type === 'proposal' ? ' data-state="proposed"' : '';
-      return `<article class="utl__item"${state}>
+      const ent = it.entity_ref ? ` data-entity="${esc(it.entity_ref)}" tabindex="0"` : '';
+      return `<article class="utl__item"${state}${ent}>
         <span class="utl__marker" data-kind="${esc(kind)}" aria-hidden="true"></span>
         <div class="utl__row">
           <span class="utl__when">${when ? esc(when) : '<span class="is-unknown">non positionné</span>'}</span>
@@ -919,7 +1172,75 @@ document.addEventListener('click', async (e) => {
   if (cd) {
     const ent = (Noema.state?.entities || []).find((x) => x.id === cd.dataset.card);
     if (ent) select('card', ent);
+    return;
   }
+  /* Synchronisation flux → carte : un clic sur un élément de la timeline
+     sélectionne la carte mémoire de la même entité (entity_ref). */
+  const tle = e.target.closest('[data-entity]');
+  if (tle && tle.dataset.entity && !e.target.closest('button')) {
+    selectByEntity(tle.dataset.entity);
+  }
+});
+
+function selectByEntity(id) {
+  const ent = (Noema.state?.entities || []).find((x) => x.id === id);
+  if (ent) {
+    select('card', ent);
+    const pane = $('#pz-pane-end');
+    if (pane?.hidden) $('#pz-toggle-inspector')?.click();
+    toast?.({ title: 'Carte synchronisée', text: 'Le flux et la carte pointent vers la même entité — zéro copie.', tone: 'accent' });
+  } else {
+    toast?.({ title: 'Entité hors mémoire chargée', text: 'La projection du flux existe, la carte correspondante n\u2019est pas dans l\u2019état actuel de la boucle.', tone: 'warning' });
+  }
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  const tle = e.target.closest?.('[data-entity]');
+  if (!tle || !tle.dataset.entity || e.target.closest?.('button')) return;
+  e.preventDefault();
+  selectByEntity(tle.dataset.entity);
+});
+
+/* ── P5 · Pack de contrôle EAA — signaux automatiques, jamais une ──
+   certification. Le moteur est auditLive du Design System, complété
+   par le balayage des noms accessibles et le rapport QA du dernier run. */
+const Qa = { report: null };
+const Eaa = { run: null };
+
+function eaaExecute() {
+  let geometry = [];
+  let targets = [];
+  let engine = 'auditLive (design-system/js/qa.js)';
+  try {
+    const live = auditLive(document);
+    if (live) { geometry = live.geometry || []; targets = live.targets || []; }
+    else engine = 'auditLive indisponible dans ce contexte — signalé, pas simulé';
+  } catch { engine = 'auditLive a refusé ce contexte — signalé, pas simulé'; }
+  const seenClasses = new Set();
+  const unnamed = [];
+  for (const el of $$('button, a[href], select, textarea')) {
+    if (el.closest('[hidden]')) continue;
+    const named = (el.textContent || '').trim() || el.getAttribute('aria-label') || el.getAttribute('aria-labelledby') || el.getAttribute('title');
+    if (!named) {
+      const sig = (el.className?.toString?.() || el.tagName.toLowerCase()).slice(0, 48);
+      if (!seenClasses.has(sig)) { seenClasses.add(sig); unnamed.push(sig); }
+    }
+    if (unnamed.length >= 8) break;
+  }
+  Eaa.run = {
+    at: new Date().toLocaleTimeString('fr-FR'),
+    engine, geometry, targets, unnamed,
+    contrast: Qa.report?.contrast || null,
+  };
+  renderInspector();
+}
+
+$('#pz-eaa')?.addEventListener('click', () => {
+  select('eaa', null);
+  const pane = $('#pz-pane-end');
+  if (pane?.hidden) $('#pz-toggle-inspector')?.click();
+  eaaExecute();
 });
 
 /* ── Z1 · badge QA — le rapport réel du dernier run ───────────── */
@@ -930,6 +1251,7 @@ async function loadQa() {
     const r = await fetch('../design-system/tokens/QA-REPORT.json');
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     const q = await r.json();
+    Qa.report = q;
     const fam = q.checks?.length || 0;
     const ok = q.checks?.filter((c) => c.result === 'pass').length || 0;
     b.innerHTML = `${ic('prf-shield', 'a-ic a-ic--state')}QA ${ok}/${fam} · ${q.scope?.pages || '?'} écrans`;

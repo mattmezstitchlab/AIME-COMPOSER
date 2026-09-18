@@ -49,6 +49,10 @@
       <a class="a-badge" id="pz-qa" href="../design-system/qa.html" title="Ouvrir le rapport Design QA">
         <svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="prf-shield"/></svg>QA : lecture…
       </a>
+      <button type="button" class="a-btn a-btn--sm" id="pz-eaa" aria-pressed="false" title="Contrôles automatiques d'accessibilité — signaux, pas certification">
+        <svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="prf-verified"/></svg>
+        EAA
+      </button>
       <span class="a-badge" id="pz-noema-status">NOEMA : connexion…</span>
       <button type="button" class="a-icon-btn" id="pz-theme" aria-label="Thème : changer de thème">
         <svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="set-theme"/></svg>
@@ -83,12 +87,20 @@
           <button type="button" class="a-pill a-pill--button" data-mode="vecteur" aria-pressed="false">Vecteur</button>
         </div>
 
+        <div class="pz__group" role="group" aria-label="Dossiers contextuels">
+          <button type="button" class="a-pill a-pill--button" data-dossier="tous" aria-pressed="true">Tous</button>
+          <button type="button" class="a-pill a-pill--button" data-dossier="doublons" aria-pressed="false">Doublons</button>
+          <button type="button" class="a-pill a-pill--button" data-dossier="places" aria-pressed="false">Placés</button>
+        </div>
+
         <div class="a-field">
           <label class="a-field__label" for="pz-bureau-q">Filtrer par nom</label>
           <input class="a-input" id="pz-bureau-q" type="search" placeholder="hero, logo, film…" autocomplete="off">
         </div>
 
         <p class="t-caption u-muted" id="pz-bureau-note"></p>
+
+        <div class="l-stack" id="pz-bureau-cov" hidden></div>
 
         <div class="pz-cards" id="pz-bureau-grid" data-a-render="bureau">
           <p class="t-body-sm u-muted">Lecture du catalogue média…</p>
@@ -120,7 +132,7 @@
             <div class="ugrid__bleed" aria-hidden="true"></div>
             <div class="ugrid__thirds" aria-hidden="true"></div>
             <span class="pz__zero" aria-hidden="true"><span class="pz__zero-label">0,0</span></span>
-            <span class="ugrid__snap" id="pz-snap-mark" data-a-snap="aimantation active" aria-hidden="true"></span>
+            <span class="ugrid__snap" id="pz-snap-mark" data-a-snap="STOP 24" aria-hidden="true" hidden></span>
             <div class="pz-places" id="pz-places"></div>
           </div>
         </div>
@@ -244,7 +256,7 @@
         <input class="a-input" id="pz-uimport-text" type="text" placeholder="https://github.com/… ou une phrase" autocomplete="off">
         <span class="a-field__hint">Lecture sans écriture : un dépôt du compte ouvre son filtre dans le Bureau ; toute autre entrée est transmise à NOEMA, rien n'est enregistré.</span>
       </div>
-      <p class="t-caption uimport__note">PDF et ZIP : lecture locale classée, couverture publiée. La résolution d'URL distantes attend le Connector Engine — aucun envoi silencieux (P1 : extraction locale ou transmission honnête à NOEMA).</p>
+      <p class="t-caption uimport__note">PDF et ZIP sont lus localement : index des entrées, nombre de pages, empreinte SHA-256, doublons nommés — la couverture de l'import est publiée dans le Bureau. Le texte intégral d'un PDF et la résolution d'URL distantes restent des étapes dédiées — aucun envoi silencieux.</p>
     </div>
 
     <input type="file" id="pz-file-dir" webkitdirectory hidden aria-label="Choisir un dossier local à classer">

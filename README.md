@@ -125,8 +125,9 @@ cd design-system && node qa/smoke-medias-v2.mjs
 
 ## Point Zero
 
-`point-zero/` is the **universal shell** — phase P1 of the fusion target audited in
-`AUDIT/POINT-ZERO-FUSION-01.md` against `ARCHITECTURE/POINT-ZERO-INTERFACE-V1.md`.
+`point-zero/` is the **universal shell** — phases P1–P5 of the fusion target audited in
+`AUDIT/POINT-ZERO-FUSION-01.md` against `ARCHITECTURE/POINT-ZERO-INTERFACE-V1.md`,
+all delivered on 2026-09-18.
 One screen that projects the existing engines instead of duplicating them.
 
 ```bash
@@ -145,9 +146,19 @@ Retractable panels, golden-ratio quiet, no demo data anywhere: unknowns stay
 unknown and absences stay named (zero audio file is committed anywhere in the
 account — the shell says so rather than hiding it).
 
-It is the 35th audited screen. Its three patterns (`pz-*`, `dock`, `uimport`) live
-in `design-system/styles/pointzero.css`, are policed by the same system-prefix
-rule in `js/qa.js`, and pass the same 12 QA families — innovation exempts no one.
+Beyond the static shell: contextual **folders** in the Bureau (All / Duplicates /
+Placed — dynamic views over content hashes, never copies), a **spatial engine**
+(magnetic drag with STOP 24 px snap, CENTRE/BORD guides with their rule label,
+full keyboard control) with **timeline↔card synchronisation** through
+`entity_ref`, a **pure local import engine** (`point-zero/pz-import.mjs`, zero
+dependency — ZIP central directory, PDF triage, SHA-256 dedup, import coverage
+published in the Bureau, NOEMA intention pre-filled and never auto-sent), and an
+**EAA control pack** of honest automatic signals (auditLive geometry, accessible
+names, QA contrast) that says it replaces neither human audit nor certification.
+
+It is the 35th audited screen. Its patterns (`pz-*`, `dock`, `uimport`) live in
+`design-system/styles/pointzero.css`, are policed by the same system-prefix rule
+in `js/qa.js`, and pass the same 12 QA families — innovation exempts no one.
 
 ## Boucle NOEMA
 

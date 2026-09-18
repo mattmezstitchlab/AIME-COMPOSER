@@ -208,3 +208,16 @@ Décisions 1–3 validées par l'humain (« go pour tout faire »). Livré dans 
 - **Reste selon le plan** : résolution d'URL distantes et parse PDF/ZIP (P4, Connector Engine), dossiers contextuels (P2 léger), moteur spatial drag/snap réel (P3), pack EAA (P5).
 
 Décision 4 (PDF/ZIP embarqué vs différé) reste ouverte — inchangée : à trancher en P4.
+
+---
+
+## Addendum — P2-fin · P3 · P4 · P5 livrés (18 septembre 2026, même jour)
+
+Décision « go » après P1. Tranches livrées dans la session, contre les mêmes gates :
+
+- **P2-fin — dossiers contextuels** (Bureau) : `Tous / Doublons / Placés`, vues dynamiques par empreinte (`sha` git-blob du catalogue, SHA-256 locale calculée à l'ingest) — des projections, jamais des copies (MASTER-ARCHITECTURE §11).
+- **P3 — moteur spatial réel** : glisser à pointeur capturé sur les placements, aimantation STOP 24 px avec rattrapage CENTRE/BORD à ±8 px, étiquette d'accrochage portant la règle réellement appliquée (visible seulement pendant le glisser), clavier complet (flèches ±4 px, Maj ±24 px = STOP, Suppr retire), champs X/Y de l'inspecteur synchronisés en direct, et **synchronisation flux ↔ carte** : un élément de Timeline cliqué (ou Entrée/Espace, `tabindex` présent) sélectionne la carte mémoire de la même entité via `entity_ref` — critère de complétude §13-2 désormais visible pour la paire timeline↔carte.
+- **P4 — import universel local réel (décision 4 tranchée : embarqué)** : nouveau module **`point-zero/pz-import.mjs`, pur, zéro dépendance** — `classifyName` (7 familles), `zipIndex` (EOCD + central directory, refus honnête si structure absente), `pdfTriage` (version/pages/titre — extraction intégrale déclarée comme étape dédiée), `summarizeImport` (couverture, doublons par empreinte, écartés nommés avec raison). Testé à la maison home-resolver : **31/31** (`pz-import.test.mjs`, ZIP construit octet par octet). L'ingest calcule SHA-256 (`crypto.subtle`, garde si absent ; > 64 Mio → « non calculée » déclaré), indexe archives/PDF, **publie la couverture dans le Bureau** et propose une **intention NOEMA pré-remplie — jamais d'envoi automatique** (critère §13-4).
+- **P5 — pack de contrôle EAA** : bouton header `EAA` → panneau inspecteur dédié, signaux automatiques uniquement : `auditLive` du Design System (débordements, cibles < 24 px — exécuté sur action, jamais au parse pour rester sûr sous jsdom), balayage des contrôles sans nom accessible, contraste/mouvement repris du `QA-REPORT.json` réel. Texte affiché inchangé : « ces signaux automatiques ne remplacent ni un audit humain ni une certification ». Relançable.
+- **Gates mesurées après livraison** : QA **12/12 familles** · vérification DOM **35/35 écrans** (point-zero : 17 icônes, module exécuté, 4 rendus pilotés) · **31/31** import · **91+36** boucle · **109/109** résolveur · test réel serveur local (`/point-zero/`, `pz.js`, `pz-import.mjs`, timeline servie avec `entity_ref`).
+- **Limites déclarées, inchangées** : résolution d'URL distantes = Connector Engine (futur) ; texte intégral PDF = étape dédiée ; titre PDF lu en PDFDoc/ASCII (UTF-16 ressort doublé — signalé en commentaire dans le module) ; géométrie d'auditLive non vérifiable sous jsdom (limite déjà déclarée par `verify-dom.mjs`).
