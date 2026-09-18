@@ -102,6 +102,17 @@
 
         <div class="l-stack" id="pz-bureau-cov" hidden></div>
 
+        <div class="pz-selbar" id="pz-selbar" role="region" aria-label="Sélection à transmettre" hidden>
+          <p class="t-caption"><span class="a-badge a-badge--accent" id="pz-selcount">0</span> média(s) choisi(s) — à transmettre à un agent ou à récupérer. Rien n'est copié dans le dépôt.</p>
+          <div class="l-row">
+            <button type="button" class="a-btn a-btn--sm" id="pz-sel-links"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-clipboard"/></svg>Copier les liens</button>
+            <button type="button" class="a-btn a-btn--sm" id="pz-sel-brief"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="prj-brief"/></svg>Brief agent</button>
+            <button type="button" class="a-btn a-btn--sm a-btn--ghost" id="pz-sel-sh"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="act-export"/></svg>Script (.sh)</button>
+            <button type="button" class="a-btn a-btn--sm a-btn--ghost" id="pz-sel-visible">Tout cocher (visibles)</button>
+            <button type="button" class="a-btn a-btn--sm a-btn--ghost" id="pz-sel-clear"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-close"/></svg>Effacer</button>
+          </div>
+        </div>
+
         <div class="pz-cards" id="pz-bureau-grid" data-a-render="bureau">
           <p class="t-body-sm u-muted">Lecture du catalogue média…</p>
         </div>

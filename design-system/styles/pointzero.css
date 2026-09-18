@@ -212,6 +212,18 @@
   overflow-wrap: anywhere;
 }
 
+/* Barre de sélection du Bureau : transmettre (liens, brief, .sh),
+   jamais copier. Visible seulement quand une case est cochée. */
+.pz-selbar {
+  display: grid;
+  gap: var(--aime-space-2);
+  padding: var(--aime-space-3);
+  border: var(--aime-border-width) solid var(--aime-color-accent);
+  border-radius: var(--aime-radius-medium);
+  background: var(--aime-color-accent-subtle);
+}
+.pz-selbar[hidden] { display: none; }
+
 /* Grille de cartes compactes (Bureau, tiroir Cartes). */
 .pz-cards {
   display: grid;

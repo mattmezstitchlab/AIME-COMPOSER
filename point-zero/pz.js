@@ -8,7 +8,11 @@
  *      origine 0,0 (point zéro, réticule du mode origine-centre).
  *   3. Z2 — Bureau : la vraie médiathèque (atlas/media.json, 38 dépôts,
  *      366 médias référencés) + mode local lu dans le navigateur — rien
- *      n'est envoyé, provenance conservée.
+ *      n'est envoyé, provenance conservée. Parité complète avec atlas/
+ *      (POINT-ZERO-INTERFACE-V1 §4, « sans exception ») : visionneuse
+ *      réelle avec repli raw, lecture vidéo/audio dans le panneau,
+ *      télécharger, vérifier (octets servis vs empreinte git / SHA-256),
+ *      copier, brief agent + manifeste JSON, script .sh, sélection multiple.
  *   4. Z4 — Inspecteur : projection de la sélection unique (canvas, média,
  *      placement, carte) ; les champs de géométrie éditent la présentation
  *      locale, jamais une donnée canonique.
@@ -244,18 +248,25 @@ function renderInspector() {
         ${it.zipError ? row('archive', esc(it.zipError), true) : ''}
         ${it.pdf ? row('pdf', `${esc(it.pdf.version)} · ${it.pdf.pages} page(s)${it.pdf.title ? ` · « ${esc(it.pdf.title)} »` : ''} — le texte intégral reste une étape dédiée`) : ''}
         ${it.pdfError ? row('pdf', esc(it.pdfError), true) : ''}
+        ${row('vérification', it.verify
+          ? `${verifyBadge(it)} <span class="t-caption u-muted">${esc(it.verify.detail)}${it.verify.via ? ` · via ${esc(it.verify.via)}` : ''}</span>`
+          : 'non vérifié — les octets servis n\u2019ont pas encore été comparés à l\u2019empreinte', !it.verify)}
       </div>
       <div class="inspector__group">
         <p class="t-label">Provenance</p>
         ${it.local
           ? row('source', 'dossier local — rien n\u2019a été envoyé')
           : row('source', `<a class="a-text-btn" href="${esc(it.source || it.url)}" target="_blank" rel="noopener noreferrer">fichier source sur GitHub</a>`)}
+        ${!it.local && it.url_raw ? row('repli', `<span class="u-mono t-caption">${esc(it.url_raw)}</span>`) : ''}
       </div>
       <div class="inspector__group">
         <div class="l-row">
           ${it.url ? `<a class="a-btn a-btn--sm" href="${esc(it.url)}" target="_blank" rel="noopener noreferrer">Voir</a>` : ''}
+          ${it.local || fetchable(it) ? `<button type="button" class="a-btn a-btn--sm" data-pz-dl="${esc(it.id)}">Télécharger</button>` : ''}
+          <button type="button" class="a-btn a-btn--sm" data-pz-verify="${esc(it.id)}">Vérifier</button>
           ${(it.kind === 'image' || it.kind === 'vecteur') ? `<button type="button" class="a-btn a-btn--sm a-btn--primary" data-ins-place>Placer sur la grille</button>` : ''}
         </div>
+        <label class="a-check"><input type="checkbox" data-pz-select="${esc(it.id)}"${Bureau.selected.has(it.id) ? ' checked' : ''}><span class="a-check__box">${ic('act-check', 'a-ic a-ic--state')}</span><span class="t-caption">dans la sélection à transmettre</span></label>
       </div>`;
   } else if (Selection.kind === 'place' && Selection.ref) {
     const p = Selection.ref;
@@ -374,11 +385,182 @@ function bindInspectorFields() {
 }
 
 /* ── Z2 · BUREAU — la médiathèque réelle, projetée en panneau ── */
-const Bureau = { data: null, source: 'github', mode: 'tout', q: '', repoFilter: '', local: [], dossier: 'tous' };
+const Bureau = {
+  data: null, source: 'github', mode: 'tout', q: '', repoFilter: '', local: [], dossier: 'tous',
+  /* Sélection multiple : sert à TRANSMETTRE (liens, brief agent, script .sh)
+     — jamais à copier un média dans le dépôt. Distincte de la sélection
+     unique de l'inspecteur (Selection). */
+  selected: new Set(),
+};
 
 const KIND_ICON = {
   image: 'med-image', video: 'med-video', audio: 'med-audio',
   vecteur: 'med-qr', document: 'doc-document', archive: 'mem-vault', autre: 'mem-archive',
+};
+const KIND_LABEL_FR = { image: 'Image', video: 'Vidéo', audio: 'Audio', vecteur: 'Vecteur', document: 'Document', archive: 'Archive', autre: 'Autre' };
+/* Formats que le lecteur HTML5 sait lire dans la page (contrat Bureau §13 :
+   la tuile devient lecteur, le média reste à sa source). */
+const VIDEO_TAG = ['mp4', 'webm', 'mov', 'm4v', 'mkv'];
+const AUDIO_TAG = ['mp3', 'wav', 'm4a', 'aac', 'flac', 'ogg', 'opus'];
+
+const humanSize = (n) => {
+  if (!n) return '—';
+  if (n < 1024) return `${n} o`;
+  if (n < 1024 * 1024) return `${Math.round(n / 1024)} Ko`;
+  return `${(n / (1024 * 1024)).toFixed(1).replace('.', ',')} Mo`;
+};
+const bestUrl = (it) => it.url || it.url_raw || it.source || '';
+const fetchable = (it) => Boolean(it.url || it.url_raw);
+
+/* ── Utilitaires de transmission : presse-papiers, fichier ──────── */
+async function copyText(text, title) {
+  const clip = window.navigator?.clipboard;
+  if (clip?.writeText) {
+    try {
+      await clip.writeText(text);
+      toast?.({ title, tone: 'success' });
+      return true;
+    } catch { /* refusé : repli ci-dessous */ }
+  }
+  toast?.({ title: 'Copie refusée par le navigateur', text: text.slice(0, 160), tone: 'warning' });
+  return false;
+}
+
+function saveBlob(name, text, type = 'text/plain') {
+  if (typeof URL === 'undefined' || typeof URL.createObjectURL !== 'function') {
+    toast?.({ title: 'Téléchargement indisponible ici', text: name, tone: 'warning' });
+    return false;
+  }
+  const url = URL.createObjectURL(new Blob([text], { type }));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => { try { URL.revokeObjectURL(url); } catch { /* déjà libérée */ } }, 4000);
+  return true;
+}
+
+/* Télécharger = récupérer le fichier réel. Local : l'objet du navigateur,
+   zéro réseau. Distant : CDN puis repli raw ; si le fichier refuse d'être
+   aspiré (CORS), on ouvre la source — on ne simule pas un téléchargement. */
+async function downloadFile(it) {
+  if (!it) return;
+  const click = (href) => {
+    const a = document.createElement('a');
+    a.href = href;
+    a.download = it.name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
+  if (it.local) {
+    if (!it.url) { toast?.({ title: 'Fichier local sans aperçu — rien à télécharger', tone: 'warning' }); return; }
+    click(it.url);
+    toast?.({ title: `« ${it.name} » téléchargé depuis votre dossier`, tone: 'success' });
+    return;
+  }
+  if (!fetchable(it)) {
+    if (it.source) window.open(it.source, '_blank', 'noreferrer');
+    toast?.({ title: 'Dépôt privé : ouverture de la source', text: 'Aucune URL publique — le fichier ne peut pas être aspiré d\u2019ici.', tone: 'warning' });
+    return;
+  }
+  for (const url of [it.url, it.url_raw].filter(Boolean)) {
+    try {
+      const r = await fetch(url);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const blob = await r.blob();
+      const u = URL.createObjectURL(blob);
+      click(u);
+      setTimeout(() => { try { URL.revokeObjectURL(u); } catch { /* déjà libérée */ } }, 4000);
+      toast?.({ title: `« ${it.name} » téléchargé`, text: url === it.url ? 'via le CDN' : 'via le repli raw', tone: 'success' });
+      return;
+    } catch { /* couche suivante */ }
+  }
+  if (it.source) window.open(it.source, '_blank', 'noreferrer');
+  toast?.({ title: 'Ouverture de la source — le fichier refuse le téléchargement direct', tone: 'warning' });
+}
+
+/* Vérifier = comparer les octets réellement servis à l'empreinte
+   cataloguée. Distant : SHA-1 « blob » git (sha1("blob <n>\0" + octets)),
+   la même empreinte que l'arbre git — CDN d'abord, repli raw ensuite.
+   Local : SHA-256 recalculé sur l'objet du navigateur. Quand rien ne peut
+   être lu, la vérification le dit : elle n'affiche jamais « conforme »
+   sans avoir lu les octets. */
+async function digestHex(algo, buf) {
+  if (!window.crypto?.subtle) return null;
+  const h = await window.crypto.subtle.digest(algo, buf);
+  return [...new Uint8Array(h)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+async function gitBlobSha1(buf) {
+  const head = new TextEncoder().encode(`blob ${buf.byteLength}\0`);
+  const all = new Uint8Array(head.length + buf.byteLength);
+  all.set(head, 0);
+  all.set(new Uint8Array(buf), head.length);
+  return digestHex('SHA-1', all);
+}
+async function verifyFile(it) {
+  if (!it) return null;
+  const at = new Date().toISOString();
+  let result;
+  if (!window.crypto?.subtle) {
+    result = { ok: null, at, detail: 'empreinte non calculable ici (WebCrypto indisponible)' };
+  } else if (it.local) {
+    if (!it.url) result = { ok: null, at, detail: 'objet local non relisible — empreinte non recalculée' };
+    else {
+      try {
+        const buf = await (await fetch(it.url)).arrayBuffer();
+        const sha = await digestHex('SHA-256', buf);
+        result = it.sha256
+          ? { ok: sha === it.sha256, at, via: 'local', size: buf.byteLength, sha, detail: sha === it.sha256 ? 'SHA-256 identique à l\u2019empreinte de l\u2019import' : 'SHA-256 différent de l\u2019empreinte de l\u2019import' }
+          : { ok: null, at, via: 'local', size: buf.byteLength, sha, detail: 'aucune empreinte de référence (fichier volumineux) — SHA-256 relevé, non comparé' };
+      } catch { result = { ok: null, at, detail: 'objet local illisible — non vérifié' }; }
+    }
+  } else if (!fetchable(it)) {
+    result = { ok: null, at, detail: 'dépôt privé, aucune URL publique — non vérifiable d\u2019ici' };
+  } else {
+    const tried = [];
+    result = null;
+    for (const url of [it.url, it.url_raw].filter(Boolean)) {
+      const via = url === it.url ? 'cdn' : 'raw';
+      try {
+        const r = await fetch(url);
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const buf = await r.arrayBuffer();
+        const sha = await gitBlobSha1(buf);
+        const sizeOk = it.size ? buf.byteLength === it.size : null;
+        if (it.sha && sha === it.sha) {
+          result = { ok: true, at, via, size: buf.byteLength, sha, sizeOk, detail: `octets servis (${via}) = blob commité` };
+          break;
+        }
+        tried.push(`${via} : ${it.sha ? 'empreinte différente' : 'pas d\u2019empreinte de référence'}${sizeOk === false ? `, ${buf.byteLength} o ≠ ${it.size} o` : ''}`);
+        if (!it.sha) { result = { ok: null, at, via, size: buf.byteLength, sha, sizeOk, detail: 'aucune empreinte git au catalogue — octets lus, non comparés' }; break; }
+      } catch (e) {
+        tried.push(`${via} : illisible (${e?.message || 'réseau/CORS'})`);
+      }
+    }
+    if (!result) {
+      const anyRead = tried.some((t) => t.includes('différente'));
+      result = { ok: anyRead ? false : null, at, detail: tried.join(' · ') || 'aucune source lue' };
+    }
+  }
+  it.verify = result;
+  toast?.({
+    title: result.ok === true ? `« ${it.name} » vérifié` : result.ok === false ? `« ${it.name} » : écart détecté` : `« ${it.name} » : non vérifiable`,
+    text: result.detail,
+    tone: result.ok === true ? 'success' : result.ok === false ? 'error' : 'warning',
+  });
+  renderBureau();
+  if (Selection.kind === 'media' && Selection.ref === it) renderInspector();
+  return result;
+}
+const verifyBadge = (it) => {
+  const v = it.verify;
+  if (!v) return '';
+  if (v.ok === true) return `<span class="a-badge a-badge--success" title="${esc(v.detail)}">${ic('prf-verified', 'a-ic a-ic--state')}vérifié</span>`;
+  if (v.ok === false) return `<span class="a-badge a-badge--error" title="${esc(v.detail)}">écart</span>`;
+  return `<span class="a-badge" title="${esc(v.detail)}">non vérifiable</span>`;
 };
 
 function visibleMediaCount() {
@@ -416,25 +598,167 @@ function filteredItems() {
   return items;
 }
 
+/* Tuile = visionneuse (même contrat que la médiathèque) : image réelle
+   avec repli raw, lecteur vidéo ou audio sur la vraie source, ou tuile
+   honnête quand rien n'est accessible — jamais un élément brisé présenté
+   comme un visuel. */
+function mediaThumb(it) {
+  const fb = it.url_raw ? ` data-fallback="${esc(it.url_raw)}"` : '';
+  const ext = (it.ext || '').toLowerCase();
+  if ((it.kind === 'image' || it.kind === 'vecteur') && it.url) {
+    return `<div class="umedia${it.kind === 'vecteur' ? ' umedia--contain' : ''}" data-format="1-1" data-kind="${esc(it.kind)}" data-ext="${esc(ext)}">
+      <img loading="lazy" src="${esc(it.url)}" alt=""${fb}>
+    </div>`;
+  }
+  if (it.kind === 'video' && it.url && VIDEO_TAG.includes(ext)) {
+    return `<div class="umedia umedia--player" data-format="1-1" data-kind="video" data-ext="${esc(ext)}">
+      <video class="umedia__video" controls preload="metadata" playsinline src="${esc(it.url)}"${fb} aria-label="Lire la vidéo ${esc(it.name)}"></video>
+      <span class="umedia__label">${esc(ext)} · ${esc(humanSize(it.size))}</span>
+    </div>`;
+  }
+  if (it.kind === 'audio' && it.url && AUDIO_TAG.includes(ext)) {
+    return `<div class="umedia umedia--player is-empty" data-format="1-1" data-kind="audio" data-ext="${esc(ext)}">
+      ${ic('med-audio', 'a-ic a-ic--lg')}
+      <span class="umedia__label">${esc(ext)} · ${esc(humanSize(it.size))}</span>
+      <audio class="umedia__audio" controls preload="metadata" src="${esc(it.url)}"${fb} aria-label="Écouter ${esc(it.name)}"></audio>
+    </div>`;
+  }
+  return `<div class="umedia is-empty" data-format="1-1" data-kind="${esc(it.kind)}" data-ext="${esc(ext)}">${ic(KIND_ICON[it.kind] || 'mem-card', 'a-ic a-ic--lg')}<span class="umedia__label">${esc(ext || it.kind)}</span></div>`;
+}
+
+function dupBadge(it) {
+  const k = it.sha256 || it.sha;
+  if (!k) return '';
+  const group = allItems().filter((x) => (x.sha256 || x.sha) === k);
+  if (group.length < 2) return '';
+  const where = group.filter((x) => x.id !== it.id).slice(0, 3).map((x) => x.local ? x.rel : `${x.repo}/${x.path}`).join(' · ');
+  return `<span class="a-badge a-badge--warning" title="Même contenu, ailleurs : ${esc(where)}">doublon ×${group.length}</span>`;
+}
+
 function mediaCard(it) {
   const visual = it.kind === 'image' || it.kind === 'vecteur';
-  const thumb = visual
-    ? `<div class="umedia" data-format="1-1"><img loading="lazy" src="${esc(it.url)}" alt=""></div>`
-    : `<div class="umedia is-empty" data-format="1-1">${ic(KIND_ICON[it.kind] || 'mem-card', 'a-ic a-ic--lg')}<span class="umedia__label">${esc(it.ext || it.kind)}</span></div>`;
   const where = it.local ? `local · ${esc(it.rel || '')}` : esc(it.repo || '');
+  const on = Bureau.selected.has(it.id);
   return `
-  <article class="ucard ucard--tile" data-id="${esc(it.id)}">
-    ${thumb}
+  <article class="ucard ucard--tile${on ? ' is-selected' : ''}" data-id="${esc(it.id)}">
+    ${mediaThumb(it)}
     <div class="ucard__head">
-      <span class="ucard__title">${esc(it.name)}</span>
-      <span class="ucard__sub">${where}</span>
+      <span class="ucard__title" title="${esc(it.path || it.rel || '')}">${esc(it.name)}</span>
+      <span class="ucard__sub">${where}${it.size ? ` · ${esc(humanSize(it.size))}` : ''}</span>
+    </div>
+    <div class="l-row">
+      <label class="a-check"><input type="checkbox" data-pz-select="${esc(it.id)}"${on ? ' checked' : ''}><span class="a-check__box">${ic('act-check', 'a-ic a-ic--state')}</span><span class="t-caption">choisir</span></label>
+      <span class="a-badge">${esc(it.ext || it.kind)}</span>
+      ${dupBadge(it)}
+      ${verifyBadge(it)}
     </div>
     <div class="ucard__foot">
       <button type="button" class="a-btn a-btn--sm a-btn--ghost" data-media-select="${esc(it.id)}">Inspecter</button>
       ${it.url ? `<button type="button" class="a-btn a-btn--sm a-btn--ghost" data-copy="${esc(it.url)}">Copier</button>` : ''}
+      ${it.local || fetchable(it) ? `<button type="button" class="a-btn a-btn--sm a-btn--ghost" data-pz-dl="${esc(it.id)}" aria-label="Télécharger ${esc(it.name)}">${ic('act-export')}Télécharger</button>` : ''}
+      <button type="button" class="a-btn a-btn--sm a-btn--ghost" data-pz-verify="${esc(it.id)}" aria-label="Vérifier ${esc(it.name)}">${ic('prf-fingerprint')}Vérifier</button>
       ${visual && it.url ? `<button type="button" class="a-btn a-btn--sm" data-place="${esc(it.id)}">Placer</button>` : ''}
+      ${it.local
+        ? ''
+        : `<a class="a-text-btn" href="${esc(it.source || bestUrl(it))}" target="_blank" rel="noopener noreferrer"><span class="t-caption">source</span>${ic('nav-external')}</a>`}
     </div>
   </article>`;
+}
+
+/* ── Sélection multiple → transmission (liens · brief · .sh) ───── */
+const chosen = () => {
+  const all = [...(Bureau.data?.items || []), ...Bureau.local];
+  return all.filter((it) => Bureau.selected.has(it.id));
+};
+
+function renderSelbar() {
+  const bar = $('#pz-selbar');
+  if (!bar) return;
+  const n = Bureau.selected.size;
+  bar.hidden = n === 0;
+  const c = $('#pz-selcount');
+  if (c) c.textContent = String(n);
+  $$('#pz-bureau-grid .ucard[data-id]').forEach((el) => {
+    el.classList.toggle('is-selected', Bureau.selected.has(el.dataset.id));
+    const box = el.querySelector('[data-pz-select]');
+    if (box) box.checked = Bureau.selected.has(el.dataset.id);
+  });
+}
+
+function linksText() {
+  return chosen().map((it) => (it.local
+    ? `[fichier local] ${it.rel || it.name} — à joindre manuellement (jamais envoyé depuis Point Zero)`
+    : bestUrl(it))).join('\n');
+}
+
+function briefText() {
+  const list = chosen();
+  const when = new Date().toISOString().slice(0, 10);
+  const manifest = list.map((it) => ({
+    nom: it.name,
+    type: it.kind,
+    extension: it.ext,
+    taille_octets: it.size,
+    depot: it.local ? `local : ${(it.rel || '').split('/')[0] || '(racine du choix)'}` : it.repo,
+    chemin: it.local ? it.rel : it.path,
+    empreinte: it.local ? (it.sha256 ? `sha256:${it.sha256}` : null) : (it.sha ? `git-blob:${it.sha}` : null),
+    verification: it.verify ? { resultat: it.verify.ok === true ? 'conforme' : it.verify.ok === false ? 'écart' : 'non vérifiable', detail: it.verify.detail, quand: it.verify.at } : null,
+    url_cdn: it.local ? null : (it.url || null),
+    url_repli: it.local ? null : (it.url_raw || null),
+    source: it.local ? `fichier local : ${it.rel}` : it.source,
+    transfert: it.local ? 'manuel — le fichier doit être joint (rien n\u2019est envoyé depuis Point Zero)' : 'url',
+  }));
+  const hasLocal = list.some((it) => it.local);
+  return [
+    '# Brief médias — sélection Bureau · Point Zero (AIME-COMPOSER)',
+    '',
+    `Généré le ${when} · ${list.length} média(s) · provenance : arbres git vérifiés + dossier local de l'utilisateur`,
+    '',
+    '## Consigne pour l\'agent',
+    '1. Intégrer ces médias dans le projet cible en conservant noms de fichiers et provenance.',
+    '2. Pour chaque entrée distante : utiliser url_cdn, puis url_repli en cas d\'échec ; signaler tout fichier inaccessible au lieu de le remplacer silencieusement.',
+    '3. Ne copier aucun média dans un dépôt sans validation humaine — la décision reste tracée.',
+    hasLocal
+      ? '4. Les entrées marquées "manuel" sont des fichiers locaux de l\'utilisateur : demander le fichier, ne jamais prétendre y accéder. Les originaux restent sur le poste de l\'utilisateur.'
+      : '4. Les vidéos et pistes audio sont lisibles depuis leurs URL — vérifier durée et poids avant intégration lourde.',
+    '5. Le champ "verification" reflète un contrôle d\'octets fait dans Point Zero ; null = non vérifié, pas « conforme par défaut ».',
+    '',
+    '```json',
+    JSON.stringify(manifest, null, 2),
+    '```',
+  ].join('\n');
+}
+
+function shText() {
+  const list = chosen();
+  const lines = [
+    '#!/usr/bin/env bash',
+    `# Récupération de ${list.length} média(s) — sélection Bureau · Point Zero (AIME-COMPOSER)`,
+    '# Chaque fichier d\u2019abord via le CDN, puis via le repli raw ; tout échec est signalé, rien n\u2019est caché.',
+    '# Les entrées « LOCAL » ne peuvent pas être aspirées : elles sont sur le poste de l\u2019utilisateur, à joindre à la main.',
+    'set -u',
+    'mkdir -p media-selection && cd media-selection',
+    '',
+  ];
+  for (const it of list) {
+    if (it.local) {
+      lines.push(`echo "LOCAL ${it.name} — sur le poste : ${it.rel || it.name} (à joindre manuellement)"`);
+      continue;
+    }
+    const urls = [it.url, it.url_raw].filter(Boolean);
+    if (!urls.length) {
+      lines.push(`echo "SANS-URL ${it.name} — dépôt privé : ${it.source}"`);
+      continue;
+    }
+    lines.push(`curl -sfL -o "${it.name}" "${urls[0]}" ` + '\\');
+    const last = urls[urls.length - 1];
+    lines.push(urls.length > 1
+      ? `  || curl -sfL -o "${it.name}" "${last}" || echo "ÉCHEC ${it.name}"`
+      : `  || echo "ÉCHEC ${it.name}"`);
+    if (it.sha) lines.push(`[ -f "${it.name}" ] && [ "$(git hash-object "${it.name}" 2>/dev/null)" = "${it.sha}" ] || echo "EMPREINTE ${it.name} — différente du blob commité (${it.sha})"`);
+  }
+  lines.push('', 'echo "terminé — vérifiez les ÉCHEC, EMPREINTE et LOCAL ci-dessus"');
+  return lines.join('\n');
 }
 
 function renderBureau() {
@@ -482,7 +806,80 @@ function renderBureau() {
   }
   grid.innerHTML = items.map(mediaCard).join('');
   resolveIcons(grid);
+  renderSelbar();
 }
+
+/* ── Bureau : événements de la visionneuse et de la sélection ──── */
+(function bindBureauMedia() {
+  const grid = $('#pz-bureau-grid');
+  if (!grid) return;
+
+  /* Cocher = sélectionner pour transmettre. */
+  grid.addEventListener('change', (e) => {
+    const box = e.target.closest?.('[data-pz-select]');
+    if (!box) return;
+    if (box.checked) Bureau.selected.add(box.dataset.pzSelect);
+    else Bureau.selected.delete(box.dataset.pzSelect);
+    renderSelbar();
+  });
+
+  /* Lecture confortable : un seul lecteur à la fois. */
+  grid.addEventListener('play', (e) => {
+    const el = e.target;
+    const Media = window.HTMLMediaElement;
+    if (!Media || !(el instanceof Media)) return;
+    grid.querySelectorAll('video, audio').forEach((m) => { if (m !== el) m.pause?.(); });
+  }, true);
+
+  /* Une ressource qui ne répond pas avoue : repli raw (une fois), puis
+     tuile de type — jamais un élément brisé présenté comme un visuel. */
+  grid.addEventListener('error', (e) => {
+    const el = e.target;
+    if (!el || !(el.tagName === 'IMG' || el.tagName === 'VIDEO' || el.tagName === 'AUDIO')) return;
+    const fb = el.dataset?.fallback;
+    if (fb) {
+      delete el.dataset.fallback;
+      el.src = fb;
+      return;
+    }
+    const media = el.closest('.umedia');
+    if (!media) return;
+    media.classList.add('is-empty');
+    media.classList.remove('umedia--player');
+    media.innerHTML = `${ic(KIND_ICON[media.dataset.kind] || 'mem-card', 'a-ic a-ic--lg')}<span class="umedia__label">${esc(media.dataset.ext || '')} · inaccessible — voir la source</span>`;
+    resolveIcons(media);
+  }, true);
+
+  /* La case de l'inspecteur vit hors de la grille : même sélection. */
+  $('#pz-inspector-body')?.addEventListener('change', (e) => {
+    const box = e.target.closest?.('[data-pz-select]');
+    if (!box) return;
+    if (box.checked) Bureau.selected.add(box.dataset.pzSelect);
+    else Bureau.selected.delete(box.dataset.pzSelect);
+    renderSelbar();
+  });
+
+  $('#pz-sel-links')?.addEventListener('click', () => {
+    copyText(linksText(), `${Bureau.selected.size} lien(s) copié(s) — collez-les à votre agent`);
+  });
+  $('#pz-sel-brief')?.addEventListener('click', () => {
+    copyText(briefText(), 'Brief agent copié — consigne + manifeste JSON');
+  });
+  $('#pz-sel-sh')?.addEventListener('click', () => {
+    if (saveBlob('mediatheque-selection.sh', shText())) {
+      toast?.({ title: `Script de récupération (${Bureau.selected.size} média(s)) téléchargé`, tone: 'success' });
+    }
+  });
+  $('#pz-sel-visible')?.addEventListener('click', () => {
+    for (const it of filteredItems()) Bureau.selected.add(it.id);
+    renderSelbar();
+    toast?.({ title: `${Bureau.selected.size} média(s) sélectionné(s)`, tone: 'accent' });
+  });
+  $('#pz-sel-clear')?.addEventListener('click', () => {
+    Bureau.selected.clear();
+    renderSelbar();
+  });
+})();
 
 function renderCoverage() {
   const box = $('#pz-bureau-coverage');
@@ -579,8 +976,10 @@ async function ingestFiles(files) {
   const lots = [];
   let topZip = null;
   for (const f of list) {
-    const ext = (f.name.split('.').pop() || '').toLowerCase();
-    const kind = classifyName(f.name);
+    /* classifyName renvoie { ext, kind } (pz-import.mjs) — la version P4
+       comparait l'objet à une chaîne : aucun fichier local n'était reconnu
+       (ni aperçu, ni index ZIP, ni filtre par type). Corrigé en Vague 1. */
+    const { ext, kind } = classifyName(f.name);
     const inspect = kind === 'archive' || ext === 'pdf';
     const want = inspect || (f.size || 0) <= BIG_FILE;
     const buf = want ? await fileBuffer(f) : null;
@@ -835,6 +1234,16 @@ document.addEventListener('click', (e) => {
     } else {
       toast?.({ title: 'Presse-papiers indisponible', text: v, tone: 'warning' });
     }
+    return;
+  }
+  const dl = e.target.closest('[data-pz-dl]');
+  if (dl) {
+    downloadFile(allItems().find((i) => i.id === dl.dataset.pzDl)).catch(() => {});
+    return;
+  }
+  const vf = e.target.closest('[data-pz-verify]');
+  if (vf) {
+    verifyFile(allItems().find((i) => i.id === vf.dataset.pzVerify)).catch(() => {});
     return;
   }
   const pl = e.target.closest('[data-place]');

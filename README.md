@@ -156,6 +156,18 @@ published in the Bureau, NOEMA intention pre-filled and never auto-sent), and an
 **EAA control pack** of honest automatic signals (auditLive geometry, accessible
 names, QA contrast) that says it replaces neither human audit nor certification.
 
+Its Bureau reaches **function parity with `atlas/`** (POINT-ZERO-INTERFACE-V1 §4,
+"without exception"): real viewer with raw fallback, in-panel video/audio
+playback, download (CDN → raw → source, never simulated), verification of the
+served bytes against the git blob sha (or the local SHA-256), agent brief with
+JSON manifest, `.sh` retrieval script, multi-selection bar. Proven by
+`design-system/qa/smoke-point-zero-bureau.mjs` (38 checks, jsdom), the gate of
+wave 1 of `AUDIT/POINT-ZERO-CONVERGENCE-01.md`:
+
+```bash
+cd design-system && node qa/smoke-point-zero-bureau.mjs
+```
+
 It is the 35th audited screen. Its patterns (`pz-*`, `dock`, `uimport`) live in
 `design-system/styles/pointzero.css`, are policed by the same system-prefix rule
 in `js/qa.js`, and pass the same 12 QA families — innovation exempts no one.
