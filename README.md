@@ -26,7 +26,7 @@ TOKENS → FOUNDATIONS → COMPONENTS → PATTERNS → LAYOUTS → EXPERIENCES
 cd design-system
 npm run build   # generate tokens + icons; refuses any colour that misses its contrast target
 npm run qa      # build + audit the 12 QA families over the shipped system
-npm run verify  # execute the scripts of all 35 audited screens in a DOM (needs the jsdom devDependency)
+npm run verify  # execute the scripts of all 34 audited screens in a DOM (needs the jsdom devDependency)
 npm run check   # qa then verify
 npm run serve   # serve the repository on http://0.0.0.0:8080/design-system/
 ```
@@ -36,9 +36,10 @@ contract · 9 typographic roles · a closed 10-step spacing scale · 86 glyphs i
 categories, no emoji · 29 fundamental components · the five AIME organs (Universal
 Card, Universal Timeline, Universal Grid, Composer, Universal Media) · the NOEMA
 layer with its six epistemic states · 13 patterns · a data-visualization language ·
-12 automatic Design QA families · 35 audited screens (19 documentation chapters,
+12 automatic Design QA families · 34 audited screens (19 documentation chapters,
 the art-direction brief page, 11 experience screens, the NOEMA loop screen, the
-Atlas media library, the repository homepage, and the Point Zero shell).
+repository homepage, and the Point Zero shell — whose Bureau absorbed the former
+Atlas media-library page).
 
 `design-system/direction.html` picks an artistic direction **inside** the system
 (theme, accent step in the fuchsia ramp, density, motion, radius level), previews
@@ -60,7 +61,7 @@ node diagnostic/diagnose.mjs --owner O --repo R       # a GitHub repository
 node diagnostic/survey.mjs                            # every repo of the account, ranked
 ```
 
-It is the same engine that audits the 35 screens of the system, not a copy, so a
+It is the same engine that audits the 34 screens of the system, not a copy, so a
 project is judged under the same conditions as the screens that ship. The report
 publishes a **density** (issues per screen), the families involved, the screens most
 affected, and an order of repair — never an invented score out of 100.
@@ -77,11 +78,14 @@ Details: `diagnostic/README.md`.
 
 ## Médiathèque
 
-`atlas/` is the **universal media library**: every visual, video, audio track and
-vector recorded in the account's repositories, referenced where it lives — never
-copied here — plus, on demand, the media of a **local folder** from your machine.
-The five pre-system Atlas screens were removed; the current page is built with the
-Design System and audited with it.
+The **universal media library** lives in the **Bureau of Point Zero**
+(`point-zero/`, left panel — `point-zero/#pz-bureau`): every visual, video,
+audio track and vector recorded in the account's repositories, referenced where
+it lives — never copied here — plus, on demand, the media of a **local folder**
+from your machine. `atlas/` now holds only the **generated catalogue** and its
+generator: the standalone page `atlas/index.html` was absorbed by the Bureau
+(wave 1 of `AUDIT/POINT-ZERO-CONVERGENCE-01.md`) once function parity was proven,
+and deleted — the five pre-system Atlas screens had been removed earlier.
 
 The catalogue is **generated, never handwritten**:
 
@@ -93,19 +97,21 @@ The scan is **transversal**: it opens the default branch of every repository
 (38 today), walks each git tree recursively — descending subtrees if GitHub
 truncates, budget-capped and honestly flagged — and records a per-repository
 coverage table (media count, empty repos, errors, duplicates by blob sha) which
-the page displays under « Couverture du scan ». An absence is a finding, never
+the Bureau displays under « Couverture du scan ». An absence is a finding, never
 a hidden corner: zero audio file is committed anywhere, because storage-heavy
 media (DISPOO's film/hero system resolved at runtime) live outside git —
 the local mode is precisely how those get classified.
 
-The page is a **viewer**: images show their real file (jsDelivr, raw fallback),
+The Bureau is a **viewer**: images show their real file (jsDelivr, raw fallback),
 videos and audio **play in-page** from their true source, and an unavailable
 file admits it with its type tile instead of a broken frame. In **local mode**,
 a picked folder is read, classified (photos / videos / audio / vectors), shown
 and playable entirely in the browser — originals preserved, relative paths kept
 as provenance, nothing uploaded or synced (the Bureau contract). Search, type
 filters, provenance filtering and source switch (GitHub / local) are all
-client-side. Every card can be **downloaded** or **checked**; the selection
+client-side. Every card can be **downloaded** or **verified** (served bytes against the git
+blob sha, or the local SHA-256 — « non vérifiable » when no byte was read, never
+« conforme » by default); the selection
 toolbar copies plain links, builds a structured **agent brief** (instructions +
 JSON manifest with CDN/fallback URLs, or transfer-by-hand clauses for local
 files), or downloads a `.sh` recovery script — transmitting stays an agent's
@@ -116,11 +122,13 @@ per-project storages) are audited in `AUDIT/MEDIA-ATLAS-01.md`, with the
 transversal-scan addendum. The old pre-system Atlas specification
 (`AUDIT/ATLAS-SPEC.md`) is superseded.
 
-Behavioral smokes (viewer, local ingest, coverage, selection, exports) run in
-`design-system/qa/smoke-medias-v2.mjs`:
+Behavioral smokes (viewer, playback, download, verification, local ingest,
+selection, exports, `?source=local` deep-link) run in
+`design-system/qa/smoke-point-zero-bureau.mjs`; the homepage routing smokes stay
+in `design-system/qa/smoke-medias-v2.mjs`:
 
 ```bash
-cd design-system && node qa/smoke-medias-v2.mjs
+cd design-system && node qa/smoke-point-zero-bureau.mjs && node qa/smoke-medias-v2.mjs
 ```
 
 ## Point Zero
@@ -156,19 +164,20 @@ published in the Bureau, NOEMA intention pre-filled and never auto-sent), and an
 **EAA control pack** of honest automatic signals (auditLive geometry, accessible
 names, QA contrast) that says it replaces neither human audit nor certification.
 
-Its Bureau reaches **function parity with `atlas/`** (POINT-ZERO-INTERFACE-V1 §4,
+Its Bureau reached **function parity with the former `atlas/` page** (POINT-ZERO-INTERFACE-V1 §4,
 "without exception"): real viewer with raw fallback, in-panel video/audio
 playback, download (CDN → raw → source, never simulated), verification of the
 served bytes against the git blob sha (or the local SHA-256), agent brief with
 JSON manifest, `.sh` retrieval script, multi-selection bar. Proven by
-`design-system/qa/smoke-point-zero-bureau.mjs` (38 checks, jsdom), the gate of
-wave 1 of `AUDIT/POINT-ZERO-CONVERGENCE-01.md`:
+`design-system/qa/smoke-point-zero-bureau.mjs` (41 checks, jsdom), the gate of
+wave 1 of `AUDIT/POINT-ZERO-CONVERGENCE-01.md` — after which `atlas/index.html`
+was deleted:
 
 ```bash
 cd design-system && node qa/smoke-point-zero-bureau.mjs
 ```
 
-It is the 35th audited screen. Its patterns (`pz-*`, `dock`, `uimport`) live in
+It is the 34th audited screen. Its patterns (`pz-*`, `dock`, `uimport`) live in
 `design-system/styles/pointzero.css`, are policed by the same system-prefix rule
 in `js/qa.js`, and pass the same 12 QA families — innovation exempts no one.
 

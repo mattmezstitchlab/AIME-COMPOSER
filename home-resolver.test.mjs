@@ -71,8 +71,8 @@ check('un texte libre', 'da', { intention: 'da', label: 'Ouvrir la Direction art
 check('owner/repo', 'da', { intention: 'diag-github', label: 'Lancer le diagnostic', destination: 'diagnostic:github:owner/repo' }); // content wins
 
 // Mode Médiathèque — sans contenu détecté
-check('', 'media', { intention: 'media', label: 'Ouvrir la Médiathèque', destination: 'atlas/' });
-check('un texte libre', 'media', { intention: 'media', label: 'Ouvrir la Médiathèque', destination: 'atlas/' });
+check('', 'media', { intention: 'media', label: 'Ouvrir la Médiathèque', destination: 'point-zero/#pz-bureau' });
+check('un texte libre', 'media', { intention: 'media', label: 'Ouvrir la Médiathèque', destination: 'point-zero/#pz-bureau' });
 check('', null, { intention: 'noema-empty', label: 'Proposer à NOEMA', destination: 'loop/' }); // null mode fallback -> noema-empty
 
 // Mode Diagnostic — cas nominaux et contre-cas

@@ -1678,6 +1678,21 @@ async function loadQa() {
 /* ── Init ─────────────────────────────────────────────────────── */
 (function init() {
   applyFormat(store.get('format', 'web'), false);
+  /* Grammaire de routage héritée de la médiathèque (Vague 1) :
+     `?source=local` arrive en mode Dossier local et ouvre le sélecteur
+     de dossier sans autre clic — l'accueil y envoie « Dossier local ». */
+  let params = null;
+  try { params = new URLSearchParams(window.location.search); } catch { /* sans URL */ }
+  if (params?.get('source') === 'local') {
+    setSource('local');
+    const pane = $('#pz-bureau');
+    if (pane?.hidden) $('#pz-toggle-bureau')?.click();
+    /* L'ouverture du sélecteur natif exige un geste utilisateur dans la
+       plupart des navigateurs : on montre le ＋ ouvert plutôt que d'échouer
+       en silence. */
+    const btn = $('#pz-import-btn');
+    if (btn && $('#pz-uimport')?.hidden) btn.click();
+  }
   loadBureau().catch(() => {});
   bootNoema().catch(() => {});
   loadQa().catch(() => {});

@@ -306,6 +306,18 @@ try {
   document.querySelector('#pz-sel-links').click();
   await drain();
   t('local : la ligne de lien dit de joindre manuellement', (clipboard.at(-1) || '').includes('[fichier local]'));
+  /* Deep-link ?source=local — la grammaire de routage héritée de la page
+     atlas (l'accueil y envoie « Dossier local ») : second DOM, même module. */
+  const dom2 = new JSDOM(html, { url: `${pathToFileURL(PAGE).href}?source=local`, runScripts: 'outside-only', pretendToBeVisual: true, virtualConsole: vc,
+    beforeParse(w) { w.URL.createObjectURL = () => 'blob:x'; w.URL.revokeObjectURL = () => {}; w.AIME = { toast() {} }; } });
+  const g2 = { document: dom2.window.document, window: dom2.window, location: dom2.window.location, localStorage: dom2.window.localStorage, navigator: dom2.window.navigator, HTMLMediaElement: dom2.window.HTMLMediaElement, URL: dom2.window.URL, Blob: dom2.window.Blob, MutationObserver: dom2.window.MutationObserver };
+  for (const [k, v] of Object.entries(g2)) { try { globalThis[k] = v; } catch { Object.defineProperty(globalThis, k, { value: v, configurable: true, writable: true }); } }
+  await import(`${pathToFileURL(path.join(ROOT, 'point-zero', 'pz.js')).href}?v=${Date.now()}-local`);
+  await drain();
+  const d2 = dom2.window.document;
+  t('deep-link ?source=local : arrive en mode Dossier local', d2.querySelector('#pz-src-local')?.getAttribute('aria-pressed') === 'true');
+  t('deep-link ?source=local : le ＋ Import est ouvert, prêt pour « Dossier »', d2.querySelector('#pz-uimport')?.hidden === false && !!d2.querySelector('[data-import="dir"]'));
+  t('deep-link ?source=local : le Bureau explique la lecture locale sans envoi', /rien n.est envoyé/i.test(d2.querySelector('#pz-bureau-note')?.textContent || ''));
 } catch (e) {
   fail++;
   console.log(`  ✗ exécution : ${e.stack?.split('\n').slice(0, 3).join(' | ')}`);

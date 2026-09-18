@@ -1,8 +1,11 @@
 /**
- * SMOKES + STUBS — Médiathèque v2 (visionneuse, mode local, couverture,
- * doublons, exports) et accueil sobre. Hors contrat : jsdom local, URLs et
- * presse-papiers stubbés. C'est la médiathèque livrée qui gagne, pas le
- * monde entier.
+ * SMOKES + STUBS — accueil sobre (entrées expliquées, routage du composer).
+ *
+ * Historique : ce fichier portait aussi les smokes de la page Médiathèque
+ * (`atlas/index.html`). Cette page a été absorbée par le Bureau de Point
+ * Zero (Vague 1 de AUDIT/POINT-ZERO-CONVERGENCE-01.md) ; ses fonctions sont
+ * désormais prouvées, une à une, par `qa/smoke-point-zero-bureau.mjs`.
+ * Hors contrat : jsdom local, URLs et presse-papiers stubbés.
  */
 import { readFileSync } from 'node:fs';
 import { JSDOM } from 'jsdom';
@@ -10,25 +13,6 @@ import { JSDOM } from 'jsdom';
 let pass = 0, fail = 0;
 const t = (name, cond) => { if (cond) { pass++; console.log(`  ✓ ${name}`); } else { fail++; console.log(`  ✗ ${name}`); } };
 
-const MEDIA = {
-  generated_at: '2026-09-17T10:00:00.000Z',
-  owner: 'mattmezstitchlab',
-  truncated: false,
-  totals: { repos: 3, repos_with_media: 2, repos_empty: 1, repos_error: 0, media: 5, duplicates: 2, image: 3, vecteur: 0, video: 1, audio: 1 },
-  repos: [
-    { name: 'by-aime', private: false, default_branch: 'main', media: 3, state: 'ok', tree_truncated: false },
-    { name: 'nails-profile', private: false, default_branch: 'main', media: 2, state: 'ok', tree_truncated: false },
-    { name: 'DISPOORED', private: false, default_branch: 'HEAD', media: 0, state: 'vide', tree_truncated: false, error: 'dépôt Git vide (aucun commit sur la branche)' },
-  ],
-  items: [
-    { id: 'med-0001', repo: 'by-aime', path: 'images/cover.jpg', name: 'cover.jpg', kind: 'image', ext: 'jpg', size: 2048, sha: 's1', url: 'https://cdn.jsdelivr.net/gh/m/a@main/images/cover.jpg', url_raw: 'https://raw.githubusercontent.com/m/a/main/images/cover.jpg', source: 'https://github.com/m/a/blob/main/images/cover.jpg' },
-    { id: 'med-0002', repo: 'by-aime', path: 'public/images/cover.jpg', name: 'cover.jpg', kind: 'image', ext: 'jpg', size: 2048, sha: 's1', duplicate_of: 'med-0001', url: 'https://cdn.jsdelivr.net/gh/m/a@main/public/images/cover.jpg', url_raw: null, source: 'https://github.com/m/a/blob/main/public/images/cover.jpg' },
-    { id: 'med-0003', repo: 'by-aime', path: 'img/logo.png', name: 'logo.png', kind: 'image', ext: 'png', size: 512, sha: 's2', url: 'https://cdn.jsdelivr.net/gh/m/a@main/img/logo.png', url_raw: null, source: 'https://github.com/m/a/blob/main/img/logo.png' },
-    { id: 'med-0004', repo: 'nails-profile', path: 'public/hand-video.mp4', name: 'hand-video.mp4', kind: 'video', ext: 'mp4', size: 2626732, sha: 's3', url: 'https://cdn.jsdelivr.net/gh/m/n@main/public/hand-video.mp4', url_raw: 'https://raw.githubusercontent.com/m/n/main/public/hand-video.mp4', source: 'https://github.com/m/n/blob/main/public/hand-video.mp4' },
-    { id: 'med-0005', repo: 'nails-profile', path: 'assets/voice.mp3', name: 'voice.mp3', kind: 'audio', ext: 'mp3', size: 90000, sha: 's4', url: 'https://cdn.jsdelivr.net/gh/m/n@main/assets/voice.mp3', url_raw: null, source: 'https://github.com/m/n/blob/main/assets/voice.mp3' },
-    { id: 'med-0006', repo: 'nails-profile', path: 'private/teaser.mov', name: 'teaser.mov', kind: 'video', ext: 'mov', size: 10, sha: 's5', url: null, url_raw: null, source: 'https://github.com/m/n/blob/main/private/teaser.mov' },
-  ],
-};
 
 function makeDom(htmlPath, { fetchImpl, search = '' } = {}) {
   /* jsdom n'exécute pas les <script src> sans chargeur de ressources :
@@ -48,9 +32,7 @@ function makeDom(htmlPath, { fetchImpl, search = '' } = {}) {
   html = html.replace('</body>', `${bodies.join('\n')}\n</body>`);
   const clipboard = { writes: [] };
   const clicks = [];
-  const targetUrl = htmlPath.includes('atlas')
-    ? `http://localhost/atlas/index.html${search}`
-    : `http://localhost/index.html${search}`;
+  const targetUrl = `http://localhost/index.html${search}`;
   const dom = new JSDOM(html, {
     url: targetUrl,
     runScripts: 'dangerously',
@@ -63,10 +45,7 @@ function makeDom(htmlPath, { fetchImpl, search = '' } = {}) {
       if (fetchImpl) {
         window.fetch = (url) => Promise.resolve(fetchImpl(url));
       } else {
-        window.fetch = (url) => {
-          if (String(url).includes('media.json')) return Promise.resolve({ ok: true, json: async () => MEDIA });
-          return Promise.reject(new Error('réseau absent — stub'));
-        };
+        window.fetch = () => Promise.reject(new Error('réseau absent — stub'));
       }
       window.open = () => {};
     },
@@ -76,130 +55,6 @@ function makeDom(htmlPath, { fetchImpl, search = '' } = {}) {
 
 const drain = async (dom) => { for (let i = 0; i < 30; i++) await new Promise((r) => dom.window.setTimeout(r, 5)); };
 const fire = (el, type) => el.dispatchEvent(new el.ownerDocument.defaultView.Event(type, { bubbles: true }));
-
-console.log('\nMÉDIATHÈQUE V2 — visionneuse, local, couverture');
-{
-  const { dom, clipboard, clicks } = makeDom('/home/user/AIME-COMPOSER/atlas/index.html');
-  const { document } = dom.window;
-  await drain(dom);
-
-  t('catalogue chargé (6 cartes)', document.querySelectorAll('#m-grid .ucard').length === 6);
-  t('compteur = 5 médias · 2 dépôts avec médias · 3 couverts · 2 doublons',
-    document.querySelector('#m-count').textContent.includes('2 doublon'));
-
-  const video = document.querySelector('video.umedia__video');
-  t('visionneuse vidéo : <video controls preload=metadata> sur la vraie source',
-    !!video && video.hasAttribute('controls') && video.getAttribute('preload') === 'metadata' && video.src.includes('jsdelivr'));
-  t('vidéo : repli raw en data-fallback', video?.dataset.fallback?.includes('raw.githubusercontent'));
-  const audio = document.querySelector('audio.umedia__audio');
-  t('visionneuse audio : <audio controls> présente', !!audio && audio.hasAttribute('controls'));
-  const privateCard = [...document.querySelectorAll('.ucard')].find((c) => c.textContent.includes('teaser.mov'));
-  t('vidéo sans URL (privée) : tuile honnête, pas de lecteur', privateCard && !privateCard.querySelector('video') && !!privateCard.querySelector('.umedia.is-empty'));
-  const dupBadges = [...document.querySelectorAll('.a-badge--warning')].filter((b) => b.textContent.startsWith('doublon'));
-  t('doublons par empreinte git : badge ×2 sur les 2 cover.jpg', dupBadges.length === 2 && dupBadges[0].textContent.includes('×2'));
-
-  t('couverture : 3 lignes de dépôts', document.querySelectorAll('#m-coverage tr').length === 3);
-  t('couverture : DISPOORED signalé « dépôt vide »', document.querySelector('#m-coverage').textContent.includes('dépôt vide'));
-  const note = document.querySelector('#m-audio-note').textContent;
-  t('note audio honnête quand des pistes existent', /Audio : 1 piste/.test(note));
-
-  /* Sélection + exports distants */
-  const boxes = [...document.querySelectorAll('[data-m-select]')];
-  boxes[3].checked = true; fire(boxes[3], 'change');
-  boxes[4].checked = true; fire(boxes[4], 'change');
-  t('barre de sélection affichée à 2', document.querySelector('#m-selbar').hidden === false && document.querySelector('#m-selcount').textContent === '2');
-  document.querySelector('#m-copy-links').click();
-  await drain(dom);
-  t('liens copiés : 2 lignes CDN', clipboard.writes[0]?.split('\n').length === 2 && clipboard.writes[0].includes('jsdelivr'));
-  document.querySelector('#m-copy-brief').click();
-  await drain(dom);
-  const brief = clipboard.writes[1] || '';
-  t('brief : consigne présente', brief.includes("## Consigne pour l'agent"));
-  t('brief : manifeste avec clés url_cdn/url_repli + transfert url', brief.includes('"url_cdn"') && brief.includes('"transfert": "url"'));
-  document.querySelector('#m-dl-sh').click();
-  await drain(dom);
-  t('script .sh : un téléchargement déclenché', clicks.filter((c) => c.tagName === 'A' && c.download === 'mediatheque-selection.sh').length === 1);
-
-  /* Bascule locale */
-  document.querySelector('[data-m-source="local"]').click();
-  t('mode local : outils visibles, règle affichée',
-    document.querySelector('#m-local-tools').hidden === false && document.querySelector('#m-local-rule').hidden === false);
-  t('mode local : état vide expliqué', document.querySelector('#m-grid').textContent.includes('Aucun dossier local chargé'));
-
-  const makeFile = (rel, name) => {
-    const f = new dom.window.File(['x'.repeat(10)], name, { type: 'application/octet-stream' });
-    Object.defineProperty(f, 'webkitRelativePath', { value: rel });
-    return f;
-  };
-  const input = document.querySelector('#m-local-input');
-  Object.defineProperty(input, 'files', {
-    configurable: true,
-    value: [
-      makeFile('album/photos/IMG_1.png', 'IMG_1.png'),
-      makeFile('album/son/track.mp3', 'track.mp3'),
-      makeFile('album/film/clip.MOV', 'clip.MOV'),
-      makeFile('album/doc/lisez-moi.pdf', 'lisez-moi.pdf'),
-      makeFile('logo.svg', 'logo.svg'),
-    ],
-  });
-  fire(input, 'change');
-  await drain(dom);
-  t('ingestion : 4 médias classés, 1 document écarté',
-    document.querySelectorAll('#m-grid .ucard').length === 4 && document.querySelector('#m-local-meta').textContent.includes('1 autre(s) fichier(s) écarté(s)'));
-  t('ingestion : provenances par section du dossier',
-    document.querySelector('#m-repo').innerHTML.includes('local : album') && document.querySelector('#m-repo').innerHTML.includes('local : (racine du choix)'));
-  const localVideo = document.querySelector('video.umedia__video');
-  t('local : vidéo lue depuis blob:, zéro réseau', !!localVideo && localVideo.src.startsWith('blob:local-'));
-  t('local : aucun faux lien « source » sur carte locale',
-    ![...document.querySelectorAll('.ucard a.a-text-btn')].some((a) => a.closest('.ucard')?.textContent.includes('track.mp3')));
-  document.querySelector('#m-count').textContent.includes('mode local')
-    ? pass++ : fail++;
-  console.log(`  ${document.querySelector('#m-count').textContent.includes('mode local') ? '✓' : '✗'} compteur bascule en mode local`);
-
-  /* Sélection mixte → brief avec clause locale */
-  const lboxes = [...document.querySelectorAll('[data-m-select]')];
-  lboxes[1].checked = true; fire(lboxes[1], 'change'); /* track.mp3 (local) */
-  t('sélection mixte : 3 médias', document.querySelector('#m-selcount').textContent === '3');
-  document.querySelector('#m-copy-links').click();
-  await drain(dom);
-  const linksMix = clipboard.writes[2] || '';
-  t('liens mixtes : la ligne locale dit de joindre manuellement', linksMix.includes('[fichier local]') && linksMix.includes('joindre manuellement'));
-  document.querySelector('#m-copy-brief').click();
-  await drain(dom);
-  const briefMix = clipboard.writes[3] || '';
-  t('brief mixte : clause « fichiers locaux … demander le fichier »', briefMix.includes('demander le fichier') && briefMix.includes('"url_cdn": null'));
-  document.querySelector('#m-dl-sh').click();
-  await drain(dom);
-  const shAnchor = clicks.filter((c) => c.tagName === 'A' && c.download === 'mediatheque-selection.sh').pop();
-  t('script .sh mixte : encore un téléchargement', !!shAnchor);
-
-  /* Note audio honnête quand zéro piste */
-  const dom2 = makeDom('/home/user/AIME-COMPOSER/atlas/index.html', {
-    fetchImpl: (url) => String(url).includes('media.json')
-      ? { ok: true, json: async () => ({ ...MEDIA, totals: { ...MEDIA.totals, audio: 0 }, items: MEDIA.items.filter((i) => i.kind !== 'audio') }) }
-      : Promise.reject(new Error('stub')),
-  });
-  await drain(dom2.dom);
-  const note2 = dom2.dom.window.document.querySelector('#m-audio-note').textContent;
-  t('audio 0 : dit la vérité (arbres lus en entier, médias hors git, mode local)',
-    note2.includes('0 piste commitée') && note2.includes('hors git') && note2.includes('mode local'));
-  t('audio 0 : retour GitHub propre', dom2.dom.window.document.querySelector('[data-m-source="github"]').getAttribute('aria-current') === 'true');
-
-  /* Deep-link ?source=local (grammaire de routage de la porte universelle) */
-  const domLocalParam = makeDom('/home/user/AIME-COMPOSER/atlas/index.html', { search: '?source=local' });
-  await drain(domLocalParam.dom);
-  const localParamDoc = domLocalParam.dom.window.document;
-  t('deep-link ?source=local active le mode local dès l’arrivée',
-    localParamDoc.querySelector('[data-m-source="local"]').getAttribute('aria-current') === 'true' &&
-    localParamDoc.querySelector('#m-local-rule').hidden === false);
-
-  const domDefaultParam = makeDom('/home/user/AIME-COMPOSER/atlas/index.html');
-  await drain(domDefaultParam.dom);
-  const defaultParamDoc = domDefaultParam.dom.window.document;
-  t('sans paramètre ou inconnu : reste en mode GitHub par défaut (non-régression)',
-    defaultParamDoc.querySelector('[data-m-source="github"]').getAttribute('aria-current') === 'true' &&
-    defaultParamDoc.querySelector('#m-local-rule').hidden === true);
-}
 
 console.log('\nACCUEIL SOBRE — entrées expliquées');
 {
@@ -215,7 +70,9 @@ console.log('\nACCUEIL SOBRE — entrées expliquées');
   t('boucle NOEMA expliquée : vous validez', rows[2]?.textContent.includes('vous validez'));
   t('conversation NOEMA intacte', !!document.querySelector('#h-noema-text') && !!document.querySelector('#h-noema-read'));
   t('menu « + » : lien Direction artistique', [...document.querySelectorAll('#h-plus-menu a')].some((a) => a.getAttribute('href') === 'design-system/direction.html'));
-  t('menu « + » : lien Médiathèque (unifié, plus universelle)', [...document.querySelectorAll('#h-plus-menu a')].some((a) => a.getAttribute('href') === 'atlas/' && a.textContent.includes('Médiathèque')));
+  t('menu « + » : lien Médiathèque → le Bureau de Point Zero (plus de page atlas)', [...document.querySelectorAll('#h-plus-menu a')].some((a) => a.getAttribute('href') === 'point-zero/#pz-bureau' && a.textContent.includes('Médiathèque')));
+  t('aucun lien vers l’ancienne page atlas/ ne subsiste', ![...document.querySelectorAll('a[href]')].some((a) => /^atlas\//.test(a.getAttribute('href'))));
+  t('entrée Médiathèque : dit qu’elle vit dans la coquille', rows[0]?.textContent.includes('Bureau de Point Zero'));
   t('menu « + » : Dossier local sans picker fichier', !!document.querySelector('[data-h-action="folder"]') && !document.querySelector('[data-h-action="file"]') && !document.querySelector('#h-file-picker') && !document.querySelector('#h-folder-picker'));
   t('organes/démos retirés (sobre)', !document.querySelector('#h-card') && !document.querySelector('#h-timeline') && !document.querySelector('#organes'));
   t('diagnostic reste une entrée expliquée', rows[3]?.textContent.includes('jamais un score inventé'));
@@ -294,7 +151,7 @@ console.log('\nACCUEIL SOBRE — entrées expliquées');
   t('pill Médiathèque → label Ouvrir la Médiathèque', getLabel().includes('Ouvrir la Médiathèque'));
   apercu.click();
   await drain(dom);
-  t('aperçu Médiathèque : destination atlas/ sans navigation', out.innerHTML.includes('atlas/') && out.innerHTML.includes('Aperçu'));
+  t('aperçu Médiathèque : destination point-zero/#pz-bureau sans navigation', out.innerHTML.includes('point-zero/#pz-bureau') && out.innerHTML.includes('Aperçu'));
 
   // Garde-fou diag : phrase naturelle en mode diag → NOEMA (contre-cas)
   document.querySelector('[data-h-mode="diag"]').click();
@@ -332,11 +189,11 @@ console.log('\nACCUEIL SOBRE — entrées expliquées');
   t('exemple d’intention → passe en Boucle NOEMA', document.querySelector('[data-h-mode="noema"]').getAttribute('aria-current') === 'true');
   t('exemple remplit le champ', input.value.includes('Camille Vasseur'));
 
-  // Plus > Dossier local → atlas/?source=local (picker unique)
+  // Plus > Dossier local → point-zero/?source=local (picker unique, dans le Bureau)
   const plusFolder = document.querySelector('[data-h-action="folder"]');
   t('menu + : Dossier local présent', !!plusFolder);
   // On ne peut pas tester la navigation réelle (jsdom NotImplemented), mais on vérifie que le handler existe sans picker
 }
 
-console.log(`\n${fail === 0 ? '✓' : '✗'} SMOKES MÉDIATHÈQUE V2 + ACCUEIL : ${pass}/${pass + fail}`);
+console.log(`\n${fail === 0 ? '✓' : '✗'} SMOKES ACCUEIL : ${pass}/${pass + fail}`);
 process.exit(fail ? 1 : 0);

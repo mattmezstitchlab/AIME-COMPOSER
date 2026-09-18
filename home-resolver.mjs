@@ -116,13 +116,13 @@ export function resolveAction(raw, activeMode) {
     return {
       intention: 'media',
       label: LABELS.media,
-      destination: 'atlas/',
+      destination: 'point-zero/#pz-bureau',
       raw: trimmed,
       mode,
       aperçu: {
-        title: 'Médiathèque',
-        body: `Ouvrira le catalogue universel (arbres git des dépôts) et le mode Dossier local — référencement sans copie, rien n’est envoyé.`,
-        destination: 'atlas/',
+        title: 'Médiathèque — le Bureau de Point Zero',
+        body: `Ouvrira le Bureau de la coquille : catalogue universel (arbres git des dépôts) et mode Dossier local — référencement sans copie, rien n’est envoyé.`,
+        destination: 'point-zero/#pz-bureau',
       },
     };
   }

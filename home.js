@@ -6,7 +6,7 @@
  *   1. Résoudre les icônes déclaratives `data-a-icon`.
  *   2. Maintenir la préférence de thème clair / sombre.
  *   3. Gérer le bloc central style Manus :
- *      - menu « + » (Dossier local → atlas/?source=local, Lien GitHub, Coller URL, intentions prêtes) ;
+ *      - menu « + » (Dossier local → point-zero/?source=local, Lien GitHub, Coller URL, intentions prêtes) ;
  *      - sélection exclusive des pastilles de modes (Diagnostic, Médiathèque, Direction artistique, Boucle NOEMA)
  *        avec contrat aria-current (cf design-system/components.html) ;
  *      - résolveur pur resolveAction(raw, activeMode) -> { intention, label, destination, aperçu } ;
@@ -192,13 +192,13 @@
       return {
         intention: 'media',
         label: LABELS.media,
-        destination: 'atlas/',
+        destination: 'point-zero/#pz-bureau',
         raw: trimmed,
         mode,
         aperçu: {
-          title: 'Médiathèque',
-          body: `Ouvrira le catalogue universel (arbres git des dépôts) et le mode Dossier local — référencement sans copie, rien n’est envoyé.`,
-          destination: 'atlas/',
+          title: 'Médiathèque — le Bureau de Point Zero',
+          body: `Ouvrira le Bureau de la coquille : catalogue universel (arbres git des dépôts) et mode Dossier local — référencement sans copie, rien n’est envoyé.`,
+          destination: 'point-zero/#pz-bureau',
         },
       };
     }
@@ -404,8 +404,8 @@
       select('#h-plus-btn')?.setAttribute('aria-expanded', 'false');
 
       if (act === 'folder') {
-        // Plus de picker local ici : l'unique picker vit dans atlas/?source=local
-        navigateTo('atlas/index.html?source=local');
+        // Plus de picker local ici : l'unique picker vit dans le Bureau de Point Zero
+        navigateTo('point-zero/index.html?source=local');
       } else if (act === 'github') {
         setMode('diag');
         if (field) {

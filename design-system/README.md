@@ -108,7 +108,7 @@ Afficher 87 % de certitude serait une fausse précision.
 - Iconographie : 86 pictogrammes, 17 catégories, contrat de grille unique.
 - Couches CSS 2 à 5 : 29 composants fondamentaux, 5 organes AIME, couche NOEMA,
   13 patterns, langage de data visualisation, moteur de layout responsive.
-- Design QA : 12 familles statiques, plus une vérification DOM des 35 écrans — dont `loop/index.html`, la page d'accueil du dépôt, la Médiathèque et la coquille Point Zero.
+- Design QA : 12 familles statiques, plus une vérification DOM des 34 écrans — dont `loop/index.html`, la page d'accueil du dépôt et la coquille Point Zero (dont le Bureau a absorbé la page Médiathèque).
 - 19 chapitres de documentation, du chapitre 00 au chapitre 19.
 - 10 écrans d'expérience (`experiences/`) : Playground, Composer, Carte Universelle,
   Timeline, Grille, Bureau, Médiathèque, NOEMA, site public, portail client — plus

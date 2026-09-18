@@ -189,6 +189,26 @@ Mode local : mêmes fonctions, zéro requête réseau (4 tests). Total **38/38**
 
 **Reste avant suppression d'`atlas/index.html` :** revue humaine « chaque carte du Bureau offre les mêmes fonctions » dans un navigateur réel (lecteurs, téléchargement, CORS du CDN pour la vérification — jsdom ne les couvre pas), puis l'étape 2 de la vague (dépendances mécaniques listées ci-dessus, dans le même changement).
 
+#### Addendum V1-b — suppression EXÉCUTÉE (18 sept. 2026, validation humaine « ok go »)
+
+Supprimés : `atlas/index.html`, `atlas/media.js`. Conservés : `atlas/media.json`, `atlas/build-media.mjs` (le catalogue et son générateur — source de vérité du Bureau).
+
+Dépendances re-ciblées dans le même changement :
+
+| Dépendance | Avant | Après |
+|---|---|---|
+| `design-system/qa/run-qa.mjs`, `verify-dom.mjs` | liste explicite avec `atlas/index.html` | retirée ; périmètre **34 écrans** (commentaire mis à jour) |
+| `design-system/qa/smoke-medias-v2.mjs` | 28 smokes atlas + accueil | smokes atlas retirés (prouvés par `smoke-point-zero-bureau.mjs`) ; accueil 41/41 dont « aucun lien `atlas/` ne subsiste » |
+| `index.html` (nav, menu ＋, « quatre entrées », pied) | `atlas/` | `point-zero/#pz-bureau` ; l'entrée 01 dit qu'elle vit dans la coquille |
+| `home.js` + `home-resolver.mjs` (+ test) | destination `atlas/` ; Dossier local → `atlas/index.html?source=local` | `point-zero/#pz-bureau` ; `point-zero/index.html?source=local` |
+| `point-zero/pz.js` | pas de grammaire d'URL | `?source=local` → mode local + ＋ ouvert (3 smokes) |
+| `point-zero/index.html` `<noscript>` | lien vers la page atlas | lien vers le catalogue `atlas/media.json` |
+| README (×3 comptages, section Médiathèque, Point Zero), `design-system/README.md`, spec §13-7 | « 35 écrans », « 34 autres » | « 34 écrans », « 33 autres » |
+
+Gates après suppression : QA 12/12 sur 34 écrans · verify DOM 34/34 · smokes Bureau 41/41 · smokes accueil 41/41 · résolveur 109/109 · import 31/31 · boucle 36/36.
+
+Non touché, volontairement : `diagnostic/report.mjs` (mesure le dépôt tel qu'il est, n'importe pas la page) · `AUDIT/MEDIA-ATLAS-01.md` (historique, reste vrai comme audit des mécanismes).
+
 ### Vague 2 — le dock et le rail absorbent l'écran de la boucle → suppression de `loop/index.html`
 
 **Tranche de parité (les 9 fonctions) :** observer · autoriser/exécuter les actions · retenues en section dédiée · journal · vue monde · les huit droits mémoire · preuves · réinitialisation · granularités de la timeline. Le tout en projection pure — les règles vivent déjà dans `loop/src/http.mjs`.
