@@ -289,6 +289,8 @@
   box-shadow: var(--aime-shadow-raise);
 }
 .uimport[hidden] { display: none; }
+/* La résolution peut afficher une carte : le popover reste dans l'écran. */
+.uimport { max-block-size: min(70vh, 640px); overflow: auto; }
 .uimport__note { color: var(--aime-color-text-subtle); }
 
 /* ── Greffe de format : seul profil absent du socle ugrid ────── */

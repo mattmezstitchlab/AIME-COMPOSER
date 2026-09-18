@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="fr" data-aime-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="a-root" content="./">
+<title>Accueil — AIME Design System V1</title>
+<link rel="stylesheet" href="tokens/tokens.css">
+<link rel="stylesheet" href="styles/foundations.css">
+<link rel="stylesheet" href="styles/layout.css">
+<link rel="stylesheet" href="styles/components.css">
+<link rel="stylesheet" href="styles/aime.css">
+<link rel="stylesheet" href="styles/noema.css">
+<link rel="stylesheet" href="styles/patterns.css">
+<link rel="stylesheet" href="styles/dataviz.css">
+<link rel="stylesheet" href="styles/doc.css">
+<script src="js/doc.js" defer></script>
+<script src="js/aime-ui.js" defer></script>
+</head>
+<body>
+<noscript><p class="t-body-sm">Ce site de documentation utilise JavaScript pour la navigation. <a class="a-text-btn" href="index.html">Recharger la page</a>.</p></noscript>
+<div class="ds-shell">
+<main class="ds-main l-page">
+
+  <header class="ds-hero">
+    <div class="ds-eyebrow">
+      <span class="noema-mark"><svg class="a-ic a-ic--sm noema-mark__glyph" aria-hidden="true" width="16" height="16"><use data-a-icon="noe-mark"/></svg><span class="noema-mark__word">AIME Design System</span></span>
+      <span class="a-badge a-badge--accent">V1</span>
+      <span class="a-badge">Proposé</span>
+    </div>
+    <h1 class="t-display">La technologie disparaît derrière la clarté.</h1>
+    <p class="t-body u-muted">Le Design System AIME est une grammaire, pas une collection de styles. Une règle posée au niveau des tokens se propage aux fondations, aux composants, aux patterns, aux layouts et jusqu'aux écrans. Un écran est une projection du système — jamais l'inverse.</p>
+    <div class="l-row">
+      <a class="a-btn a-btn--primary" href="foundations.html"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-arrow-right"/></svg>Ouvrir les fondations</a>
+      <a class="a-btn" href="qa.html"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="prf-shield"/></svg>Voir le Design QA</a>
+      <a class="a-text-btn" href="experiences/index.html">Voir les écrans réels</a>
+    </div>
+  </header>
+
+  <section class="ds-block" aria-labelledby="grammar">
+    <h2 class="t-h2" id="grammar">La grammaire à six couches</h2>
+    <div class="ds-rule">
+      <p class="ds-rule__title">Règle fondatrice</p>
+      <p>Le système fonctionne comme une grammaire à six couches. Chaque couche ne consomme que celle du dessous. Aucune couche ne peut inventer une valeur : elle la reçoit.</p>
+    </div>
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--col" role="list" aria-label="Les six couches du système">
+        <div class="l-row l-row--between" role="listitem"><span class="l-row"><span class="a-badge">01</span><span class="t-body u-strong">Tokens</span></span><span class="t-caption u-muted">couleur · typographie · espace · rayon · bordure · ombre · motion</span></div>
+        <div class="l-row l-row--between" role="listitem"><span class="l-row"><span class="a-badge">02</span><span class="t-body u-strong">Foundations</span></span><span class="t-caption u-muted">reset · rôles typographiques · surfaces · focus · mouvement réduit</span></div>
+        <div class="l-row l-row--between" role="listitem"><span class="l-row"><span class="a-badge">03</span><span class="t-body u-strong">Components</span></span><span class="t-caption u-muted">30 composants fondamentaux, 7 états chacun</span></div>
+        <div class="l-row l-row--between" role="listitem"><span class="l-row"><span class="a-badge">04</span><span class="t-body u-strong">Patterns</span></span><span class="t-caption u-muted">assemblages : aucun pattern n'introduit de token</span></div>
+        <div class="l-row l-row--between" role="listitem"><span class="l-row"><span class="a-badge">05</span><span class="t-body u-strong">Layouts</span></span><span class="t-caption u-muted">grille · proportions admises · rythme · responsive</span></div>
+        <div class="l-row l-row--between" role="listitem"><span class="l-row"><span class="a-badge">06</span><span class="t-body u-strong">Experiences</span></span><span class="t-caption u-muted">10 écrans composés uniquement avec ce système</span></div>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Lecture</span><span class="t-caption">Une flèche vers le haut est une interdiction : une couche ne remonte jamais une valeur.</span></p>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="intent">
+    <h2 class="t-h2" id="intent">Intention</h2>
+    <p class="t-body u-muted">AIME doit donner l'impression d'un produit technologique extrêmement avancé, mais calme, précis et humain. La sensibilité visée est celle de l'architecture suisse, du design allemand, du minimalisme scandinave et de la précision éditoriale.</p>
+    <div class="l-grid">
+      <div class="l-span-half l-stack">
+        <h3 class="t-h3">Ce que le système cherche</h3>
+        <ul class="l-stack l-stack--tight">
+          <li class="t-body-sm u-muted">Zéro charge cognitive : chaque élément a une fonction démontrable.</li>
+          <li class="t-body-sm u-muted">La profondeur vient de la surface, du contraste et de l'espace — pas de l'ombre.</li>
+          <li class="t-body-sm u-muted">Le fuchsia est un signal fonctionnel, jamais une décoration.</li>
+          <li class="t-body-sm u-muted">Une proposition ne ressemble jamais à un fait.</li>
+          <li class="t-body-sm u-muted">Toute information importante expose sa provenance.</li>
+        </ul>
+      </div>
+      <div class="l-span-half l-stack">
+        <h3 class="t-h3">Ce que le système interdit</h3>
+        <ul class="l-stack l-stack--tight">
+          <li class="t-body-sm u-muted">Kitsch, dégradés excessifs, glassmorphism systématique.</li>
+          <li class="t-body-sm u-muted">Ombres lourdes et effets 3D décoratifs.</li>
+          <li class="t-body-sm u-muted">Emojis comme icônes — la famille SVG AIME est obligatoire.</li>
+          <li class="t-body-sm u-muted">Couleurs arbitraires, cartes SaaS empilées, boutons surchargés.</li>
+          <li class="t-body-sm u-muted">Toute décoration sans fonction.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="organes">
+    <h2 class="t-h2" id="organes">Les cinq organes visuels</h2>
+    <p class="t-body u-muted">AIME ne multiplie pas les composants : il projette cinq objets canoniques. Chacun répond à une question, et chacun reste visuellement identique quel que soit son contenu.</p>
+    <div class="l-grid">
+      <a class="ucard l-span-third" href="universal-card.html">
+        <div class="ucard__id"><span class="ucard__mark" data-type="person"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="mem-card"/></svg></span><span class="ucard__head"><span class="ucard__type">Qui / Quoi</span><span class="ucard__title">Carte Universelle</span></span></div>
+        <p class="t-body-sm u-muted">Personne, organisation, projet, événement, document, lieu, relation, média : huit types, un seul cadre.</p>
+      </a>
+      <a class="ucard l-span-third" href="universal-timeline.html">
+        <div class="ucard__id"><span class="ucard__mark" data-type="event"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="time-timeline"/></svg></span><span class="ucard__head"><span class="ucard__type">Quand</span><span class="ucard__title">Timeline Universelle</span></span></div>
+        <p class="t-body-sm u-muted">Un moteur, six modes. Le mode change la projection, jamais les données.</p>
+      </a>
+      <a class="ucard l-span-third" href="universal-grid.html">
+        <div class="ucard__id"><span class="ucard__mark" data-type="place"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="grd-guides"/></svg></span><span class="ucard__head"><span class="ucard__type">Où / Format</span><span class="ucard__title">Grille Universelle</span></span></div>
+        <p class="t-body-sm u-muted">Un système de mesure et de placement, pas une grille de cartes.</p>
+      </a>
+      <a class="ucard l-span-third" href="composer.html">
+        <div class="ucard__id"><span class="ucard__mark" data-type="media"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="cmp-compose"/></svg></span><span class="ucard__head"><span class="ucard__type">Comment</span><span class="ucard__title">Composer</span></span></div>
+        <p class="t-body-sm u-muted">Objets, relations, médias et structures assemblés sur un seul plan de référence.</p>
+      </a>
+      <a class="ucard l-span-third" href="aime-components.html">
+        <div class="ucard__id"><span class="ucard__mark" data-type="media"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="med-library"/></svg></span><span class="ucard__head"><span class="ucard__type">Asset</span><span class="ucard__title">Média Universel</span></span></div>
+        <p class="t-body-sm u-muted">Une ressource, plusieurs contextes, aucune duplication de la source.</p>
+      </a>
+      <a class="ucard l-span-third" href="noema-components.html">
+        <div class="ucard__id" ><span class="ucard__mark" data-type="relation"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="noe-mark"/></svg></span><span class="ucard__head"><span class="ucard__type">Qui décide</span><span class="ucard__title">Couche NOEMA</span></span></div>
+        <p class="t-body-sm u-muted">NOEMA propose, l'humain valide. Huit usages, un seul châssis.</p>
+      </a>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="garanties">
+    <h2 class="t-h2" id="garanties">Ce que le système garantit</h2>
+    <div class="ds-table-wrap">
+      <table class="ds-table">
+        <caption>Chaque garantie est vérifiée automatiquement par <span class="u-mono">npm run qa</span>, pas déclarée.</caption>
+        <thead><tr><th scope="col">Garantie</th><th scope="col">Mécanisme</th><th scope="col">Contrôle</th></tr></thead>
+        <tbody>
+          <tr><td>Aucune couleur arbitraire</td><td>Seul <span class="u-mono">tokens.css</span> contient des littéraux couleur ; tout le reste consomme un rôle.</td><td>QA · COLOR</td></tr>
+          <tr><td>Aucun contraste insuffisant</td><td>Les valeurs sont déduites du seuil WCAG au build, puis revérifiées sur l'artefact.</td><td>Build + QA · CONTRAST</td></tr>
+          <tr><td>Aucun espacement libre</td><td>L'échelle est fermée : 4 · 8 · 12 · 16 · 24 · 32 · 48 · 64 · 96 · 128.</td><td>QA · SPACING</td></tr>
+          <tr><td>Aucune taille de police libre</td><td>Neuf rôles typographiques, aucun autre <span class="u-mono">font-size</span>.</td><td>QA · TYPOGRAPHY</td></tr>
+          <tr><td>Aucun emoji d'interface</td><td>Famille SVG de 85 pictogrammes, grille 24, trait 1.5.</td><td>QA · ICONOGRAPHY</td></tr>
+          <tr><td>Aucun focus supprimé</td><td>Outline retiré au pointeur uniquement ; substitution exigée sinon.</td><td>QA · FOCUS</td></tr>
+          <tr><td>Aucune durée d'animation libre</td><td>Quatre durées, trois courbes, sept primitives.</td><td>QA · MOTION</td></tr>
+          <tr><td>Aucun style inexpliqué</td><td>Toute classe système utilisée doit être définie par le système.</td><td>QA · CONSISTENCY</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <nav class="ds-pager" aria-label="Chapitre suivant">
+    <span></span>
+    <a href="foundations.html"><small>02 — suivant</small><span class="t-body u-strong">Foundations</span></a>
+  </nav>
+
+  <footer class="ds-foot">
+    <span>AIME Design System V1 — proposition, à valider avant implémentation.</span>
+    <span class="u-mono">85 icônes · 21 rôles × 2 thèmes · 9 rôles typographiques</span>
+  </footer>
+
+</main>
+</div>
+</body>
+</html>

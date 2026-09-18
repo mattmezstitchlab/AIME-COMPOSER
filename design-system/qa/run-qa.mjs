@@ -4,7 +4,7 @@
  * Sortie non nulle si une seule règle échoue.
  */
 import { readFileSync, writeFileSync, readdirSync, statSync, existsSync } from 'node:fs';
-import { join, dirname, relative } from 'node:path';
+import { join, dirname, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { audit } from '../js/qa.js';
 import { evaluateContrast } from '../src/tokens.mjs';
@@ -41,7 +41,10 @@ const roots = [ROOT, ...(existsSync(LOOP) ? [LOOP] : [])];
 const REPO = join(ROOT, '..');
 const pages = roots
   .flatMap((r) => walk(r))
-  .filter((p) => p.endsWith('.html') && !p.includes('node_modules'))
+  .filter((p) => p.endsWith('.html') && !p.includes('node_modules') && !p.includes(`${sep}src${sep}`))
+  /* `src/doc-intro.html` est la SOURCE du chapitre 01, lue par
+     src/merge-doc.mjs pour produire index.html : un fragment de build, pas
+     un écran — même périmètre que verify-dom.mjs, qui ne lit pas src/. */
   /* La page d'accueil du dépôt et la coquille Point Zero sont ajoutées
      fichier par fichier, et non en faisant de la racine un dossier parcouru :
      celle-ci contient aussi `diagnostic/.work/`, des clones jetables de

@@ -33,6 +33,7 @@
  * état, jamais une erreur console.
  */
 import { classifyName, zipIndex, pdfTriage, summarizeImport } from './pz-import.mjs';
+import { resolveAction, parseGitHub } from '../home-resolver.mjs';
 import { auditLive } from '../design-system/js/qa.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -1056,26 +1057,62 @@ document.addEventListener('click', (e) => {
 importText?.addEventListener('keydown', (e) => {
   if (e.key !== 'Enter') return;
   resolveImport(importText.value);
-  importText.value = '';
 });
 
-function resolveImport(raw) {
+/* ── Résolution universelle — le résolveur pur de l'ancien accueil ──────
+   `home-resolver.mjs` (109 tests) décide, sans DOM ni effet de bord, ce
+   qu'une saisie EST : dépôt GitHub → diagnostic ; URL de site → « en
+   préparation », dit tel quel ; texte → intention NOEMA. La coquille ne
+   fait que projeter la décision et, pour un dépôt du catalogue, filtrer le
+   Bureau en plus (parité Vague 3 : rien de l'accueil n'est perdu). */
+const importOut = $('#pz-uimport-out');
+
+function renderResolution(r, { preview = false } = {}) {
+  if (!importOut) return;
+  const isInvalid = r.intention === 'diag-invalid';
+  const icon = r.intention.startsWith('diag') ? 'prf-shield' : r.intention === 'da' ? 'set-sliders' : r.intention === 'media' ? 'med-library' : 'noe-proposed';
+  const command = r.command ? `<pre class="ds-code">${esc(r.command)}</pre>` : '';
+  const dest = r.aperçu?.destination || r.destination || '';
+  const destLine = dest && !/^(noema:|diagnostic:)/.test(dest) ? `<p class="t-caption u-muted">Destination : <span class="u-mono">${esc(dest)}</span></p>` : '';
+  const foot = r.intention === 'diag-github'
+    ? `<div class="noema-card__foot"><button type="button" class="a-btn a-btn--sm" data-copy-cmd="${esc(r.command)}">${ic('doc-document')}Copier la commande</button><a class="a-text-btn" href="../diagnostic/README.md"><span class="t-caption">Documentation du diagnostic</span></a></div>`
+    : r.intention === 'diag-site'
+      ? `<div class="noema-card__foot"><a class="a-text-btn" href="../diagnostic/README.md"><span class="t-caption">Périmètre actuel du diagnostic</span></a></div>`
+      : '';
+  importOut.innerHTML = `<div class="noema-card noema-rail" data-certainty="${isInvalid ? 'uncertain' : r.intention === 'diag-github' && !preview ? 'confirmed' : 'proposed'}">
+      <div class="noema-card__head">
+        <span class="noema-card__kind">${ic(isInvalid ? 'com-alert' : icon)}${esc(isInvalid ? 'Format invalide' : r.label)}</span>
+        <span class="${isInvalid ? 'a-badge a-badge--error' : r.intention === 'diag-site' ? 'a-badge a-badge--warning' : 'a-badge'}">${preview ? 'Aperçu' : isInvalid ? 'à corriger' : r.intention === 'diag-site' ? 'en préparation' : 'résolu'}</span>
+      </div>
+      <p class="noema-card__title">${esc(r.aperçu?.title || r.label)}</p>
+      <p class="noema-card__body">${esc(r.aperçu?.body || '')}</p>
+      ${command}${destLine}${foot}
+      <p class="t-caption u-muted">${preview ? 'Aperçu : rien n\u2019a été écrit ni navigué.' : 'Rien n\u2019a été écrit : une commande à exécuter vous-même, ou une intention à valider.'}</p>
+    </div>`;
+  resolveIcons(importOut);
+}
+
+function resolveImport(raw, { preview = false } = {}) {
   const text = String(raw || '').trim();
-  if (!text) return;
-  const gh = text.match(/github\.com\/([\w.-]+)\/([\w.-]+)/);
-  if (gh) {
-    const repo = gh[2].replace(/\.git$/, '');
-    const known = (Bureau.data?.repos || []).some((r) => r.name === repo);
+  if (!text) return null;
+  const r = resolveAction(text, 'noema');
+  if (preview) { renderResolution(r, { preview: true }); return r; }
+
+  if (r.intention === 'diag-github') {
+    /* Un dépôt du catalogue filtre aussi le Bureau — en plus, jamais à la place. */
+    const gh = parseGitHub(text);
+    const known = gh && (Bureau.data?.repos || []).some((x) => x.name === gh.repo);
     if (known) {
-      Bureau.repoFilter = repo;
+      Bureau.repoFilter = gh.repo;
       setSource('github');
-      closeLayers();
-      toast?.({ title: `Bureau filtré sur « ${repo} »`, text: 'Le dépôt est dans le catalogue transversal (scan du 17 sept.).', tone: 'success' });
-    } else {
-      toast?.({ title: `« ${repo} » hors catalogue`, text: 'Le scan couvre 38 dépôts ; régénérez-le avec node atlas/build-media.mjs pour l\u2019y lire.', tone: 'warning' });
+      toast?.({ title: `Bureau filtré sur « ${gh.repo} »`, text: 'Le dépôt est dans le catalogue transversal ; la commande de diagnostic est prête ci-dessous.', tone: 'success' });
     }
-    return;
+    renderResolution(r);
+    return r;
   }
+  if (r.intention === 'diag-site') { renderResolution(r); return r; }
+  if (r.intention === 'diag-invalid') { renderResolution(r); return r; }
+
   /* Toute autre entrée devient une intention : transmission honnête,
      aucune écriture (PastedInformation → proposition, jamais un fait). */
   const ta = $('#pz-noema-text');
@@ -1083,9 +1120,18 @@ function resolveImport(raw) {
     ta.value = text;
     ta.focus();
   }
+  const pane = $('#pz-pane-end');
+  if (pane?.hidden) $('#pz-toggle-inspector')?.click();
   closeLayers();
   toast?.({ title: 'Transmis à NOEMA', text: 'Le texte attend votre intention — utilisez « Lire sans écrire » pour voir ce qui est compris.', tone: 'accent' });
+  return r;
 }
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-copy-cmd]');
+  if (b) copyText(b.dataset.copyCmd, 'Commande de diagnostic copiée');
+});
+$('#pz-uimport-preview')?.addEventListener('click', () => resolveImport(importText?.value, { preview: true }));
+$('#pz-uimport-go')?.addEventListener('click', () => { resolveImport(importText?.value); });
 
 /* ── Placements sur la grille (projection locale) ─────────────── */
 function place(it) {
@@ -2017,6 +2063,13 @@ async function loadQa() {
        en silence. */
     const btn = $('#pz-import-btn');
     if (btn && $('#pz-uimport')?.hidden) btn.click();
+  }
+  /* `?resolve=1` (le seuil y envoie « Diagnostic ») : le ＋ s'ouvre sur le
+     champ de résolution universelle, prêt pour un dépôt, une URL, une phrase. */
+  if (params?.get('resolve') === '1') {
+    const btn = $('#pz-import-btn');
+    if (btn && $('#pz-uimport')?.hidden) btn.click();
+    if ($('#pz-uimport-field')?.hidden) $('[data-import="resolve"]')?.click();
   }
   /* `#pz-noema` (l'accueil y envoie « Boucle NOEMA », l'écran loop/ ayant
      été absorbé — Vague 2) : le panneau de droite doit être visible et le

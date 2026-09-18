@@ -306,6 +306,42 @@ try {
   document.querySelector('#pz-sel-links').click();
   await drain();
   t('local : la ligne de lien dit de joindre manuellement', (clipboard.at(-1) || '').includes('[fichier local]'));
+
+  /* ── Vague 3 : la coquille absorbe la porte universelle de l'accueil ──
+     Le résolveur pur (home-resolver.mjs, 109 tests) est branché dans le
+     ＋ : dépôt GitHub → commande de diagnostic vérifiable, URL de site →
+     « en préparation » dit tel quel, texte → NOEMA, malformé → refus. */
+  const openResolve = () => { if (document.querySelector('#pz-uimport')?.hidden) document.querySelector('#pz-import-btn').click(); const f = document.querySelector('#pz-uimport-field'); if (f?.hidden) document.querySelector('[data-import="resolve"]').click(); };
+  const uin = () => document.querySelector('#pz-uimport-text');
+  const uout = () => document.querySelector('#pz-uimport-out');
+  openResolve();
+  t('porte universelle : le ＋ porte Aperçu · Résoudre · Direction artistique', !!document.querySelector('#pz-uimport-preview') && !!document.querySelector('#pz-uimport-go') && document.querySelector('#pz-uimport-field a[href$="#direction"]') !== null);
+  uin().value = 'https://github.com/mattmezstitchlab/AIME-COMPOSER';
+  document.querySelector('#pz-uimport-preview').click();
+  await drain();
+  t('aperçu GitHub : la commande node diagnostic/diagnose.mjs est montrée, rien n’est navigué', /diagnostic\/diagnose\.mjs --owner mattmezstitchlab --repo AIME-COMPOSER/.test(uout().textContent) && /Aperçu/.test(uout().textContent) && window.location.href.includes('index.html'));
+  document.querySelector('#pz-uimport-go').click();
+  await drain();
+  t('résoudre GitHub : commande + bouton « Copier la commande » (jamais lancée par la coquille)', !!uout().querySelector('[data-copy-cmd]') && /Diagnostic GitHub/.test(uout().textContent));
+  uout().querySelector('[data-copy-cmd]').click();
+  await drain();
+  t('résoudre GitHub : la commande copiée est celle du diagnostic', (clipboard.at(-1) || '').startsWith('node diagnostic/diagnose.mjs --owner mattmezstitchlab --repo AIME-COMPOSER'));
+  uin().value = 'mattmezstitchlab/by-aime';
+  document.querySelector('#pz-uimport-go').click();
+  await drain();
+  t('résoudre owner/repo au catalogue : filtre du Bureau EN PLUS de la commande', document.querySelector('#pz-bureau-grid .ucard[data-id]') !== null && (toasts.at(-1)?.title || '').includes('by-aime') && /diagnose\.mjs/.test(uout().textContent));
+  uin().value = 'https://mon-site-vitrine.fr';
+  document.querySelector('#pz-uimport-go').click();
+  await drain();
+  t('résoudre URL de site : « en préparation », dit tel quel — aucune simulation', /en préparation/.test(uout().textContent) && !!uout().querySelector('.a-badge--warning'));
+  uin().value = 'foobar';
+  document.querySelector('#pz-uimport-preview').click();
+  await drain();
+  t('aperçu « foobar » : ni commande fabriquée ni intention — texte compris comme intention NOEMA (mode par défaut)', !/diagnose\.mjs/.test(uout().textContent) && /NOEMA/.test(uout().textContent));
+  uin().value = 'Camille Vasseur est saxophoniste au Conservatoire de Lyon';
+  document.querySelector('#pz-uimport-go').click();
+  await drain();
+  t('résoudre une phrase : transmise au rail NOEMA, rien d’écrit', document.querySelector('#pz-noema-text').value.includes('Camille Vasseur') && (toasts.at(-1)?.title || '').includes('Transmis à NOEMA'));
   /* Deep-link ?source=local — la grammaire de routage héritée de la page
      atlas (l'accueil y envoie « Dossier local ») : second DOM, même module. */
   const dom2 = new JSDOM(html, { url: `${pathToFileURL(PAGE).href}?source=local`, runScripts: 'outside-only', pretendToBeVisual: true, virtualConsole: vc,

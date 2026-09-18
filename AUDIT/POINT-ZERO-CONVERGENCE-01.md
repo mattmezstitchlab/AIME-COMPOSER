@@ -272,20 +272,38 @@ Gates après suppression : QA 12/12 sur 33 écrans · verify DOM 33/33 · smokes
 **Dépendances mécaniques :** `run-qa.mjs`/`verify-dom.mjs` liste explicite · `smoke-medias-v2.mjs` section accueil · `home-resolver.test.mjs` (le module pur reste, la page change) · README « Page d'accueil » · liens `../index.html` depuis `atlas/` (déjà supprimé en vague 1), `point-zero/` (`pz__brand`).
 **Ce qui reste :** `home-resolver.mjs` et ses 109 tests (fonction pure réutilisée par la coquille).
 
+**Réalisée le 18 sept. 2026 (feu vert utilisateur « oui fait ça ») — en un seul changement, la page n'étant pas supprimée mais réduite :**
+
+| Fonction de l'accueil | Où elle vit désormais | Preuve |
+|---|---|---|
+| Résolveur pur (GitHub / URL / texte, modes) | `point-zero/pz.js` importe `resolveAction`, `parseGitHub` depuis `../home-resolver.mjs` ; `resolveImport(raw, { preview })` | résolveur 109/109 (inchangé), Bureau 52/52 |
+| Aperçu avant action (« Voir »/« Faire ») | boutons `#pz-uimport-preview` / `#pz-uimport-go`, sortie `#pz-uimport-out` dans le ＋ | smoke « aperçu GitHub : commande diagnostic + copier » |
+| Mode Diagnostic | dépôt GitHub → `node diagnostic/diagnose.mjs --owner O --repo R`, copiable, **jamais un score inventé** ; filtre Bureau en plus si le dépôt est au catalogue | smokes « commande copiée », « dépôt du catalogue → filtre » |
+| URL de site distante | badge d'avertissement « en préparation » — les deux surfaces disaient déjà la même chose | smoke « URL http → en préparation » |
+| Phrase pour NOEMA | remplit `#pz-noema-text`, ouvre l'inspecteur | smoke « texte → composer NOEMA » |
+| Lien Direction artistique | lien `#direction` dans le ＋ → `design-system/index.html#direction` | smoke « lien DA » |
+| Entrée profonde « Diagnostic » | `point-zero/?resolve=1` ouvre le ＋ sur le champ de résolution | smoke seuil « 03 Diagnostic → ?resolve=1 » |
+
+**Le seuil** (`index.html`, 218 → 89 lignes ; `home.js`, 640 → 68) : un `h1` « Une seule interface. », l'appel « Entrer dans Point Zero », quatre entrées « Où sont les choses » (Bureau, rail NOEMA, ＋ diagnostic, DS une page + atelier `#direction`), badge NOEMA honnête, thème partagé, `noscript`. Plus de composer, plus de menu ＋, plus de nav secondaire ; la marque reste le seul chemin « Accueil ». Ses smokes : `qa/smoke-seuil.mjs` (17/17, ex `smoke-medias-v2.mjs` dont les sections Médiathèque puis accueil ont chacune suivi leur fonction dans la coquille).
+
+**Dans le même mouvement, la documentation du design system est devenue une seule page verticale** (demande utilisateur) : 19 chapitres + `direction.html` + `qa.html` fusionnés par `design-system/src/merge-doc.mjs` dans `design-system/index.html` (20 chapitres, 197 ancres uniques préfixées par chapitre, un seul `h1`, scroll-spy dans `js/doc.js`), les 20 pages supprimées, toutes les références retargetées (`experiences/`, `direction.js`, `pz.js`, résolveur, README). Deux orphelins préexistants corrigés à la source (`aria-labelledby="grammar"` sans cible, onglets `fa-t1/2` sans panneaux). Périmètre QA : **14 écrans**.
+
+Gates : QA 12/12 sur 14 écrans · verify DOM 14/14 · Bureau 52/52 · NOEMA 50/50 · seuil 17/17 · résolveur 109/109 · boucle 91 + 36. Limite connue : le scroll-spy (`IntersectionObserver`) n'est pas exerçable en jsdom — vérifié par lecture seulement.
+
 ### Vague 4 — décision sur les références : expériences et atelier
 
 - **Les 11 écrans d'expérience** ont préfiguré les zones que la coquille réalise désormais en vrai. Deux issues honnêtes : (a) **gel** — ils restent la démonstration de la grammaire, au prix d'une maintenance doublonnée avec la coquille ; (b) **suppression** de ceux dont la zone est réalisée (bureau, media-library, timeline, universal-card, grid, composer, noema au minimum) — rien ne casse techniquement (le périmètre QA est dynamique), mais le nombre d'écrans audités baisse et chaque texte qui le cite doit suivre. **NI l'une NI l'autre ne sera faite sans validation humaine** : ce sont des écrans du système, pas des pages-silos.
-- **`direction.html`** : à ne toucher qu'une fois l'inspecteur capable d'appliquer un override de tokens à la composition courante (spec §6) — jusque-là c'est le seul lieu où le mécanisme est prouvé.
+- **L'atelier de direction artistique** (désormais chapitre 21 de la page unique, `design-system/index.html#direction` ; `direction.html` n'existe plus comme page) : à ne toucher qu'une fois l'inspecteur capable d'appliquer un override de tokens à la composition courante (spec §6) — jusque-là c'est le seul lieu où le mécanisme est prouvé.
 
 ### Ordre recommandé
 
 ```text
 Vague 1 (atlas)  →  Vague 2 (loop)  →  Vague 3 (accueil)  →  Vague 4 (décision références)
      7 fonctions        9 fonctions        4 fonctions           arbitrage humain
-     ✓ close 18/09       ✓ close 18/09      à décider             à décider
+     ✓ close 18/09       ✓ close 18/09      ✓ close 18/09         à décider
 ```
 
-La vague 1 est la plus encadrée par la spec (§4 l'exige littéralement) et la moins câblée dans les tests ; c'est par elle qu'il faut commencer. La vague 2 est la plus câblée (serveur, tests, smoke de déploiement). La vague 3 est un choix de produit. La vague 4 est un arbitrage.
+La vague 1 est la plus encadrée par la spec (§4 l'exige littéralement) et la moins câblée dans les tests ; c'est par elle qu'il faut commencer. La vague 2 est la plus câblée (serveur, tests, smoke de déploiement). La vague 3 était un choix de produit (tranché : seuil, pas redirection). La vague 4 est un arbitrage.
 
 ## 7. Garde-fous
 

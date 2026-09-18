@@ -40,4 +40,4 @@ Question que tout le monde se pose et que rien ne répond : **« qui utilise ce 
 - Mesurer avant de promettre ; publier la couverture, pas la confiance.
 - Originaux et provenance préservés ; aucune copie, aucune sync sans validation humaine.
 - Chaque export est un contrat vérifiable, chaque absence un constat nommé.
-- Un écran innovant passe Design QA comme les 32 autres — l'innovation n'exempte du système pour personne.
+- Un écran innovant passe Design QA comme les 13 autres — l'innovation n'exempte du système pour personne.

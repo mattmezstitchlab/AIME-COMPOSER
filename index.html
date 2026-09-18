@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="a-root" content="design-system/">
-<title>AIME-COMPOSER — Accueil</title>
+<title>AIME-COMPOSER — Seuil</title>
 <link rel="stylesheet" href="design-system/tokens/tokens.css">
 <link rel="stylesheet" href="design-system/styles/foundations.css">
 <link rel="stylesheet" href="design-system/styles/layout.css">
@@ -14,202 +14,73 @@
 <link rel="stylesheet" href="design-system/styles/patterns.css">
 <link rel="stylesheet" href="design-system/styles/dataviz.css">
 <link rel="stylesheet" href="design-system/styles/doc.css">
-<style>
-.home-hero {
-  display: grid;
-  gap: var(--aime-space-4);
-  padding-block-start: var(--aime-space-2);
-}
-.home-composer {
-  border: var(--aime-border-default);
-  border-radius: var(--aime-radius-large);
-  background: var(--aime-color-surface);
-  padding: var(--aime-space-3);
-  display: grid;
-  gap: var(--aime-space-3);
-  box-shadow: var(--aime-shadow-raise);
-  transition: border-color var(--aime-motion-fast) var(--aime-ease-out), box-shadow var(--aime-motion-fast) var(--aime-ease-out);
-}
-.home-composer:focus-within {
-  border-color: var(--aime-color-accent);
-  box-shadow: var(--aime-focus-ring);
-}
-.home-composer__box {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--aime-space-2);
-}
-.home-composer__add {
-  flex: none;
-  margin-block-start: var(--aime-space-1);
-}
-.home-composer__field {
-  flex: 1 1 auto;
-  min-width: 0;
-  display: grid;
-  gap: var(--aime-space-1);
-}
-.home-composer__input {
-  width: 100%;
-  min-height: 88px;
-  border: 0;
-  padding: var(--aime-space-1) var(--aime-space-2);
-  background: transparent;
-  color: var(--aime-color-text);
-  font-size: var(--aime-text-body-size);
-  line-height: var(--aime-text-body-lh);
-  resize: vertical;
-}
-.home-composer__input:focus {
-  outline: none;
-}
-.home-composer__input::placeholder {
-  color: var(--aime-color-text-subtle);
-}
-.home-composer__bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--aime-space-3);
-  flex-wrap: wrap;
-  padding-block-start: var(--aime-space-2);
-  border-top: var(--aime-border-subtle);
-}
-.home-modes {
-  display: flex;
-  align-items: center;
-  gap: var(--aime-space-2);
-  flex-wrap: wrap;
-}
-</style>
 <script src="design-system/js/aime-ui.js" defer></script>
 <script src="home.js" defer></script>
 </head>
 <body>
-<noscript><p class="t-body-sm">Cette page utilise JavaScript pour la conversation avec NOEMA et les raccourcis d'entrée. <a class="a-text-btn" href="index.html">Recharger la page</a>.</p></noscript>
+<noscript><p class="t-body-sm u-muted u-pad-sm">Cette page est un seuil : tout le produit vit dans <a class="a-text-btn" href="point-zero/">Point Zero</a>. Le badge NOEMA demande JavaScript ; les liens, non.</p></noscript>
 
 <header class="ds-top">
   <a class="ds-brand" href="index.html" title="Accueil du site AIME-COMPOSER"><span>AIME<i>·</i>COMPOSER</span><small>V1</small></a>
-  <nav class="l-row l-row--nowrap l-hide-mobile" aria-label="Surfaces">
-    <a class="a-text-btn" href="point-zero/">Point Zero</a>
-    <a class="a-text-btn" href="point-zero/#pz-noema">Boucle NOEMA</a>
-    <a class="a-text-btn" href="point-zero/#pz-bureau">Médiathèque</a>
-    <a class="a-text-btn" href="diagnostic/README.md">Diagnostic</a>
-  </nav>
   <span class="l-spacer"></span>
   <span class="ds-top__tools">
     <span class="a-badge" id="h-noema-status">NOEMA : connexion…</span>
     <button type="button" class="a-icon-btn" id="h-theme" aria-label="Changer de thème"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="set-theme"/></svg></button>
-    <a class="a-btn a-btn--sm a-btn--primary" href="design-system/index.html"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-document"/></svg>Design System</a>
   </span>
 </header>
 
 <main class="ds-main l-page" id="contenu">
 
-  <!-- HERO CENTRAL — LA PORTE UNIVERSELLE DU PRODUIT -->
-  <header class="ds-hero home-hero">
+  <!-- LE SEUIL — une porte, pas une vitrine (Vague 3 de AUDIT/POINT-ZERO-CONVERGENCE-01.md) -->
+  <header class="ds-hero">
     <div class="ds-eyebrow">
       <span class="noema-mark"><svg class="a-ic a-ic--sm noema-mark__glyph" aria-hidden="true" width="16" height="16"><use data-a-icon="noe-mark"/></svg><span class="noema-mark__word">AIME-COMPOSER</span></span>
       <span class="a-badge a-badge--accent">V1</span>
       <span class="a-badge" id="h-hero-badge">NOEMA : connexion…</span>
     </div>
-    <h1 class="t-display">La porte universelle du produit.</h1>
-    <p class="t-body u-muted l-measure-xl">Un point d'entrée unique pour décrire une intention, ausculter un dépôt, joindre vos fichiers ou régler un style. Le complexe et le technique vivent derrière.</p>
+    <h1 class="t-display">Une seule interface.</h1>
+    <p class="t-body u-muted l-measure-xl">Tout ce que ce dépôt sait faire — la médiathèque, la boucle NOEMA, le diagnostic, la direction artistique — vit dans Point Zero. Cette page n'est qu'un seuil : elle dit où sont les choses et vous y conduit.</p>
+    <div class="l-row">
+      <a class="a-btn a-btn--primary" href="point-zero/"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="grd-grid"/></svg>Entrer dans Point Zero</a>
+      <a class="a-btn" href="design-system/index.html"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-document"/></svg>Design System — une page</a>
+    </div>
   </header>
 
-  <!-- BLOC CENTRAL : STYLE MANUS / COMPOSER -->
-  <section class="ds-block l-measure-xl" aria-labelledby="atelier-composer">
-    <h2 class="u-sr" id="atelier-composer">Atelier d'entrée universel</h2>
-
-    <div class="home-composer">
-      <div class="home-composer__box">
-        <div class="home-composer__add">
-          <button type="button" class="a-icon-btn a-icon-btn--edge" id="h-plus-btn" data-a-pop="#h-plus-menu" aria-expanded="false" aria-haspopup="true" aria-label="Ajouter une source ou choisir une entrée"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="act-add"/></svg></button>
-        </div>
-        <div class="home-composer__field">
-          <label class="u-sr" for="h-noema-text">Décris ce que tu veux faire, colle un lien, ou joins un dossier…</label>
-          <textarea class="home-composer__input" id="h-noema-text" rows="3" placeholder="Décris ce que tu veux faire, colle un lien, ou joins un dossier…"></textarea>
-        </div>
-      </div>
-
-      <div class="home-composer__bar">
-        <!-- MODES EN PASTILLES SÉLECTIONNABLES — contrat aria-current (cf design-system/components.html) -->
-        <div class="home-modes" role="group" aria-label="Modes de traitement">
-          <button type="button" class="a-pill a-pill--button" data-h-mode="diag"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="prf-shield"/></svg>Diagnostic</button>
-          <button type="button" class="a-pill a-pill--button" data-h-mode="media"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="med-library"/></svg>Médiathèque</button>
-          <button type="button" class="a-pill a-pill--button" data-h-mode="da"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="set-sliders"/></svg>Direction artistique</button>
-          <button type="button" class="a-pill a-pill--button is-active" data-h-mode="noema" aria-current="true"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="cmp-compose"/></svg>Boucle NOEMA</button>
-        </div>
-
-        <div class="l-row">
-          <button type="button" class="a-btn a-btn--sm" id="h-noema-read" title="Aperçu — affiche l'action résolue sans naviguer ni écrire">Aperçu</button>
-          <button type="button" class="a-btn a-btn--sm a-btn--primary" id="h-noema-submit" aria-label="Proposer à NOEMA">Proposer à NOEMA</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- SORTIE DU ROUTEUR ET DE LA CONVERSATION NOEMA -->
-    <div class="l-stack" id="h-noema-out" aria-live="polite">
-      <p class="t-body-sm u-muted">Texte libre, lien GitHub, dossier local ou mode choisi : chaque action est branchée sur le réel et n'invente rien.</p>
-    </div>
-  </section>
-
-  <!-- MENU DÉROULANT DU BOUTON + DU CHAMP -->
-  <div class="a-pop" id="h-plus-menu" hidden>
-    <ul class="a-menu">
-      <li class="a-menu__label">Joindre ou brancher</li>
-      <li><button type="button" class="a-menu__item" data-h-action="folder"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="com-inbox"/></svg>Dossier local</button></li>
-      <li><button type="button" class="a-menu__item" data-h-action="github"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-version"/></svg>Lien GitHub</button></li>
-      <li><button type="button" class="a-menu__item" data-h-action="url"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-external"/></svg>Coller une URL</button></li>
-      <li class="a-menu__sep" role="presentation"></li>
-      <li class="a-menu__label">Surfaces</li>
-      <li><a class="a-menu__item" href="design-system/direction.html"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="set-sliders"/></svg>Direction artistique</a></li>
-      <li><a class="a-menu__item" href="point-zero/#pz-bureau"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="med-library"/></svg>Médiathèque</a></li>
-      <li><a class="a-menu__item" href="point-zero/#pz-noema"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="cmp-compose"/></svg>Boucle NOEMA</a></li>
-      <li class="a-menu__sep" role="presentation"></li>
-      <li class="a-menu__label">Exemples d'intentions NOEMA</li>
-      <li><button type="button" class="a-menu__item" data-h-intent="Camille Vasseur est saxophoniste au Conservatoire de Lyon"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="ppl-person"/></svg>Mémoriser une personne</button></li>
-      <li><button type="button" class="a-menu__item" data-h-intent="il me faut la capacité de la Salle des Fêtes"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="mem-card"/></svg>Déclarer une donnée manquante</button></li>
-      <li><button type="button" class="a-menu__item" data-h-intent="envoyer l'annonce du concert pour le 24 septembre"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="com-broadcast"/></svg>Demander une action</button></li>
-    </ul>
-  </div>
-
-  <!-- SECTION SECONDAIRE COMPACTE : LES QUATRE ENTRÉES DU PRODUIT -->
   <section class="ds-block" aria-labelledby="entrees">
-    <h2 class="t-h2" id="entrees">Les quatre entrées</h2>
-    <p class="t-body u-muted l-measure-xl">Chacune est la vraie surface, pas une vitrine ; chacune dit en une phrase ce qu'elle fait et pour qui.</p>
+    <h2 class="t-h2" id="entrees">Où sont les choses</h2>
+    <p class="t-body u-muted l-measure-xl">Chaque lien ouvre la vraie surface, à l'endroit exact où la fonction vit dans la coquille.</p>
     <div class="ds-demo">
-      <div class="ds-demo__stage ds-demo__stage--col" role="list" aria-label="Les quatre entrées du dépôt">
+      <div class="ds-demo__stage ds-demo__stage--col" role="list" aria-label="Les entrées du produit, toutes dans Point Zero">
         <div class="l-row l-row--top l-row--between" role="listitem">
-          <span class="l-row l-row--top"><span class="a-badge">01</span><span><span class="t-body u-strong">Médiathèque</span><span class="t-caption u-muted"> (le Bureau de Point Zero)</span><br><span class="t-caption u-muted l-measure-lg">Tous les médias de vos 38 dépôts GitHub — chaque image, vidéo, piste audio et vecteur référencé là où il vit, jamais copié — plus un mode « dossier local » pour classer, voir et écouter ce qui vit sur votre poste. Chaque carte se voit, se lit, se télécharge et se vérifie ; la sélection se transmet à un agent en un clic (liens, brief structuré avec manifeste JSON, script de récupération). Elle vit dans la coquille, pas dans une page à part.</span></span></span>
-          <a class="a-text-btn" href="point-zero/#pz-bureau"><span class="t-caption">point-zero/</span><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-arrow-right"/></svg></a>
+          <span class="l-row l-row--top"><span class="a-badge">01</span><span><span class="t-body u-strong">Médiathèque</span><span class="t-caption u-muted"> — le Bureau</span><br><span class="t-caption u-muted l-measure-lg">Le catalogue transversal des dépôts et le mode dossier local : voir, lire, télécharger, vérifier, brief agent, sélection — rien n'est envoyé.</span></span></span>
+          <a class="a-text-btn" href="point-zero/#pz-bureau"><span class="t-caption">point-zero/#pz-bureau</span><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-arrow-right"/></svg></a>
         </div>
         <div class="l-row l-row--top l-row--between" role="listitem">
-          <span class="l-row l-row--top"><span class="a-badge">02</span><span><span class="t-body u-strong">Design System</span><span class="t-caption u-muted"> (la doc)</span> &amp; <span class="t-body u-strong">Direction artistique</span><span class="t-caption u-muted"> (l’atelier)</span><br><span class="t-caption u-muted l-measure-lg">La grammaire complète en 21 chapitres, auditée en continu — et, dans l’atelier, on y règle thème, accent, densité et rayons, puis on <span class="u-strong">exporte le brief ou le CSS</span> pour le transmettre tel quel à un agent ou à un autre projet. C’est ainsi qu’un style se partage sans être réinterprété ; la conformité EAA / WCAG y est un moteur, pas un badge.</span></span></span>
+          <span class="l-row l-row--top"><span class="a-badge">02</span><span><span class="t-body u-strong">Boucle NOEMA</span><span class="t-caption u-muted"> — le rail et le tiroir Cartes</span><br><span class="t-caption u-muted l-measure-lg">NOEMA observe et propose, <span class="u-strong">vous validez</span> ; actions autorisées puis exécutées, journal, preuves, les huit droits de la mémoire.</span></span></span>
+          <a class="a-text-btn" href="point-zero/#pz-noema"><span class="t-caption">point-zero/#pz-noema</span><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-arrow-right"/></svg></a>
+        </div>
+        <div class="l-row l-row--top l-row--between" role="listitem">
+          <span class="l-row l-row--top"><span class="a-badge">03</span><span><span class="t-body u-strong">Diagnostic</span><span class="t-caption u-muted"> — le ＋ de la coquille</span><br><span class="t-caption u-muted l-measure-lg">Collez un dépôt GitHub : la commande vérifiable du diagnostic apparaît, jamais un score inventé sur 100. Une URL de site dit honnêtement « en préparation ».</span></span></span>
+          <a class="a-text-btn" href="point-zero/?resolve=1"><span class="t-caption">point-zero/?resolve=1</span><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-arrow-right"/></svg></a>
+        </div>
+        <div class="l-row l-row--top l-row--between" role="listitem">
+          <span class="l-row l-row--top"><span class="a-badge">04</span><span><span class="t-body u-strong">Design System</span><span class="t-caption u-muted"> (la doc, une page)</span> &amp; <span class="t-body u-strong">Direction artistique</span><span class="t-caption u-muted"> (l'atelier, son chapitre 21)</span><br><span class="t-caption u-muted l-measure-lg">La grammaire complète en une verticale — tokens, composants, organes, règles, Design QA — et l'atelier qui exporte le brief agent et le CSS conforme.</span></span></span>
           <span class="l-row l-row--nowrap">
             <a class="a-text-btn" href="design-system/index.html"><span class="t-caption">design-system/</span><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-arrow-right"/></svg></a>
-            <a class="a-text-btn" href="design-system/direction.html"><span class="t-caption">direction.html</span><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-arrow-right"/></svg></a>
+            <a class="a-text-btn" href="design-system/index.html#direction"><span class="t-caption">#direction</span><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-arrow-right"/></svg></a>
           </span>
         </div>
-        <div class="l-row l-row--top l-row--between" role="listitem">
-          <span class="l-row l-row--top"><span class="a-badge">03</span><span><span class="t-body u-strong">Boucle NOEMA</span><br><span class="t-caption u-muted l-measure-lg">Le moteur de la conversation — son écran vit dans le rail NOEMA de Point Zero : NOEMA propose sous vos yeux, <span class="u-strong">vous validez</span>, la mémoire retient ce qui a été décidé. Aucune écriture sans accord humain ; chaque décision garde sa trace dans le journal.</span></span></span>
-          <a class="a-text-btn" href="point-zero/#pz-noema"><span class="t-caption">point-zero/ · NOEMA</span><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-arrow-right"/></svg></a>
-        </div>
-        <div class="l-row l-row--top l-row--between" role="listitem">
-          <span class="l-row l-row--top"><span class="a-badge">04</span><span><span class="t-body u-strong">Diagnostic</span><br><span class="t-caption u-muted l-measure-lg">Le juge qui valide ces écrans, appliqué à vos propres projets : un dépôt GitHub ou un dossier local est mesuré sans jamais y écrire — densité d’écarts publiée, jamais un score inventé sur 100.</span></span></span>
-          <a class="a-text-btn" href="diagnostic/README.md"><span class="t-caption">diagnostic/</span><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-arrow-right"/></svg></a>
-        </div>
       </div>
-      <p class="ds-demo__caption"><span class="t-label">Contrat</span><span class="t-caption">Chaque surface est une projection du même Design System : aucune n’invente une valeur, elle la reçoit. Cette page est auditée comme les autres écrans du dépôt.</span></p>
+      <p class="ds-demo__caption"><span class="t-label">Règle</span><span class="t-caption">Rien n'est simulé ici : servie statiquement, cette page reste lisible et le dit. La conversation avec NOEMA se tient dans la coquille, contre la vraie boucle.</span></p>
     </div>
   </section>
 
-  <footer class="l-row l-row--between">
+  <footer class="ds-foot">
     <span class="t-caption u-muted">AIME-COMPOSER · la couche qui audite et fait converger</span>
     <span class="l-row">
-      <a class="a-text-btn" href="#contenu">Haut de page</a>
-      <a class="a-text-btn" href="point-zero/#pz-bureau">Médiathèque</a>
-      <a class="a-text-btn" href="point-zero/#pz-noema">Boucle NOEMA</a>
+      <a class="a-text-btn" href="point-zero/">Point Zero</a>
+      <a class="a-text-btn" href="design-system/index.html#qa">Design QA</a>
+      <a class="a-text-btn" href="diagnostic/README.md">Diagnostic</a>
     </span>
   </footer>
 

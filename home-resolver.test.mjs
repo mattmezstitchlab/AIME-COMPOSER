@@ -66,8 +66,8 @@ check('example.com', 'media', { intention: 'diag-site', label: 'Lancer le diagno
 check('example.com', 'da', { intention: 'diag-site', label: 'Lancer le diagnostic', destination: 'https://example.com/' });
 
 // Mode DA — sans contenu détecté
-check('', 'da', { intention: 'da', label: 'Ouvrir la Direction artistique', destination: 'design-system/direction.html' });
-check('un texte libre', 'da', { intention: 'da', label: 'Ouvrir la Direction artistique', destination: 'design-system/direction.html' });
+check('', 'da', { intention: 'da', label: 'Ouvrir la Direction artistique', destination: 'design-system/index.html#direction' });
+check('un texte libre', 'da', { intention: 'da', label: 'Ouvrir la Direction artistique', destination: 'design-system/index.html#direction' });
 check('owner/repo', 'da', { intention: 'diag-github', label: 'Lancer le diagnostic', destination: 'diagnostic:github:owner/repo' }); // content wins
 
 // Mode Médiathèque — sans contenu détecté

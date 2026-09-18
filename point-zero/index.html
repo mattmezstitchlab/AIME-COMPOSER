@@ -13,13 +13,14 @@
 <link rel="stylesheet" href="../design-system/styles/noema.css">
 <link rel="stylesheet" href="../design-system/styles/patterns.css">
 <link rel="stylesheet" href="../design-system/styles/dataviz.css">
+<link rel="stylesheet" href="../design-system/styles/doc.css">
 <link rel="stylesheet" href="../design-system/styles/pointzero.css">
 <script src="../design-system/js/doc.js" defer></script>
 <script src="../design-system/js/aime-ui.js" defer></script>
 <script type="module" src="pz.js"></script>
 </head>
 <body>
-<noscript><p class="t-body-sm u-muted u-pad-sm">Point Zero fonctionne avec JavaScript : la coquille projette en direct la médiathèque (le catalogue généré <a class="a-text-btn" href="../atlas/media.json">atlas/media.json</a> — son ancienne page a été absorbée par le Bureau), la boucle NOEMA (son écran vit ici, dans le rail — le moteur : <code>node loop/server.mjs</code>) et le rapport Design QA (<a class="a-text-btn" href="../design-system/qa.html">qa</a>).</p></noscript>
+<noscript><p class="t-body-sm u-muted u-pad-sm">Point Zero fonctionne avec JavaScript : la coquille projette en direct la médiathèque (le catalogue généré <a class="a-text-btn" href="../atlas/media.json">atlas/media.json</a> — son ancienne page a été absorbée par le Bureau), la boucle NOEMA (son écran vit ici, dans le rail — le moteur : <code>node loop/server.mjs</code>) et le rapport Design QA (<a class="a-text-btn" href="../design-system/index.html#qa">qa</a>).</p></noscript>
 
 <div class="pz" id="pz">
 
@@ -46,7 +47,7 @@
     </div>
 
     <div class="pz__group">
-      <a class="a-badge" id="pz-qa" href="../design-system/qa.html" title="Ouvrir le rapport Design QA">
+      <a class="a-badge" id="pz-qa" href="../design-system/index.html#qa" title="Ouvrir le rapport Design QA">
         <svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="prf-shield"/></svg>QA : lecture…
       </a>
       <button type="button" class="a-btn a-btn--sm" id="pz-eaa" aria-pressed="false" title="Contrôles automatiques d'accessibilité — signaux, pas certification">
@@ -319,10 +320,18 @@
           Lien GitHub, URL ou texte collé
         </button>
       </div>
-      <div class="a-field" id="pz-uimport-field" hidden>
-        <label class="a-field__label" for="pz-uimport-text">Lien ou texte</label>
-        <input class="a-input" id="pz-uimport-text" type="text" placeholder="https://github.com/… ou une phrase" autocomplete="off">
-        <span class="a-field__hint">Lecture sans écriture : un dépôt du compte ouvre son filtre dans le Bureau ; toute autre entrée est transmise à NOEMA, rien n'est enregistré.</span>
+      <div class="l-stack" id="pz-uimport-field" hidden>
+        <div class="a-field">
+          <label class="a-field__label" for="pz-uimport-text">Lien ou texte</label>
+          <input class="a-input" id="pz-uimport-text" type="text" placeholder="https://github.com/owner/repo · owner/repo · https://… · ou une phrase" autocomplete="off">
+          <span class="a-field__hint">Un dépôt GitHub → la commande du diagnostic (et le filtre du Bureau s'il est au catalogue) ; une URL de site → dit « en préparation » ; toute autre entrée → NOEMA. Rien n'est enregistré.</span>
+        </div>
+        <div class="l-row">
+          <button type="button" class="a-btn a-btn--sm" id="pz-uimport-preview">Aperçu</button>
+          <button type="button" class="a-btn a-btn--sm a-btn--primary" id="pz-uimport-go">Résoudre</button>
+          <a class="a-text-btn" href="../design-system/index.html#direction"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="set-sliders"/></svg>Direction artistique</a>
+        </div>
+        <div class="l-stack" id="pz-uimport-out" aria-live="polite"></div>
       </div>
       <p class="t-caption uimport__note">PDF et ZIP sont lus localement : index des entrées, nombre de pages, empreinte SHA-256, doublons nommés — la couverture de l'import est publiée dans le Bureau. Le texte intégral d'un PDF et la résolution d'URL distantes restent des étapes dédiées — aucun envoi silencieux.</p>
     </div>

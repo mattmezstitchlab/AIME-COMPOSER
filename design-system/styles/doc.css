@@ -22,6 +22,15 @@
 .ds-brand small { font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size); letter-spacing: var(--aime-text-meta-ls); color: var(--aime-color-text-subtle); font-weight: var(--aime-font-regular); }
 .ds-top__tools { display: flex; align-items: center; gap: var(--aime-space-2); }
 
+/* Page unique : un chapitre = une section, séparée par un filet ; les
+   ancres s'arrêtent sous la barre collante. */
+.ds-chapter { display: grid; gap: var(--aime-gap-section); padding-block-start: var(--aime-gap-section); border-block-start: var(--aime-border-default); scroll-margin-block-start: var(--aime-space-9); }
+.ds-chapter__hero .ds-eyebrow .a-badge { font-variant-numeric: tabular-nums; }
+#intro { scroll-margin-block-start: var(--aime-space-9); }
+.ds-toc { display: grid; gap: var(--aime-space-3); }
+.ds-toc__list { display: flex; flex-wrap: wrap; gap: var(--aime-space-2) var(--aime-space-4); list-style: none; padding: 0; margin: 0; }
+.ds-toc__list a { display: inline-flex; align-items: center; gap: var(--aime-space-2); }
+
 /* Navigation latérale */
 .ds-side {
   display: none;

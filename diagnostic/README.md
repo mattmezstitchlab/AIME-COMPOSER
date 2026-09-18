@@ -38,7 +38,7 @@ Aucune écriture dans le projet examiné — c'est un test, pas une promesse.
    jamais exécuté ; ce qui ne se résout pas statiquement est compté
    « non résolu », publié, jamais deviné.
 4. **Jugement** — le moteur `design-system/js/qa.js`, **celui qui juge les
-   33 écrans du système**, pas une copie.
+   14 écrans du système**, pas une copie.
 
 ## Hiérarchie — ce qui est non résolu, jamais un écart
 

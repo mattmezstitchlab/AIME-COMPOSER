@@ -27,7 +27,7 @@ projection du système, jamais l'inverse.
 cd design-system
 npm run build   # génère tokens + icônes, refuse toute couleur non conforme
 npm run qa      # build + audit des 12 familles sur le système livré
-npm run verify  # exécute réellement les scripts des 19 écrans dans un DOM
+npm run verify  # exécute réellement les scripts des 14 écrans dans un DOM
 npm run check   # qa puis verify — la vérification complète
 npm run serve   # sert le dépôt sur http://0.0.0.0:8080/design-system/
 ```
@@ -108,8 +108,8 @@ Afficher 87 % de certitude serait une fausse précision.
 - Iconographie : 86 pictogrammes, 17 catégories, contrat de grille unique.
 - Couches CSS 2 à 5 : 29 composants fondamentaux, 5 organes AIME, couche NOEMA,
   13 patterns, langage de data visualisation, moteur de layout responsive.
-- Design QA : 12 familles statiques, plus une vérification DOM des 33 écrans — dont la page d'accueil du dépôt et la coquille Point Zero (dont le Bureau a absorbé la page Médiathèque, et le rail NOEMA l'écran de la boucle `loop/`).
-- 19 chapitres de documentation, du chapitre 00 au chapitre 19.
+- Design QA : 12 familles statiques, plus une vérification DOM des 14 écrans — la page unique de documentation, les 11 écrans d'expérience, le seuil du dépôt et la coquille Point Zero (dont le Bureau a absorbé la page Médiathèque, le rail NOEMA l'écran de la boucle `loop/`, et le ＋ le composer de l'accueil).
+- **Une seule page verticale** de documentation (`index.html`, 20 chapitres dont la Direction artistique en 21), générée par `node src/merge-doc.mjs` depuis `src/doc-intro.html` ; le sommaire latéral suit le chapitre lu.
 - 10 écrans d'expérience (`experiences/`) : Playground, Composer, Carte Universelle,
   Timeline, Grille, Bureau, Médiathèque, NOEMA, site public, portail client — plus
   leur index. Tous composés uniquement avec le système.

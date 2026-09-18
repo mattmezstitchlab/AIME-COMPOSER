@@ -2,7 +2,7 @@
 
 **Status:** PROPOSED / CONVERGENCE  
 **Depends on:** Universal Card, Universal Timeline, Universal Grid, Composition Model, NOEMA Constitution, NOEMA Accessibility Engine (EAA)  
-**Primary implementation:** `design-system/` — tokens, icon family, CSS layers 2–5, Design QA, 30 shipped screens plus the repository homepage and the Point Zero shell (which absorbed the former `loop/index.html`), all audited by the same QA.  
+**Primary implementation:** `design-system/` — tokens, icon family, CSS layers 2–5, Design QA, one vertical documentation page (20 chapters) plus 11 experience screens, the repository threshold and the Point Zero shell, all audited by the same QA.  
 **Primary evidence:** the running system itself. `npm run qa` and `npm run verify` are the proof, not this document.
 
 ## 1. Purpose
@@ -163,7 +163,7 @@ A check that cannot fail checks nothing, so every family has been proven to fail
 - real behaviour — no browser engine, so no real keyboard, screen reader or zoom test;
 - performance.
 
-`npm run verify` adds a DOM pass with jsdom: it executes the scripts of all 33 audited screens — the 31 of `design-system/`, the repository homepage and the Point Zero shell — confirming the chrome is injected, icons resolve, token-driven containers fill, and `auditLive()` runs on the living document. Its limit is declared by the script itself: jsdom has no layout engine, so the geometric parts of `auditLive` — real overflow and target size — remain unverified and require a real browser.
+`npm run verify` adds a DOM pass with jsdom: it executes the scripts of all 14 audited screens — the single documentation page and the 11 experience screens of `design-system/`, the repository threshold and the Point Zero shell — confirming the chrome is injected, icons resolve, token-driven containers fill, and `auditLive()` runs on the living document. Its limit is declared by the script itself: jsdom has no layout engine, so the geometric parts of `auditLive` — real overflow and target size — remain unverified and require a real browser.
 
 ## 10. Closing rule
 

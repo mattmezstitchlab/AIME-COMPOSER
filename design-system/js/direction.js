@@ -56,7 +56,23 @@
   /* ── État de la direction ────────────────────────────────────── */
   const RADIUS = { none: 0, small: 4, medium: 8, large: 14 };
   const RADIUS_LABEL = { none: 'aucun (0)', small: 'discret (4)', medium: 'système (8)', large: 'généreux (14)' };
-  const state = { theme: 'dark', accentStep: '500', density: 'normal', motion: 'full', radius: 'medium' };
+  /* Sur la page unique, le chapitre 21 cohabite avec le châssis (js/doc.js)
+     qui a déjà posé la préférence de thème / densité / mouvement : on part
+     de l'état réel du document, jamais d'un « dark » imposé à toute la page. */
+  const html0 = document.documentElement;
+  const state = {
+    theme: html0.dataset.aimeTheme || 'dark',
+    accentStep: '500',
+    density: html0.dataset.aimeDensity || 'normal',
+    motion: html0.dataset.aimeMotion === 'reduced' ? 'reduced' : 'full',
+    radius: 'medium',
+  };
+  for (const [gid, key] of Object.entries({ 'dp-theme': 'theme', 'dp-density': 'density', 'dp-motion': 'motion' })) {
+    $(`#${gid}`)?.querySelectorAll('.a-pill--button[data-val]').forEach((p) => {
+      if (p.dataset.val === state[key]) p.setAttribute('aria-current', 'true');
+      else p.removeAttribute('aria-current');
+    });
+  }
   let ramp = null; /* rampe fuchsia {300:'#…',…} lue dans tokens.json */
 
   /* Dérivation le long de la rampe, comme le système le fait lui-même :
@@ -107,7 +123,7 @@
   function cssText() {
     const a = accentSet();
     const lines = [
-      `/* tokens.custom.css — généré le ${new Date().toISOString().slice(0, 10)} par design-system/direction.html`,
+      `/* tokens.custom.css — généré le ${new Date().toISOString().slice(0, 10)} par design-system/index.html#direction`,
       `   À poser APRÈS tokens.css. Ces surcharges sont des jetons ; aucun`,
       `   composant ne doit recopier une valeur. */`,
       `:root {`,
@@ -141,7 +157,7 @@
     return [
       `# Direction artistique — brief agent (AIME DESIGN SYSTEM V1)`,
       ``,
-      `Généré le ${new Date().toISOString()} depuis design-system/direction.html`,
+      `Généré le ${new Date().toISOString()} depuis design-system/index.html#direction`,
       ``,
       `## Choix`,
       `- thème : ${state.theme}`,

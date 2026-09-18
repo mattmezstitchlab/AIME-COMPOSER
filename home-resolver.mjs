@@ -101,13 +101,13 @@ export function resolveAction(raw, activeMode) {
     return {
       intention: 'da',
       label: LABELS.da,
-      destination: 'design-system/direction.html',
+      destination: 'design-system/index.html#direction',
       raw: trimmed,
       mode,
       aperçu: {
         title: 'Direction artistique — l’atelier',
         body: `Ouvrira l’atelier DA : thème, accent, densité, rayons. Export du brief agent ou du tokens.custom.css.`,
-        destination: 'design-system/direction.html',
+        destination: 'design-system/index.html#direction',
       },
     };
   }
