@@ -49,8 +49,11 @@ const pages = roots
      qui ne sont pas les siens. (La page Médiathèque `atlas/index.html` a
      été absorbée par le Bureau de Point Zero — Vague 1 de
      AUDIT/POINT-ZERO-CONVERGENCE-01.md ; `atlas/` ne garde que le
-     catalogue généré et son générateur. Un écran exempté finit par inventer
-     un style ; un périmètre trop large rend le rapport illisible.) */
+     catalogue généré et son générateur. L'écran de la boucle
+     `loop/index.html` a été absorbé par le rail NOEMA et le tiroir Cartes —
+     Vague 2 ; `loop/` ne garde que le moteur, toujours parcouru au cas où
+     un écran y renaîtrait. Un écran exempté finit par inventer un style ;
+     un périmètre trop large rend le rapport illisible.) */
   .concat(
     [join(REPO, 'index.html'), join(REPO, 'point-zero', 'index.html')]
       .filter((p) => existsSync(p)),

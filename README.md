@@ -26,7 +26,7 @@ TOKENS → FOUNDATIONS → COMPONENTS → PATTERNS → LAYOUTS → EXPERIENCES
 cd design-system
 npm run build   # generate tokens + icons; refuses any colour that misses its contrast target
 npm run qa      # build + audit the 12 QA families over the shipped system
-npm run verify  # execute the scripts of all 34 audited screens in a DOM (needs the jsdom devDependency)
+npm run verify  # execute the scripts of all 33 audited screens in a DOM (needs the jsdom devDependency)
 npm run check   # qa then verify
 npm run serve   # serve the repository on http://0.0.0.0:8080/design-system/
 ```
@@ -36,10 +36,10 @@ contract · 9 typographic roles · a closed 10-step spacing scale · 86 glyphs i
 categories, no emoji · 29 fundamental components · the five AIME organs (Universal
 Card, Universal Timeline, Universal Grid, Composer, Universal Media) · the NOEMA
 layer with its six epistemic states · 13 patterns · a data-visualization language ·
-12 automatic Design QA families · 34 audited screens (19 documentation chapters,
-the art-direction brief page, 11 experience screens, the NOEMA loop screen, the
-repository homepage, and the Point Zero shell — whose Bureau absorbed the former
-Atlas media-library page).
+12 automatic Design QA families · 33 audited screens (19 documentation chapters,
+the art-direction brief page, 11 experience screens, the repository homepage, and
+the Point Zero shell — whose Bureau absorbed the former Atlas media-library page
+and whose NOEMA rail absorbed the former loop screen).
 
 `design-system/direction.html` picks an artistic direction **inside** the system
 (theme, accent step in the fuchsia ramp, density, motion, radius level), previews
@@ -61,7 +61,7 @@ node diagnostic/diagnose.mjs --owner O --repo R       # a GitHub repository
 node diagnostic/survey.mjs                            # every repo of the account, ranked
 ```
 
-It is the same engine that audits the 34 screens of the system, not a copy, so a
+It is the same engine that audits the 33 screens of the system, not a copy, so a
 project is judged under the same conditions as the screens that ship. The report
 publishes a **density** (issues per screen), the families involved, the screens most
 affected, and an order of repair — never an invented score out of 100.
@@ -128,7 +128,7 @@ selection, exports, `?source=local` deep-link) run in
 in `design-system/qa/smoke-medias-v2.mjs`:
 
 ```bash
-cd design-system && node qa/smoke-point-zero-bureau.mjs && node qa/smoke-medias-v2.mjs
+cd design-system && node qa/smoke-point-zero-bureau.mjs && node qa/smoke-point-zero-loop.mjs && node qa/smoke-medias-v2.mjs
 ```
 
 ## Point Zero
@@ -170,7 +170,7 @@ Its Bureau reached **function parity with the former `atlas/` page** (POINT-ZERO
 playback, download (CDN → raw → source, never simulated), verification of the
 served bytes against the git blob sha (or the local SHA-256), agent brief with
 JSON manifest, `.sh` retrieval script, multi-selection bar. Proven by
-`design-system/qa/smoke-point-zero-bureau.mjs` (41 checks, jsdom), the gate of
+`design-system/qa/smoke-point-zero-bureau.mjs` (44 checks, jsdom), the gate of
 wave 1 of `AUDIT/POINT-ZERO-CONVERGENCE-01.md` — after which `atlas/index.html`
 was deleted:
 
@@ -185,7 +185,9 @@ proofs, reset, timeline granularities — are projected in pure form, every act 
 API call, every rule still living in `loop/src/http.mjs`. Proven by
 `design-system/qa/smoke-point-zero-loop.mjs` (50 checks, jsdom against the **real
 loop** on a throw-away world, including the "no actor → 400" rule from the shell).
-`loop/index.html` is still there: its deletion awaits an explicit human go.
+After a human go, `loop/index.html` and `loop/ui.mjs` were deleted (wave 2, step 2):
+the local server root `/` now serves the shell, the home sends "Boucle NOEMA" to
+`point-zero/#pz-noema`, and the post-deploy smoke checks `/point-zero/`.
 
 ```bash
 cd design-system && node qa/smoke-point-zero-loop.mjs
@@ -212,8 +214,8 @@ two hosts without duplication:
 **Serverless honesty contract**: on the hosting, the world lives in memory per
 function instance — it survives while the instance is warm and resets to the
 demonstration seed on cold start. This is *displayed*, never hidden: the
-`/loop/` screen shows a "démo · réinitialisée à froid" badge and the home
-badge reads "NOEMA en ligne · démo". Disk persistence remains the promise of
+NOEMA badge of Point Zero reads "NOEMA en ligne · démo" (with the cold-reset
+explanation on hover) and so does the home badge. Disk persistence remains the promise of
 the full local server, never simulated.
 
 ```bash
@@ -223,7 +225,7 @@ npm run smoke:deployed # post-deploy gate against the real host
 # BASE_URL=https://… npm run smoke:deployed
 ```
 
-The post-deploy smoke checks what a deployment must prove: the screen is
-served, `/api/state` answers with a world and an honest runtime, an actor-less
+The post-deploy smoke checks what a deployment must prove: Point Zero (the
+screen that carries the loop) is served, `/api/state` answers with a world and an honest runtime, an actor-less
 decision is refused (400) on the real host, and unknown API routes stay JSON
 404s. A deployment that does not prove what it serves is an opinion.

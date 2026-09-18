@@ -5,7 +5,7 @@
  * Un déploiement qui ne prouve pas ce qu'il sert est une opinion. Après
  * chaque mise en ligne, ce smoke demande à l'hôte réel :
  *
- *   1. l'écran de la boucle est servi (HTML, titre attendu) ;
+ *   1. Point Zero — la coquille qui porte la boucle — est servi (HTML, titre attendu) ;
  *   2. /api/state répond en JSON, avec un monde et un runtime honnête ;
  *   3. une décision sans acteur est refusée (400) — la règle centrale
  *      tient sur l'hébergement, pas seulement en local ;
@@ -33,13 +33,14 @@ console.log(`\nSMOKE BOUCLE — ${BASE}\n`);
 
 /* 1. L'écran est servi. */
 try {
-  const r = await fetch(`${BASE}/loop/`);
+  const r = await fetch(`${BASE}/point-zero/`);
   const html = await r.text();
   const served = r.status === 200 && (r.headers.get('content-type') || '').includes('text/html');
-  check(served, 'l’écran de la boucle est servi (HTML 200)');
-  check(/Boucle minimale — AIME \/ NOEMA/.test(html), 'l’écran porte son titre attendu');
+  check(served, 'Point Zero est servi (HTML 200)');
+  check(/Point Zero — AIME/.test(html), 'la coquille porte son titre attendu');
+  check(/id="pz-noema-observe"/.test(html), 'la coquille servie porte le rail NOEMA (observer)');
 } catch (e) {
-  check(false, 'l’écran de la boucle est servi (HTML 200)', e.message);
+  check(false, 'Point Zero est servi (HTML 200)', e.message);
 }
 
 /* 2. L'API répond, avec un monde et un runtime honnête. */

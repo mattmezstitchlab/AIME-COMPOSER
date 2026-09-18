@@ -19,13 +19,13 @@
 <script type="module" src="pz.js"></script>
 </head>
 <body>
-<noscript><p class="t-body-sm u-muted u-pad-sm">Point Zero fonctionne avec JavaScript : la coquille projette en direct la médiathèque (le catalogue généré <a class="a-text-btn" href="../atlas/media.json">atlas/media.json</a> — son ancienne page a été absorbée par le Bureau), la boucle NOEMA (<a class="a-text-btn" href="../loop/index.html">loop</a>) et le rapport Design QA (<a class="a-text-btn" href="../design-system/qa.html">qa</a>).</p></noscript>
+<noscript><p class="t-body-sm u-muted u-pad-sm">Point Zero fonctionne avec JavaScript : la coquille projette en direct la médiathèque (le catalogue généré <a class="a-text-btn" href="../atlas/media.json">atlas/media.json</a> — son ancienne page a été absorbée par le Bureau), la boucle NOEMA (son écran vit ici, dans le rail — le moteur : <code>node loop/server.mjs</code>) et le rapport Design QA (<a class="a-text-btn" href="../design-system/qa.html">qa</a>).</p></noscript>
 
 <div class="pz" id="pz">
 
   <!-- ── Z1 · HEADER ──────────────────────────────────────── -->
   <header class="pz__head">
-    <a class="pz__brand" href="../index.html">
+    <a class="pz__brand" href="../index.html" title="Accueil du site AIME-COMPOSER">
       <svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="grd-grid"/></svg>
       <span>POINT<i>·</i>ZERO</span><small>AIME SHELL · P1</small>
     </a>
@@ -159,7 +159,7 @@
           </div>
         </div>
 
-        <div class="pz__noema" aria-labelledby="pz-noema-h">
+        <div class="pz__noema" id="pz-noema" aria-labelledby="pz-noema-h">
           <div class="pz__group">
             <h2 class="t-h2" id="pz-noema-h">
               <span class="noema-mark"><svg class="a-ic noema-mark__glyph" aria-hidden="true" width="20" height="20"><use data-a-icon="noe-mark"/></svg></span>

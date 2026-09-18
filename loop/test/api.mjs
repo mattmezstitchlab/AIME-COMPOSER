@@ -62,25 +62,26 @@ const reset = () => post('/api/reset', {});
 /* ══ STATIQUE ═══════════════════════════════════════════════════ */
 console.log('\nSERVEUR — statique');
 
-await test('la racine sert l\'écran de la boucle', async () => {
+await test('la racine sert Point Zero — la coquille a absorbé l\'écran de la boucle', async () => {
   const r = await get('/');
   eq(r.status, 200, 'la racine ne répond pas 200');
-  ok(r.body.includes('NOEMA propose'), 'la racine ne sert pas l\'écran attendu');
+  ok(r.body.includes('Point Zero — AIME'), 'la racine ne sert pas la coquille');
+  ok(r.body.includes('id="pz-noema-observe"'), 'la coquille servie ne porte pas le rail NOEMA');
 });
 
-await test('un chemin de dossier sert son index — le 404 de /loop/', async () => {
-  /* Régression gardée : `/loop/` renvoyait 404 parce que le serveur ne
+await test('un chemin de dossier sert son index — le 404 de /point-zero/', async () => {
+  /* Régression gardée : un dossier renvoyait 404 parce que le serveur ne
      résolvait que `/` vers index.html. */
-  for (const p of ['/loop/', '/design-system/']) {
+  for (const p of ['/point-zero/', '/design-system/']) {
     const r = await get(p);
     eq(r.status, 200, `${p} ne sert pas son index.html`);
   }
 });
 
 await test('les modules et feuilles sont servis avec le bon type MIME', async () => {
-  const ui = await get('/loop/ui.mjs');
-  eq(ui.status, 200, 'ui.mjs inaccessible');
-  ok(ui.type.includes('javascript'), `ui.mjs servi en « ${ui.type} »`);
+  const ui = await get('/point-zero/pz.js');
+  eq(ui.status, 200, 'pz.js inaccessible');
+  ok(ui.type.includes('javascript'), `pz.js servi en « ${ui.type} »`);
   const css = await get('/design-system/tokens/tokens.css');
   eq(css.status, 200, 'tokens.css inaccessible');
   ok(css.type.includes('text/css'), `tokens.css servi en « ${css.type} »`);

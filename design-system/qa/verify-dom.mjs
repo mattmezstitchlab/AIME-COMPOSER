@@ -62,7 +62,8 @@ for (const sub of ['experiences', path.join('..', 'loop')]) {
    (des clones jetables de dépôts tiers). Même raison que pour run-qa.mjs :
    les deux périmètres doivent rester identiques, sinon un écran exécuté
    n'est pas audité, ou l'inverse. (`atlas/index.html` : absorbée par le
-   Bureau de Point Zero, Vague 1.) */
+   Bureau de Point Zero, Vague 1 ; `loop/index.html` : absorbé par le rail
+   NOEMA et le tiroir Cartes, Vague 2 — `loop/` reste parcouru.) */
 for (const f of ['index.html', path.join('point-zero', 'index.html')]) {
   const p = path.join(ROOT, f);
   if (existsSync(p)) pages.push(p);

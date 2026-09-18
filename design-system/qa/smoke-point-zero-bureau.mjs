@@ -318,6 +318,22 @@ try {
   t('deep-link ?source=local : arrive en mode Dossier local', d2.querySelector('#pz-src-local')?.getAttribute('aria-pressed') === 'true');
   t('deep-link ?source=local : le ＋ Import est ouvert, prêt pour « Dossier »', d2.querySelector('#pz-uimport')?.hidden === false && !!d2.querySelector('[data-import="dir"]'));
   t('deep-link ?source=local : le Bureau explique la lecture locale sans envoi', /rien n.est envoyé/i.test(d2.querySelector('#pz-bureau-note')?.textContent || ''));
+  /* Deep-link #pz-noema — l'accueil y envoie « Boucle NOEMA » depuis la
+     Vague 2 : le panneau de droite, même rétracté par l'utilisateur, se
+     rouvre — une ancre qui mène à un panneau caché ne mène nulle part. */
+  const dom3 = new JSDOM(html, { url: `${pathToFileURL(PAGE).href}#pz-noema`, runScripts: 'outside-only', pretendToBeVisual: true, virtualConsole: vc,
+    beforeParse(w) { w.URL.createObjectURL = () => 'blob:x'; w.URL.revokeObjectURL = () => {}; w.AIME = { toast() {} };
+      /* Origine file:// → pas de localStorage dans jsdom : on en fournit un, déjà porteur d'un panneau droit rétracté. */
+      const mem = new Map([['aime-pz-pane-r', 'off']]);
+      Object.defineProperty(w, 'localStorage', { value: { getItem: (k) => mem.get(k) ?? null, setItem: (k, v) => mem.set(k, String(v)), removeItem: (k) => mem.delete(k) }, configurable: true }); } });
+  const g3 = { document: dom3.window.document, window: dom3.window, location: dom3.window.location, localStorage: dom3.window.localStorage, navigator: dom3.window.navigator, HTMLMediaElement: dom3.window.HTMLMediaElement, URL: dom3.window.URL, Blob: dom3.window.Blob, MutationObserver: dom3.window.MutationObserver };
+  for (const [k, v] of Object.entries(g3)) { try { globalThis[k] = v; } catch { Object.defineProperty(globalThis, k, { value: v, configurable: true, writable: true }); } }
+  await import(`${pathToFileURL(path.join(ROOT, 'point-zero', 'pz.js')).href}?v=${Date.now()}-noema`);
+  await drain();
+  const d3 = dom3.window.document;
+  t('deep-link #pz-noema : le panneau Inspecteur + NOEMA est rouvert même s’il était rétracté', d3.querySelector('#pz-pane-end')?.hidden === false && d3.querySelector('#pz-toggle-inspector')?.getAttribute('aria-expanded') === 'true');
+  t('deep-link #pz-noema : le rail porte l’ancre et ses trois actes (observer · intention · réinitialiser)', !!d3.querySelector('#pz-noema #pz-noema-observe') && !!d3.querySelector('#pz-noema #pz-noema-send') && !!d3.querySelector('#pz-noema #pz-noema-reset'));
+  t('logo en haut à gauche → accueil du site ; aucun bouton « Accueil » à droite', d3.querySelector('.pz__brand')?.getAttribute('href') === '../index.html' && ![...d3.querySelectorAll('.pz__head a, .pz__head button')].some((a) => /accueil/i.test(a.textContent)));
 } catch (e) {
   fail++;
   console.log(`  ✗ exécution : ${e.stack?.split('\n').slice(0, 3).join(' | ')}`);

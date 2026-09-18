@@ -73,7 +73,7 @@ check('owner/repo', 'da', { intention: 'diag-github', label: 'Lancer le diagnost
 // Mode Médiathèque — sans contenu détecté
 check('', 'media', { intention: 'media', label: 'Ouvrir la Médiathèque', destination: 'point-zero/#pz-bureau' });
 check('un texte libre', 'media', { intention: 'media', label: 'Ouvrir la Médiathèque', destination: 'point-zero/#pz-bureau' });
-check('', null, { intention: 'noema-empty', label: 'Proposer à NOEMA', destination: 'loop/' }); // null mode fallback -> noema-empty
+check('', null, { intention: 'noema-empty', label: 'Proposer à NOEMA', destination: 'point-zero/#pz-noema' }); // null mode fallback -> noema-empty
 
 // Mode Diagnostic — cas nominaux et contre-cas
 check('', 'diag', { intention: 'diag-empty', label: 'Lancer le diagnostic', destination: 'diagnostic/README.md' });
@@ -123,8 +123,8 @@ check('https://github.com/foo/bar', 'diag', { intention: 'diag-github', label: '
 }
 
 // Mode NOEMA — défaut
-check('', 'noema', { intention: 'noema-empty', label: 'Proposer à NOEMA', destination: 'loop/' });
-check('', null, { intention: 'noema-empty', label: 'Proposer à NOEMA', destination: 'loop/' });
+check('', 'noema', { intention: 'noema-empty', label: 'Proposer à NOEMA', destination: 'point-zero/#pz-noema' });
+check('', null, { intention: 'noema-empty', label: 'Proposer à NOEMA', destination: 'point-zero/#pz-noema' });
 check('Camille Vasseur est saxophoniste', 'noema', { intention: 'noema', label: 'Proposer à NOEMA', destination: 'noema:intent' });
 check('Camille Vasseur est saxophoniste', null, { intention: 'noema', label: 'Proposer à NOEMA', destination: 'noema:intent' });
 check('il faut la capacité de la salle', 'noema', { intention: 'noema', label: 'Proposer à NOEMA', destination: 'noema:intent' });

@@ -252,13 +252,13 @@
         return {
           intention: 'noema-empty',
           label: LABELS.noema,
-          destination: 'loop/',
+          destination: 'point-zero/#pz-noema',
           raw: trimmed,
           mode,
           aperçu: {
-            title: 'Boucle NOEMA — ouvrir la boucle',
-            body: `Aucune intention saisie. Ouvrira la Boucle NOEMA : NOEMA propose, vous validez.`,
-            destination: 'loop/',
+            title: 'Boucle NOEMA — ouvrir Point Zero',
+            body: `Aucune intention saisie. Ouvrira le rail NOEMA de Point Zero : NOEMA propose, vous validez.`,
+            destination: 'point-zero/#pz-noema',
           },
         };
       }
@@ -279,13 +279,13 @@
       return {
         intention: 'noema-empty',
         label: LABELS.noema,
-        destination: 'loop/',
+        destination: 'point-zero/#pz-noema',
         raw: trimmed,
         mode,
         aperçu: {
-          title: 'Boucle NOEMA — ouvrir la boucle',
-          body: `Aucune intention saisie. Ouvrira la Boucle NOEMA.`,
-          destination: 'loop/',
+          title: 'Boucle NOEMA — ouvrir Point Zero',
+          body: `Aucune intention saisie. Ouvrira le rail NOEMA de Point Zero.`,
+          destination: 'point-zero/#pz-noema',
         },
       };
     }
@@ -451,7 +451,7 @@
     if (!out) return;
     out.innerHTML = `<p class="t-body-sm u-muted">La boucle NOEMA n'a pas répondu depuis cet hébergement — la page reste consultable, la conversation demande le serveur de la boucle :</p>
       <pre class="ds-code">node loop/server.mjs\n<i>puis recharger cette page — le badge passera « NOEMA en ligne ».</i></pre>
-      <p class="t-caption u-muted">En attendant, la boucle complète — propositions, validation, mémoire, journal — s'ouvre <a class="a-text-btn" href="loop/">sur l'écran de la boucle</a>.</p>`;
+      <p class="t-caption u-muted">En attendant, la boucle complète — propositions, validation, mémoire, journal — s'ouvre <a class="a-text-btn" href="point-zero/#pz-noema">dans le rail NOEMA de Point Zero</a>.</p>`;
   }
 
   function renderCandidates(d, submitted) {
@@ -489,7 +489,7 @@
       parts.push(`<p class="t-body-sm u-muted">${written.length
         ? `${written.length} proposition(s) déposée(s) à l'état proposed — rien n'est un fait tant qu'un humain n'a pas validé.`
         : 'Rien n’a été écrit.'}
-        La décision se prend <a class="a-text-btn" href="loop/">dans la boucle</a>.</p>`);
+        La décision se prend <a class="a-text-btn" href="point-zero/#pz-noema">dans le rail NOEMA de Point Zero</a>.</p>`);
     }
     if (!cands.length && !unparsed.length) {
       parts.push('<p class="t-body-sm u-muted">NOEMA n’a rien retenu de cette phrase — elle préfère se taire plutôt que deviner.</p>');

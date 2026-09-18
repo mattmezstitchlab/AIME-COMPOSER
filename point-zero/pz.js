@@ -2018,6 +2018,14 @@ async function loadQa() {
     const btn = $('#pz-import-btn');
     if (btn && $('#pz-uimport')?.hidden) btn.click();
   }
+  /* `#pz-noema` (l'accueil y envoie « Boucle NOEMA », l'écran loop/ ayant
+     été absorbé — Vague 2) : le panneau de droite doit être visible et le
+     rail amené à l'écran, sinon l'ancre ne mène nulle part. */
+  if (window.location.hash === '#pz-noema') {
+    const pane = $('#pz-pane-end');
+    if (pane?.hidden) $('#pz-toggle-inspector')?.click();
+    try { $('#pz-noema')?.scrollIntoView({ block: 'start' }); } catch { /* jsdom */ }
+  }
   loadBureau().catch(() => {});
   bootNoema().catch(() => {});
   loadQa().catch(() => {});

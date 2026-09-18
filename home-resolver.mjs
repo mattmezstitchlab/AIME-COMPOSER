@@ -182,13 +182,13 @@ export function resolveAction(raw, activeMode) {
       return {
         intention: 'noema-empty',
         label: LABELS.noema,
-        destination: 'loop/',
+        destination: 'point-zero/#pz-noema',
         raw: trimmed,
         mode,
         aperçu: {
-          title: 'Boucle NOEMA — ouvrir la boucle',
-          body: `Aucune intention saisie. Ouvrira la Boucle NOEMA : NOEMA propose, vous validez.`,
-          destination: 'loop/',
+          title: 'Boucle NOEMA — ouvrir Point Zero',
+          body: `Aucune intention saisie. Ouvrira le rail NOEMA de Point Zero : NOEMA propose, vous validez.`,
+          destination: 'point-zero/#pz-noema',
         },
       };
     }
@@ -211,13 +211,13 @@ export function resolveAction(raw, activeMode) {
     return {
       intention: 'noema-empty',
       label: LABELS.noema,
-      destination: 'loop/',
+      destination: 'point-zero/#pz-noema',
       raw: trimmed,
       mode,
       aperçu: {
-        title: 'Boucle NOEMA — ouvrir la boucle',
-        body: `Aucune intention saisie. Ouvrira la Boucle NOEMA.`,
-        destination: 'loop/',
+        title: 'Boucle NOEMA — ouvrir Point Zero',
+        body: `Aucune intention saisie. Ouvrira le rail NOEMA de Point Zero.`,
+        destination: 'point-zero/#pz-noema',
       },
     };
   }

@@ -245,6 +245,26 @@ Règle cœur re-démontrée depuis la coquille : décision, exécution et droit 
 
 **Reste avant suppression de `loop/index.html` (feu vert humain requis) :** revue dans un navigateur réel (le tiroir en 6 onglets, le tiroir timeline en PLAN avec déplacement) ; puis, dans le **même changement**, les dépendances mécaniques listées ci-dessus : racine `/` de `loop/server.mjs` → `point-zero/index.html`, les trois tests de `loop/test/api.mjs`, `smoke-deployed.mjs` re-ciblé sur `/point-zero/` et son titre, `run-qa.mjs`/`verify-dom.mjs` (33 écrans), liens de l'accueil, README section Boucle, `loop/ui.mjs` (n'a plus de lecteur).
 
+#### Addendum V2-b — suppression EXÉCUTÉE (18 sept. 2026, validation humaine « si tu es sûr de toi tu peux supprimer […] go »)
+
+Supprimés : `loop/index.html`, `loop/ui.mjs`. Conservés : tout `loop/src/`, `loop/seed.mjs`, `loop/server.mjs`, `loop/test/` — le moteur, seule source de vérité, que la coquille projette.
+
+Dépendances re-ciblées dans le même changement :
+
+| Dépendance | Avant | Après |
+|---|---|---|
+| `loop/server.mjs` | la racine `/` servait `loop/index.html` ; bannière « écran …/loop/ » | `/` sert `point-zero/index.html` ; bannière « écran …/point-zero/ » |
+| `loop/test/api.mjs` (3 tests) | « la racine sert l'écran de la boucle » (contenu « NOEMA propose ») · `/loop/` sert son index · `/loop/ui.mjs` en JS | « la racine sert Point Zero » (titre + `#pz-noema-observe`) · `/point-zero/` · `/point-zero/pz.js` |
+| `loop/test/smoke-deployed.mjs` | `/loop/` 200 + titre « Boucle minimale — AIME / NOEMA » | `/point-zero/` 200 + titre « Point Zero — AIME » + présence du rail (`#pz-noema-observe`) — la gate de déploiement reste vraie |
+| `index.html` (nav, menu ＋, « quatre entrées » 03, pied) · `home.js` · `home-resolver.mjs` (+ test) | `loop/` | `point-zero/#pz-noema` ; l'entrée 03 dit que l'écran vit dans le rail |
+| `point-zero/index.html` / `pz.js` | pas d'ancre | `id="pz-noema"` sur le rail ; `#pz-noema` rouvre le panneau droit s'il était rétracté et amène le rail à l'écran |
+| `run-qa.mjs`, `verify-dom.mjs` | 34 écrans | **33 écrans** (`loop/` reste parcouru — un écran qui y renaîtrait serait audité) |
+| README (×3 comptages, sections Point Zero et Boucle), `design-system/README.md`, `diagnostic/README.md`, `ARCHITECTURE/*` (4 mentions) | « 34 écrans », « loop/index.html » | « 33 écrans », coquille |
+
+**Cohérence de navigation demandée en même temps :** la marque en haut à gauche est le seul chemin vers l'accueil du site — `pz__brand` (Point Zero) et `ds-brand` (accueil) y menaient déjà ; dans la documentation du design system (`js/doc.js`), la marque pointait sur l'index du DS et un bouton « Accueil du site » vivait à droite : la marque devient `AIME·COMPOSER / DESIGN V1` → accueil du site, le bouton de droite disparaît. Le sommaire latéral garde son entrée « 01 Accueil » (celle du DS). Vérifié par smoke sur l'accueil et sur la coquille.
+
+Gates après suppression : QA 12/12 sur 33 écrans · verify DOM 33/33 · smokes Bureau 44/44 (dont deep-link `#pz-noema` et logo→accueil) · smokes NOEMA 50/50 · smokes accueil 44/44 (dont « aucun lien `loop/` ne subsiste ») · résolveur 109/109 · boucle 91 + 36.
+
 ### Vague 3 — la coquille absorbe l'accueil → l'accueil devient un seuil
 
 **Tranche de parité (les 4 fonctions) :** mode Diagnostic (générer la commande `node diagnostic/diagnose.mjs --owner O --repo R` en aperçu sans écriture — prolongement naturel de `resolveImport`), lien Direction artistique, branchement du résolveur pur `home-resolver.mjs` (109/109, il survit à la page), décision explicite sur l'URL distante (l'accueil la disait déjà « en préparation » — la parité peut être « les deux disent la même chose »).
@@ -262,6 +282,7 @@ Règle cœur re-démontrée depuis la coquille : décision, exécution et droit 
 ```text
 Vague 1 (atlas)  →  Vague 2 (loop)  →  Vague 3 (accueil)  →  Vague 4 (décision références)
      7 fonctions        9 fonctions        4 fonctions           arbitrage humain
+     ✓ close 18/09       ✓ close 18/09      à décider             à décider
 ```
 
 La vague 1 est la plus encadrée par la spec (§4 l'exige littéralement) et la moins câblée dans les tests ; c'est par elle qu'il faut commencer. La vague 2 est la plus câblée (serveur, tests, smoke de déploiement). La vague 3 est un choix de produit. La vague 4 est un arbitrage.

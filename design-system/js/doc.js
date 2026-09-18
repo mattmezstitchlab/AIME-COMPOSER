@@ -73,14 +73,13 @@
   top.className = 'ds-top';
   top.innerHTML = `
     <button type="button" class="a-icon-btn l-hide-desktop-up" id="a-nav-toggle" aria-label="Ouvrir la navigation" aria-expanded="false" aria-controls="a-side">${icon('nav-menu', 'a-ic a-ic--lg')}</button>
-    <a class="ds-brand" href="${root}index.html"><span>AIME<i>·</i>DESIGN</span><small>V1</small></a>
+    <a class="ds-brand" href="${root}../index.html" title="Accueil du site AIME-COMPOSER"><span>AIME<i>·</i>COMPOSER</span><small>DESIGN V1</small></a>
     <span class="l-spacer"></span>
     <div class="ds-top__tools">
       <button type="button" class="a-icon-btn" id="a-theme" aria-label="Changer de thème" data-a-tip="Thème"><span class="a-tip" data-a-tip="Thème clair / sombre">${icon('set-theme')}</span></button>
       <button type="button" class="a-icon-btn" id="a-density" aria-label="Changer la densité de cibles" data-a-tip="Densité">${icon('grd-ruler')}</button>
       <button type="button" class="a-icon-btn" id="a-motion" aria-label="Réduire le mouvement" aria-pressed="false" data-a-tip="Mouvement">${icon('time-clock')}</button>
       <a class="a-btn a-btn--sm a-btn--ghost l-hide-mobile" href="${root}qa.html">Design QA</a>
-      <a class="a-btn a-btn--sm a-btn--ghost l-hide-mobile" href="${root}../index.html" title="Accueil du site AIME-COMPOSER">${icon('nav-home')}Accueil du site</a>
     </div>`;
 
   /* ── Navigation latérale ──────────────────────────────────── */

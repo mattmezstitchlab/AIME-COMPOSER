@@ -72,7 +72,9 @@ const MIME = {
 function serveStatic(req, res) {
   const url = new URL(req.url, `http://${req.headers.host}`);
   const path = decodeURIComponent(url.pathname);
-  let file = join(REPO, path === '/' ? 'loop/index.html' : path);
+  /* La racine sert Point Zero : l'écran de la boucle a été absorbé par la
+     coquille (AUDIT/POINT-ZERO-CONVERGENCE-01.md, Vague 2). */
+  let file = join(REPO, path === '/' ? 'point-zero/index.html' : path);
   /* Un chemin qui se termine par / ou pointe un dossier sert son index. */
   if (existsSync(file) && statSync(file).isDirectory()) file = join(file, 'index.html');
   if (!file.startsWith(REPO) || !existsSync(file) || !statSync(file).isFile()) {
@@ -89,7 +91,7 @@ if (isMain) {
   const server = createLoopServer();
   server.listen(PORT, '0.0.0.0', () => {
     console.log(`\nAIME / NOEMA — boucle minimale`);
-    console.log(`  écran   http://0.0.0.0:${PORT}/loop/`);
+    console.log(`  écran   http://0.0.0.0:${PORT}/point-zero/`);
     console.log(`  API     http://0.0.0.0:${PORT}/api/state`);
     console.log(`  données ${relative(REPO, DB)} · ${store.all().length} entités\n`);
   });

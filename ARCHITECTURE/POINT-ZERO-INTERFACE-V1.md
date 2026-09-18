@@ -149,7 +149,7 @@ Règles inviolables :
 4. **Un profil n'est pas une application** : format, mode timeline et pack de contrôle changent la projection, pas le moteur.
 5. **Capacités plutôt que variantes** : pas de dock mariage / dock studio ; un dock, des capacités.
 6. **Couverture publiée, absence nommée** : tout inventaire (Bureau, import, QA) dit ce qu'il n'a pas vu.
-7. **Aucun style inexplicable** : la coquille est un écran du design system comme les autres (33 au 18 sept. 2026, la page `atlas/` ayant été absorbée par le Bureau) — les parties nouvelles (dock, coquille, rail) entrent dans le système comme patterns, auditées par les 12 familles. L'innovation n'exempte du système pour personne.
+7. **Aucun style inexplicable** : la coquille est un écran du design system comme les autres (33 au 18 sept. 2026, les pages `atlas/` et `loop/` ayant été absorbées — par le Bureau et par le rail NOEMA) — les parties nouvelles (dock, coquille, rail) entrent dans le système comme patterns, auditées par les 12 familles. L'innovation n'exempte du système pour personne.
 8. **Le point zéro est un repère, pas une donnée** : l'origine, les guides et la grille restent des métadonnées d'assistance ; ils ne dupliquent jamais le contenu canonique.
 
 ## 10. Contrat d'état de la coquille (présentation)
