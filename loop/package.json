@@ -7,6 +7,7 @@
   "scripts": {
     "test": "node test/run.mjs && node test/api.mjs",
     "test:unit": "node test/run.mjs",
-    "test:api": "node test/api.mjs"
+    "test:api": "node test/api.mjs",
+    "smoke:deployed": "node test/smoke-deployed.mjs"
   }
 }

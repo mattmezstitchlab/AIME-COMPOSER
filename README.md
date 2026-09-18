@@ -122,3 +122,36 @@ Behavioral smokes (viewer, local ingest, coverage, selection, exports) run in
 ```bash
 cd design-system && node qa/smoke-medias-v2.mjs
 ```
+
+## Boucle NOEMA
+
+`loop/` is the minimal AIME/NOEMA loop: a provenance-carrying store, a
+proposition engine, and **human-only decisions** — a decision without an actor
+is refused, on every host, by the same router.
+
+The API routes live in `loop/src/http.mjs` (`createLoopApi`) and are shared by
+two hosts without duplication:
+
+| Host | What it is | Runtime published in `/api/state` |
+|---|---|---|
+| `node loop/server.mjs` | the full local server — static files + API, **disk persistence** (`loop/data/world.json`, atomic writes) | `{ mode: 'server', persisted: true }` |
+| `api/[[...route]].mjs` | the hosting function (Vercel) — same router, **in-memory demo world** | `{ mode: 'serverless', persisted: false }` |
+
+**Serverless honesty contract**: on the hosting, the world lives in memory per
+function instance — it survives while the instance is warm and resets to the
+demonstration seed on cold start. This is *displayed*, never hidden: the
+`/loop/` screen shows a "démo · réinitialisée à froid" badge and the home
+badge reads "NOEMA en ligne · démo". Disk persistence remains the promise of
+the full local server, never simulated.
+
+```bash
+cd loop
+npm test               # 91 unit + 36 API tests (HTTP, ephemeral ports)
+npm run smoke:deployed # post-deploy gate against the real host
+# BASE_URL=https://… npm run smoke:deployed
+```
+
+The post-deploy smoke checks what a deployment must prove: the screen is
+served, `/api/state` answers with a world and an honest runtime, an actor-less
+decision is refused (400) on the real host, and unknown API routes stay JSON
+404s. A deployment that does not prove what it serves is an opinion.

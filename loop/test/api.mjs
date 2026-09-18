@@ -14,6 +14,7 @@
  * handler directement ne prouverait rien sur le routage.
  */
 import { createLoopServer, currentStore } from '../server.mjs';
+import { createServer } from 'node:http';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -327,6 +328,54 @@ await test('une écriture est sauvée sur disque', async () => {
   const personne = Object.values(brut.entities).find((e) => e.id === 'ppl-0002');
   eq(personne.roles, ['contrebasse'], 'la correction n\'est pas sur disque');
   ok(brut.journal.length > 0, 'le journal n\'est pas persisté');
+});
+
+/* ══ RUNTIME — l'hôte est publié, jamais déguisé ════════════════ */
+console.log('\nSERVEUR — runtime publié');
+
+await test('le serveur local publie son runtime : server, persisté', async () => {
+  const r = await get('/api/state');
+  eq(r.body.runtime, { mode: 'server', persisted: true }, 'runtime mensonger');
+});
+
+await test('un hôte serverless publie sa vérité : démo en mémoire', async () => {
+  const { createLoopApi } = await import('../src/http.mjs');
+  const { createStore } = await import('../src/store.mjs');
+  const { seed } = await import('../seed.mjs');
+  const store = createStore(null); /* mémoire seule : aucun disque promis */
+  seed(store);
+  const api = createLoopApi({ store, runtime: { mode: 'serverless', persisted: false } });
+  /* On parle HTTP pour de vrai, comme le reste du fichier : un handler
+     appelé directement ne prouverait rien sur le routage. */
+  const srv = createServer(api);
+  await new Promise((r) => srv.listen(0, '127.0.0.1', r));
+  const base = `http://127.0.0.1:${srv.address().port}`;
+  const state = await (await fetch(`${base}/api/state`)).json();
+  eq(state.runtime, { mode: 'serverless', persisted: false }, 'runtime mensonger');
+  ok(state.entities.length > 0, 'le monde de démonstration est absent');
+  const refused = await fetch(`${base}/api/decide`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ proposal_id: 'prop-0001', decision: 'accepted' }),
+  });
+  eq(refused.status, 400, 'une décision sans acteur passe sur un hôte serverless');
+  srv.close();
+});
+
+await test('la fonction de l\u2019hébergement branche le même routeur, sans ouvrir de port', async () => {
+  const mod = await import('../../api/[[...route]].mjs');
+  ok(typeof mod.default === 'function', 'pas de handler exporté par défaut');
+  const srv = createServer(mod.default);
+  await new Promise((r) => srv.listen(0, '127.0.0.1', r));
+  const base = `http://127.0.0.1:${srv.address().port}`;
+  const state = await (await fetch(`${base}/api/state`)).json();
+  eq(state.runtime, { mode: 'serverless', persisted: false }, 'la fonction déguise son hôte');
+  ok(state.entities.length > 0, 'le monde de démonstration est absent');
+  /* Le même store sert toutes les requêtes de l'instance : la boucle
+     conversationnelle tient tant que l'instance est chaude. */
+  const apres = await (await fetch(`${base}/api/state`)).json();
+  eq(apres.entities.length, state.entities.length, "l'instance ne tient pas son monde entre deux requêtes");
+  srv.close();
 });
 
 /* ── Bilan ─────────────────────────────────────────────────────── */
