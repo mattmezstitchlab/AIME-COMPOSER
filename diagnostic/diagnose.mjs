@@ -106,6 +106,8 @@ export function reportJson(target, d) {
     bibliotheques_icones_tierces: d.icon_libraries,
     non_resolu: d.unresolved,
     non_resolu_detail: d.unresolved_detail,
+    hierarchie_non_resolue: d.hierarchy_unresolved || 0,
+    hierarchie_non_resolue_detail: d.hierarchy_unresolved_detail || [],
     non_mesure: d.non_measured,
     exclusions: { fichiers_ecartes: d.skipped.length, detail: d.skipped.slice(0, 20) },
     signatures: d.signatures,
@@ -156,6 +158,10 @@ export function printReport(name, d, recs, baseline = null) {
     for (const p of d.fragments.worst.slice(0, 4)) {
       console.log(`    ${String(p.count).padStart(5)}  ${p.name}`);
     }
+  }
+  if (d.hierarchy_unresolved) {
+    console.log(`\n  HIÉRARCHIE NON RÉSOLUE — ${d.hierarchy_unresolved} écran(s) : le h1 vit hors du fichier, jamais deviné`);
+    for (const r of (d.hierarchy_unresolved_detail || []).slice(0, 10)) console.log(`    · ${r}`);
   }
   if (d.icon_libraries?.length) {
     console.log(`\n  BIBLIOTHÈQUES D'ICÔNES TIERCES (nommées, jamais comptées en écarts)\n    ${d.icon_libraries.join(' · ')}`);

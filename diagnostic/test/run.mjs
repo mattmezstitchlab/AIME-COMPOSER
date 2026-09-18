@@ -447,6 +447,65 @@ test('l\'extraction ne produit aucune requête ni exécution — preuve : dépen
   ok(d.ok && d.screens.total === 1, 'l\'écran n\'a pas été jugé');
 });
 
+/* ══ HIERARCHY — ANGLES MORTS §7 pont (collecteur V2) ══ */
+console.log('\nHIERARCHY — ANGLES MORTS');
+
+test('alias motion.h1 / styled.h1 comptés comme h1 (whitelist documentée)', () => {
+  const d = diagnoseV2(collect(FIX('hierarchy-alias')), REF);
+  const hier = d.families.find((f) => f.family === 'HIERARCHY');
+  eq(hier.count, 0, `motion.h1 non compté : ${hier.count}`);
+  eq(d.hierarchy_unresolved, 1, `Home composé via motion.h1 doit être non-résolu (1), reçu ${d.hierarchy_unresolved}`);
+  ok(d.hierarchy_unresolved_detail.some((s) => /Home/.test(s) && /compos/.test(s)), 'détail h1 composé Home manquant');
+  // Direct contient motion.h1 directement : pas besoin de compose, hierarchy reste 0
+  ok(d.screens.total === 2, `écrans mal comptés : ${d.screens.total}`);
+});
+
+test('*.test.* et *.spec.* exclus des routes — jamais des écrans', () => {
+  const d = diagnoseV2(collect(FIX('hierarchy-test')), REF);
+  eq(d.screens.total, 1, `fichiers *.test.* comptés comme écrans : ${d.screens.total}`);
+  eq(d.fragments.total, 2, `fragments mal comptés : ${d.fragments.total}`);
+  const hier = d.families.find((f) => f.family === 'HIERARCHY');
+  eq(hier.count, 0, `un test à 2 h1 ne doit pas produire d'écart HIERARCHY, reçu ${hier.count}`);
+  // le fichier test à 2 h1 serait 2 h1 s'il était écran — exclure évite le faux « 2 h1 »
+  ok(!d.screens.worst.some((w) => w.name.includes('.test.')), 'un .test. apparaît dans les écrans');
+});
+
+test('coquille SPA index.html — NON RÉSOLU coquille, jamais 0 h1', () => {
+  const d = diagnoseV2(collect(FIX('hierarchy-coquille')), REF);
+  const hier = d.families.find((f) => f.family === 'HIERARCHY');
+  eq(hier.count, 0, `coquille SPA comptée comme 0 h1 : ${hier.count}`);
+  eq(d.hierarchy_unresolved, 1, `coquille non comptée comme non-résolue : ${d.hierarchy_unresolved}`);
+  ok(d.hierarchy_unresolved_detail.some((s) => /coquille/.test(s) && /index\.html/.test(s)), 'détail coquille manquant');
+  ok(d.non_measured.some((s) => /hiérarchie non résolue/i.test(s)), 'non_mesuré ne publie pas la hiérarchie non résolue');
+});
+
+test('h1 composé via import local — NON RÉSOLU h1 composé, jamais 0 h1', () => {
+  const d = diagnoseV2(collect(FIX('hierarchy-compose')), REF);
+  const hier = d.families.find((f) => f.family === 'HIERARCHY');
+  eq(hier.count, 0, `h1 composé compté comme 0 h1 : ${hier.count}`);
+  eq(d.hierarchy_unresolved, 2, `2 écrans composés attendus, reçu ${d.hierarchy_unresolved}`);
+  ok(d.hierarchy_unresolved_detail.every((s) => /compos/.test(s)), 'détail compose manquant');
+  eq(d.screens.total, 2, `écrans mal comptés : ${d.screens.total}`);
+});
+
+test('styled.h1 alias et compose — même whitelist', () => {
+  const d = diagnoseV2(collect(FIX('hierarchy-styled')), REF);
+  eq(d.families.find((f) => f.family === 'HIERARCHY').count, 0, 'styled.h1 non compté');
+  eq(d.hierarchy_unresolved, 1, `compose styled attendu 1, reçu ${d.hierarchy_unresolved}`);
+  ok(d.hierarchy_unresolved_detail.some((s) => /Compose/.test(s)), 'détail styled compose manquant');
+});
+
+test('hierarchy non-résolu publié séparément — jamais un écart, jamais deviné', () => {
+  const d = diagnoseV2(collect(FIX('hierarchy-compose')), REF);
+  // le rapport doit distinguer écarts et non-résolus
+  eq(d.families.find((f) => f.family === 'HIERARCHY').count, 0, 'écart HIERARCHY non nul');
+  ok(d.hierarchy_unresolved > 0, 'non-résolu HIERARCHY vide');
+  ok(d.non_measured.some((s) => /hiérarchie non résolue/i.test(s)), 'non_mesuré ne publie pas la hiérarchie');
+  // codes sortie inchangés : ecarts = 0 → ok, density 0
+  eq(d.ecarts, 0, 'ecarts non nul sur fixture composée conforme');
+});
+
+
 /* ── Bilan ─────────────────────────────────────────────────────── */
 console.log(`\n${failures.length ? '✗' : '✓'} ${pass} test(s) réussi(s) · ${failures.length} échec(s)\n`);
 if (failures.length) process.exit(1);

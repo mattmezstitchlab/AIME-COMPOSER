@@ -40,6 +40,36 @@ Aucune écriture dans le projet examiné — c'est un test, pas une promesse.
 4. **Jugement** — le moteur `design-system/js/qa.js`, **celui qui juge les
    34 écrans du système**, pas une copie.
 
+## Hiérarchie — ce qui est non résolu, jamais un écart
+
+Quatre angles morts du collecteur, mesurés sur `byaime-one-page` (12 faux
+`HIERARCHY` sur 16, corrigés sans deviner) :
+
+- **h1 composé** — une route importe un fragment local qui porte le h1
+  (`SiteHero` pour Legal/Mentions, `ProjectStage` pour Home/app). Le scan
+  statique d'une route n’inline pas ses imports : on publie
+  `NON RÉSOLU — h1 composé — <écran> importe <fragment>`, jamais `0 h1`.
+- **alias** — `<motion.h1>` (framer-motion) et `<styled.h1>`
+  (styled-components/emotion) sont des h1 à l’exécution. Whitelist
+  documentée : `motion`, `styled` → `h1…h6`. Seuls ces préfixes sont
+  comptés ; ajouter un préfixe est une décision, pas une devinette.
+  Voir `design-system/js/qa.js` § HIERARCHY et
+  `diagnostic/src/diagnose.mjs` `HEADING_ALIAS_PREFIXES`.
+- **tests** — `*.test.*` et `*.spec.*` ne sont jamais des écrans. Un test
+  de page qui rend 2 h1 n’est pas un écran à 2 h1. Exclus des routes par
+  `diagnostic/src/profile.mjs` (`isScreen`), comptés comme fragments s’ils
+  existent.
+- **coquille SPA** — `index.html` du montage Vite (`<div id="root">` +
+  `<script type="module" src="/src/main.tsx">`) n’a pas de h1 statique ;
+  il vit dans le rendu. On publie `NON RÉSOLU — coquille SPA`, on n’ajoute
+  jamais un h1 artificiel au projet. Le rapport distingue alors
+  `4 écarts HIERARCHY + 4 non-résolus` (exemple byaime), codes sortie
+  inchangés.
+
+Tous ces cas sont comptés, nommés écran par écran dans
+`hierarchie_non_resolue` / `hierarchie_non_resolue_detail` et résumés dans
+`non_mesuré` — jamais devinés, jamais comptés comme écarts.
+
 ## Le pont officiel — converger vers zéro sans changer de moteur
 
 Le système génère son propre preset (`design-system/bridge/`,
@@ -54,7 +84,8 @@ tests, pas promis. La convergence dans le temps se mesure avec `--baseline`.
 - **densité** (écarts / écran), jamais un score sur 100 — un 78/100
   inventé ne dirait pas ce qui ne va pas ;
 - **profil moteur**, **écrans/fragments**, bibliothèques d'icônes tierces
-  (nommées, jamais comptées), constructions de classes **non résolues** ;
+  (nommées, jamais comptées), constructions de classes **non résolues** et
+  hiérarchies **non résolues** (`h1 composé` / `coquille` / alias) ;
 - **adoption** : combien de classes système le projet utilise déjà ;
 - **répartition par famille**, et les écrans les plus touchés ;
 - **ordre de réparation** — pas une note : l'ordre dans lequel les

@@ -101,6 +101,9 @@ export function profileProject(collected) {
   const fragments = [];
   const isScreen = (name) => {
     const base = name.split('/').pop();
+    // Fichiers de test : jamais des écrans — un test de page n'est pas une page.
+    // Motif `*.test.*` et `*.spec.*` (vitest, jest, playwright).
+    if (/\.test\./.test(base) || /\.spec\./.test(base)) return false;
     if (/^_[A-Za-z]+/.test(base)) return false;                 /* _app, _document */
     if (/(^|\/)api\//.test(name)) return false;                 /* endpoints */
     if (/(^|\/)app\//.test(name) && /^page\.[jt]sx?$/.test(base)) return true; /* Next App Router */
