@@ -148,6 +148,28 @@ const SYSTEM_PREFIX = /^(a-|l-|t-|u-|ds-|noema|ucard|utl|ugrid|umedia|composer|c
 const EMOJI = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{1F000}-\u{1F0FF}\u{2B00}-\u{2BFF}]/gu;
 const ARROW = /[\u{2190}-\u{21FF}\u{2794}\u{27F0}-\u{27FF}]/u;
 
+/* ── HIERARCHY : alias de composants comptés comme titres ──────────
+   Un `<motion.h1>` (framer-motion) ou `<styled.h1>` (styled-components /
+   emotion) rend un vrai h1 à l'exécution. Les ignorer compterait 0 h1
+   sur un écran qui en a un. Whitelist documentée, pas devinette : seuls
+   ces deux préfixes sont reconnus. Ajouter un préfixe ici, c'est
+   documenter une décision, pas deviner un rendu.
+   Voir diagnostic/src/profile.mjs et diagnostic/README.md § HIERARCHY. */
+const HEADING_ALIAS_PREFIXES = ['motion', 'styled'];
+function countH1(html) {
+  const re = new RegExp(`<(?:h1|${HEADING_ALIAS_PREFIXES.map((p) => `${p}\\.h1`).join('|')})[\\s>/]`, 'g');
+  return (html.match(re) || []).length;
+}
+function headingLevels(html) {
+  const re = new RegExp(`<(?:h([1-6])|${HEADING_ALIAS_PREFIXES.map((p) => `${p}\\.h([1-6])`).join('|')})[\\s>/]`, 'g');
+  const out = [];
+  for (const m of html.matchAll(re)) {
+    const n = Number(m[1] || m[2] || m[3]);
+    if (Number.isFinite(n)) out.push(n);
+  }
+  return out;
+}
+
 /* ══════════════════════════════════════════════════════════════
    AUDIT
    ══════════════════════════════════════════════════════════════ */
@@ -399,7 +421,7 @@ export function audit(input) {
        serait un faux écart en cascade. La hiérarchie d'un fragment est
        vérifiée en interne (ordre des niveaux), jamais son titre unique. */
     if (p.fragment) {
-      const levels = [...p.html.matchAll(/<h([1-6])[\s>]/g)].map((m) => Number(m[1]));
+      const levels = headingLevels(p.html);
       for (let i = 1; i < levels.length; i++) {
         if (levels[i] - levels[i - 1] > 1) {
           add('HIERARCHY', p.name, lineOf(p.html, p.html.indexOf(`<h${levels[i]}`)), `saut de niveau h${levels[i - 1]} → h${levels[i]}`);
@@ -408,9 +430,9 @@ export function audit(input) {
       continue;
     }
     const hier = stripRegions(p.html, 'ds-demo__stage');
-    const h1 = (hier.match(/<h1[\s>]/g) || []).length;
+    const h1 = countH1(hier);
     if (h1 !== 1) add('HIERARCHY', p.name, 0, `${h1} <h1> — un écran doit avoir exactement un titre de niveau 1`);
-    const levels = [...hier.matchAll(/<h([1-6])[\s>]/g)].map((m) => Number(m[1]));
+    const levels = headingLevels(hier);
     for (let i = 1; i < levels.length; i++) {
       if (levels[i] - levels[i - 1] > 1) {
         add('HIERARCHY', p.name, lineOf(p.html, p.html.indexOf(`<h${levels[i]}`)), `saut de niveau h${levels[i - 1]} → h${levels[i]}`);

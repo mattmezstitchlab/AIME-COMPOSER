@@ -22,7 +22,87 @@
  */
 import { audit } from '../../design-system/js/qa.js';
 import { profileProject } from './profile.mjs';
-import { extractProject } from './extract.mjs';
+import { extractProject, normalizeComponent } from './extract.mjs';
+import { join, dirname } from 'node:path';
+
+/* ── HIERARCHY : alias whitelist documentée ────────────────────
+   Les mêmes préfixes que design-system/js/qa.js — motion (framer-motion)
+   et styled (styled-components/emotion). Voir qa.js § HIERARCHY. */
+const HEADING_ALIAS_PREFIXES = ['motion', 'styled'];
+function hasH1(html) {
+  const re = new RegExp(`<(?:h1|${HEADING_ALIAS_PREFIXES.map((p) => `${p}\\.h1`).join('|')})[\\s>/]`);
+  return re.test(html);
+}
+function isSpaCoquille(page) {
+  if (!page.name.endsWith('index.html')) return false;
+  const html = page.html || '';
+  const hasRoot = /<div[^>]*id=["']root["']/.test(html);
+  const hasModuleScript = /<script[^>]*type=["']module["'][^>]*src=/.test(html);
+  return hasRoot && hasModuleScript && !hasH1(html);
+}
+function parseImports(text) {
+  const out = [];
+  for (const m of text.matchAll(/import\s+(?:[^'"]*\s+from\s+)?["']([^"']+)["']/g)) out.push(m[1]);
+  // export ... from "..."
+  for (const m of text.matchAll(/export\s+(?:[^'"]*\s+from\s+)?["']([^"']+)["']/g)) out.push(m[1]);
+  return out;
+}
+function findImportTarget(importPath, screenName, allSources, fragmentNames) {
+  if (!importPath || /^[a-z@][a-z0-9-]*$/.test(importPath) && !importPath.includes('/')) {
+    // dépendance externe sans slash — pas local
+    // mais "@clerk/react" contient slash mais externe : filtrer les non locaux sans résolution
+  }
+  // filtrer les dépendances externes évidentes (pas de résolution locale)
+  if (/^(react|react-dom|vue|svelte|next|nuxt|astro|tailwindcss|framer-motion|styled-components|@emotion|lucide-react|wouter|@clerk|@tanstack|date-fns|clsx|@workspace)/.test(importPath)) {
+    // ces imports ne pointent jamais vers un fichier du projet
+    if (!importPath.startsWith('.') && !importPath.startsWith('@/') && !importPath.startsWith('~/') && !importPath.startsWith('src/')) return null;
+  }
+  let candidate = importPath;
+  if (candidate.startsWith('@/')) candidate = candidate.slice(2);
+  else if (candidate.startsWith('~/')) candidate = candidate.slice(2);
+  else if (candidate.startsWith('.')) {
+    // relatif : résoudre par rapport au dossier de l'écran
+    const baseDir = dirname(screenName);
+    // join naïf pour éviter dépendance path.posix hors node
+    candidate = join(baseDir, candidate).replace(/\\/g, '/');
+    // enlever l'extension explicite si présente
+    candidate = candidate.replace(/\.[jt]sx?$/, '').replace(/\/index$/, '');
+  } else if (candidate.startsWith('src/')) {
+    candidate = candidate.replace(/^src\//, '');
+  }
+  // candidate est maintenant un chemin sans extension, ex "components/SiteChrome"
+  // Chercher une source dont le nom se termine par candidate + extension
+  // Priorité aux sources sous src/ pour les imports aliasés @/ — sinon un
+  // fichier de référence (reference/source-zip/…) passerait devant.
+  const tryNames = [candidate + '.tsx', candidate + '.ts', candidate + '.jsx', candidate + '.js', candidate + '.vue', candidate + '.svelte'];
+  for (const t of tryNames) {
+    const srcHit = allSources.find((s) => s.name === 'src/' + t && fragmentNames.has(s.name));
+    if (srcHit) return srcHit;
+    const hit = allSources.find((s) => (s.name === t || s.name.endsWith('/' + t)) && fragmentNames.has(s.name) && s.name.startsWith('src/'));
+    if (hit) return hit;
+    const anyHit = allSources.find((s) => (s.name === t || s.name.endsWith('/' + t)) && fragmentNames.has(s.name));
+    if (anyHit) return anyHit;
+  }
+  // repli : correspondance par basename uniquement (ex: "SiteChrome" → "src/components/SiteChrome.tsx")
+  const base = candidate.split('/').pop().replace(/\.[^.]+$/, '');
+  if (!base) return null;
+  const hits = allSources.filter((s) => {
+    const b = s.name.split('/').pop().replace(/\.[^.]+$/, '');
+    return b === base && fragmentNames.has(s.name);
+  });
+  if (hits.length === 1) return hits[0];
+  // si plusieurs, prendre celui dont le chemin contient le plus de segments du candidate
+  if (hits.length > 1) {
+    const candParts = candidate.split('/');
+    let best = null; let bestScore = -1;
+    for (const h of hits) {
+      const score = candParts.filter((p) => h.name.includes(p)).length;
+      if (score > bestScore) { bestScore = score; best = h; }
+    }
+    return best;
+  }
+  return null;
+}
 
 /**
  * Familles qui jugent réellement le projet examiné.
@@ -76,6 +156,59 @@ export function diagnose(collected, reference) {
   if (!screens.length) {
     /* Une bibliothèque de composants sans route : densité sur fragments,
        et le rapport le dit au lieu de diviser par zéro. */
+  }
+
+  /* ── HIERARCHY : angles morts du collecteur (jamais devinés) ─────
+     1) h1 composé — une route importe un fragment local qui porte le h1
+        (SiteHero → Legal/Mentions, ProjectStage → Home). Le scan statique
+        de la route seule voit 0 h1 ; le rendu en a un. On publie NON RÉSOLU
+        — h1 composé, jamais un écart.
+     2) coquille SPA — index.html du montage Vite (div#root + script module)
+        n'a pas de h1 statique ; il vit dans le rendu. NON RÉSOLU — coquille.
+     3) alias — motion.h1 / styled.h1 déjà comptés comme h1 par qa.js
+        (whitelist documentée) ; ici on s'assure que l'import d'un fragment
+        à motion.h1 est bien détecté comme porteur de h1.
+     Les *.test.* sont déjà exclus des routes par profile.mjs.          */
+  const fragmentNameSet = new Set(profile.fragments.map((s) => s.name));
+  const allSources = collected.sources || [];
+  const hierarchyUnresolved = [];
+  const patchedScreens = new Set();
+  // Documents : coquilles SPA
+  for (const p of htmlPages) {
+    if (!hasH1(p.html) && isSpaCoquille(p)) {
+      hierarchyUnresolved.push({ name: p.name, reason: 'NON RÉSOLU — coquille SPA — index.html est le montage Vite (div#root + script module) sans h1 statique — le h1 vit dans le rendu', kind: 'coquille' });
+      patchedScreens.add(p.name);
+    }
+  }
+  // Routes composées : import local vers fragment porteur de h1
+  for (const src of profile.screens) {
+    // Coquilles d'entrée (main) : le h1 n'est jamais dans ce fichier, mais
+    // ce n'est pas une route composée — c'est le montage. On le laisse en écart.
+    if (src.name.endsWith('main.tsx') || src.name.endsWith('main.jsx') || src.name.endsWith('main.ts') || src.name.endsWith('main.js')) continue;
+    const norm = normalizeComponent(src.text);
+    if (hasH1(norm)) continue;
+    const imports = parseImports(src.text);
+    let hit = null; let hitImport = null;
+    for (const imp of imports) {
+      const target = findImportTarget(imp, src.name, allSources, fragmentNameSet);
+      if (!target) continue;
+      const targetNorm = normalizeComponent(target.text);
+      if (hasH1(targetNorm)) { hit = target; hitImport = imp; }
+    }
+    if (hit) {
+      hierarchyUnresolved.push({ name: src.name, reason: `NON RÉSOLU — h1 composé — ${src.name} importe ${hit.name} (via "${hitImport}") qui porte le <h1> — le scan statique ne l'inline pas`, kind: 'compose' });
+      patchedScreens.add(src.name);
+    }
+  }
+  // Injecter un h1 synthétique là où le h1 est composé/coquille, pour que
+  // le juge ne compte pas un faux 0 h1. Le h1 synthétique est marqué pour
+  // traçabilité, mais le rapport publie bien le NON RÉSOLU à part.
+  if (patchedScreens.size) {
+    for (const p of pages) {
+      if (patchedScreens.has(p.name)) {
+        p.html = `<h1 data-hierarchy-unresolved="${hierarchyUnresolved.find((h) => h.name === p.name)?.kind || 'compose'}">h1-non-résolu</h1>\n` + p.html;
+      }
+    }
   }
 
   /* Les feuilles du système font partie du corpus (CONSISTENCY des
@@ -184,6 +317,9 @@ export function diagnose(collected, reference) {
   if (ext.unresolved) {
     nonMeasured.push(`${ext.unresolved} construction(s) dynamique(s) de classes — non résolues, jamais devinées`);
   }
+  if (hierarchyUnresolved.length) {
+    nonMeasured.push(`${hierarchyUnresolved.length} écran(s) à hiérarchie non résolue — ${hierarchyUnresolved.map((h) => h.name).join(', ')} — h1 composé/coquille/alias : le h1 vit hors du fichier, jamais deviné`);
+  }
   if (profile.unknown) {
     nonMeasured.push('moteur non reconnu — jugement intégral sur HTML/CSS (repli garanti)');
   }
@@ -247,6 +383,8 @@ export function diagnose(collected, reference) {
     icon_libraries: ext.iconLibs,
     unresolved: ext.unresolved,
     unresolved_detail: ext.unresolvedDetail,
+    hierarchy_unresolved: hierarchyUnresolved.length,
+    hierarchy_unresolved_detail: hierarchyUnresolved.map((h) => h.reason),
     non_measured: nonMeasured,
     signatures,
     bridged: profile.bridged,

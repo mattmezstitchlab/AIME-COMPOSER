@@ -1,6 +1,6 @@
 # AIME — Rapport de contraste V1
 
-Généré par `npm run build` le 2026-09-17. Toute valeur ci-dessous est calculée
+Généré par `npm run build` le 2026-09-18. Toute valeur ci-dessous est calculée
 selon la formule de luminance relative WCAG 2.x, puis comparée au seuil du rôle.
 Le build échoue si une ligne est en échec : aucune couleur n'entre dans le système sans preuve.
 
