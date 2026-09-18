@@ -98,6 +98,41 @@ adoption** : `adoption.tokens_layer = true`,
 présente ». Le bridge promet zéro écart pour qui n'utilise que le pont ;
 désormais il ne facture plus la couche elle-même (pont §8.1).
 
+## Focus — pairing, la substitution pas le token
+
+La famille `FOCUS` comptait autrefois un écart pour chaque classe
+`outline-none`, quelle que soit sa substitution. Or l'idiome canonique
+accessible shadcn/Tailwind
+`focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring`
+est une **substitution valide**, plus accessible que l'outline par défaut
+(pont §9 — preuve par intervention : 58 vrais défauts corrigés dans
+byaime faisaient passer la mesure de 218 à 217, le seul point gagné
+étant un cas CSS). La règle, **par attribut de classes** (le seul
+substitut reconnu vit dans le même attribut, symétrique de l'exemption
+CSS `:focus:not(:focus-visible)` déjà en vigueur) :
+
+1. `focus-visible:outline-none` **accompagné** de `focus-visible:ring-*`
+   (ou `focus-visible:shadow-*`) dans le même attribut = substitution
+   valide → **pas un écart** ;
+2. `focus:outline-none` (suppression au pointeur) sans substitution dans
+   le même attribut = écart — `focus:ring-*` ne substitue rien au
+   clavier ;
+3. `outline-none` nu sans ring adjacent = écart ;
+4. toute paire non appariée est comptée **et nommée** dans le détail
+   FOCUS — jamais devinée, jamais tue.
+
+La substitution est de **même scope** : un retrait au scope `V:` est
+apparié ssi le même attribut porte `V:ring-*` / `V:shadow-*` — donc
+`focus:ring-*` ne substitue pas un `focus-visible:outline-none`
+(fixture « incomplète »), tandis que `focus-within:ring-*` apparie un
+`focus-within:outline-none` (même scope).
+
+Le `focus:ring-*` sans retrait d'outline n'est pas évalué (aucun anneau
+supprimé, rien à signaler). Fixtures `focus-pairing`
+(valide / nu / pointeur / incomplète) : comptes exacts, testés. Sur
+byaime, FOCUS tombe ainsi de 217 à **l'inventaire réel des paires non
+appariées** (attendu proche de zéro).
+
 ## Le pont officiel — converger vers zéro sans changer de moteur
 
 Le système génère son propre preset (`design-system/bridge/`,

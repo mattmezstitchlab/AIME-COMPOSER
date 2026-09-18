@@ -438,7 +438,15 @@ export function audit(input) {
         add('HIERARCHY', p.name, lineOf(p.html, p.html.indexOf(`<h${levels[i]}`)), `saut de niveau h${levels[i - 1]} → h${levels[i]}`);
       }
     }
-    const display = (hier.match(/t-display/g) || []).length;
+    /* .t-display est compté comme TOKEN de classe, pas comme sous-chaîne :
+       `font-display` (utilitaire Tailwind) contient « t-display » mais n'est
+       pas un affichage du système — le compter produisait un faux écart
+       (pont §9 re-mesuré sur byaime : 46 font-display → « 4 usages de
+       .t-display » sur Landing). Seul le token exact `t-display` compte. */
+    let display = 0;
+    for (const m of hier.matchAll(/\bclass=(["'])([^"']*)\1/g)) {
+      for (const c of m[2].split(/\s+/)) if (c === 't-display') display++;
+    }
     if (display > 1) add('HIERARCHY', p.name, 0, `${display} usages de .t-display — un seul affichage par écran`);
   }
 
@@ -573,6 +581,15 @@ export function audit(input) {
          --aime-focus-ring est rappelée dans le message. */
       case 'outline-none':
         add('FOCUS', a.file, a.line, `« ${a.value} » (${src}) — anneau supprimé sans substitution (--aime-focus-ring)`);
+        break;
+      /* Pont §9 — la substitution, pas le token. Une classe triée seule
+         n'a jamais de voisin : l'extracteur juge désormais le pairing dans
+         l'attribut de classes et n'émet plus d'atome pour une substitution
+         valide (ring/shadow de MÊME scope, MÊME attribut). Ne remontent ici
+         que les retraits réellement non appariés (nu / pointeur / scope
+         sans ring ni shadow jumeau). */
+      case 'focus-unpaired':
+        add('FOCUS', a.file, a.line, `${a.value} (${src}) — anneau supprimé sans substitution valide (ring/shadow de même scope, même attribut)`);
         break;
       case 'emoji':
         add('ICONOGRAPHY', a.file, a.line, `emoji « ${a.value} » (${src}) — utiliser la famille SVG AIME`);
