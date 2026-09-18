@@ -193,3 +193,18 @@ Effort relatif : P3 > P4 > P2 ≈ P1 > P5 > P0. Rien dans P1–P2 n'attend P3 : 
 4. **Arbitrer P4** : parseur PDF/ZIP embarqué vs extraction différée (poids vs immédiateté — peut attendre P3).
 
 > Proposition NOEMA/AIME — appliquer reste votre décision. *NOEMA propose. L'humain valide.*
+
+---
+
+## Addendum — P1 livrée (18 septembre 2026, même jour)
+
+Décisions 1–3 validées par l'humain (« go pour tout faire »). Livré dans la session :
+
+- **`point-zero/`** — la coquille en 5 zones (header projet/format/QA/NOEMA · Bureau · grille 9 profils + origine 0,0 · inspecteur + rail NOEMA · dock Timeline/＋/Cartes), panneaux rétractables persistés, état de présentation seul.
+- **`design-system/styles/pointzero.css`** — les 3 patterns autorisés (`pz-*`, `dock`, `uimport`), tokens uniquement.
+- **Périmètre QA étendu** : `run-qa.mjs` (35e écran), `verify-dom.mjs` (idem), préfixes `pz|dock|uimport` ajoutés à `SYSTEM_PREFIX` dans `js/qa.js`.
+- **Gates mesurées le jour même** : QA **12/12 familles · 35 écrans · 11 feuilles CSS · 80/80 contrastes** ; vérification DOM **35/35 écrans exécutés sans erreur** (module `pz.js` ok, 4 rendus pilotés alimentés, 16 icônes résolues) ; test réel sur `node loop/server.mjs` : `/point-zero/` 200, timeline PLAN/SEMAINE servie (événements canoniques, capacités), intention écrite via `/api/intend` avec acteur `point.zero.shell`.
+- **Projections vivantes déjà en place (avance sur P2)** : Bureau ← `atlas/media.json` réel (viseur, copie, placement sur grille, mode local classé sans envoi, couverture par dépôt, filtre par nom/type/dépôt) ; rail NOEMA ← boucle réelle (propositions ouvertes + valider/refuser attribués ; intention « Lire sans écrire » dry-run) ; Timeline ← `/api/timeline` (6 modes, achèvement quand la capacité l'autorise) ; Cartes ← `/api/state` ; badge QA ← `QA-REPORT.json`. Hors ligne, chaque zone le dit et n'invente rien.
+- **Reste selon le plan** : résolution d'URL distantes et parse PDF/ZIP (P4, Connector Engine), dossiers contextuels (P2 léger), moteur spatial drag/snap réel (P3), pack EAA (P5).
+
+Décision 4 (PDF/ZIP embarqué vs différé) reste ouverte — inchangée : à trancher en P4.

@@ -51,7 +51,7 @@ const pages = roots
      entre donc dans son audit — un écran exempté finit par inventer un
      style ; un périmètre trop large rend le rapport illisible.) */
   .concat(
-    [join(REPO, 'index.html'), join(REPO, 'atlas', 'index.html')]
+    [join(REPO, 'index.html'), join(REPO, 'atlas', 'index.html'), join(REPO, 'point-zero', 'index.html')]
       .filter((p) => existsSync(p)),
   )
   .sort()

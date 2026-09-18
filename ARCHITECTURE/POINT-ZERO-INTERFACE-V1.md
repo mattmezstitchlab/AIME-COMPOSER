@@ -1,6 +1,6 @@
 # POINT ZERO — INTERFACE UNIVERSELLE V1
 
-**Statut :** PROPOSÉ — cible d'intégration, soumise à validation humaine
+**Statut :** PROPOSÉ puis **VALIDÉ par l'humain (18 sept. 2026)** — Phase 1 livrée : `point-zero/` (coquille statique, 35e écran audité, QA 12/12 + vérification DOM 35/35). Phases suivantes : P2–P5 du plan (§AUDIT).
 **Dépend de :** UNIVERSAL-GRID-V1 · TIMELINE-UNIVERSELLE-V1 · UNIVERSAL-BUREAU-DOCUMENTS-V1 · AIME-DESIGN-SYSTEM-V1 · NOEMA-CONSTITUTION-V1 · FINAL-CONVERGENCE-V1 · FINAL-MISSING-ORGANS-V1
 **Audit d'alignement :** `AUDIT/POINT-ZERO-FUSION-01.md` — l'audit mesure l'existant contre cette cible ; ce document définit la cible.
 

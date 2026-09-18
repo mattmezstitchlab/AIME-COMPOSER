@@ -62,7 +62,7 @@ for (const sub of ['experiences', path.join('..', 'loop')]) {
    clones jetables de dépôts tiers). Même raison que pour run-qa.mjs : les
    deux périmètres doivent rester identiques, sinon un écran exécuté n'est
    pas audité, ou l'inverse. */
-for (const f of ['index.html', path.join('atlas', 'index.html')]) {
+for (const f of ['index.html', path.join('atlas', 'index.html'), path.join('point-zero', 'index.html')]) {
   const p = path.join(ROOT, f);
   if (existsSync(p)) pages.push(p);
 }

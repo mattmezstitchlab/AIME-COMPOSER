@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="fr" data-aime-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="a-root" content="../design-system/">
+<title>Point Zero — AIME</title>
+<link rel="stylesheet" href="../design-system/tokens/tokens.css">
+<link rel="stylesheet" href="../design-system/styles/foundations.css">
+<link rel="stylesheet" href="../design-system/styles/layout.css">
+<link rel="stylesheet" href="../design-system/styles/components.css">
+<link rel="stylesheet" href="../design-system/styles/aime.css">
+<link rel="stylesheet" href="../design-system/styles/noema.css">
+<link rel="stylesheet" href="../design-system/styles/patterns.css">
+<link rel="stylesheet" href="../design-system/styles/dataviz.css">
+<link rel="stylesheet" href="../design-system/styles/pointzero.css">
+<script src="../design-system/js/doc.js" defer></script>
+<script src="../design-system/js/aime-ui.js" defer></script>
+<script type="module" src="pz.js"></script>
+</head>
+<body>
+<noscript><p class="t-body-sm u-muted u-pad-sm">Point Zero fonctionne avec JavaScript : la coquille projette en direct la médiathèque (<a class="a-text-btn" href="../atlas/index.html">atlas</a>), la boucle NOEMA (<a class="a-text-btn" href="../loop/index.html">loop</a>) et le rapport Design QA (<a class="a-text-btn" href="../design-system/qa.html">qa</a>) — ces trois surfaces restent lisibles seules.</p></noscript>
+
+<div class="pz" id="pz">
+
+  <!-- ── Z1 · HEADER ──────────────────────────────────────── -->
+  <header class="pz__head">
+    <a class="pz__brand" href="../index.html">
+      <svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="grd-grid"/></svg>
+      <span>POINT<i>·</i>ZERO</span><small>AIME SHELL · P1</small>
+    </a>
+    <h1 class="u-sr">Point Zero — coquille universelle AIME</h1>
+    <span class="l-spacer"></span>
+
+    <div class="pz__group">
+      <svg class="a-ic a-ic--sm u-subtle" aria-hidden="true" width="16" height="16"><use data-a-icon="prj-project"/></svg>
+      <select class="a-select" id="pz-project" aria-label="Projet actif">
+        <option value="">Tous les projets</option>
+      </select>
+    </div>
+
+    <div class="pz__group">
+      <svg class="a-ic a-ic--sm u-subtle" aria-hidden="true" width="16" height="16"><use data-a-icon="grd-format"/></svg>
+      <select class="a-select" id="pz-format" aria-label="Profil de format"></select>
+      <span class="t-meta" id="pz-format-meta"></span>
+    </div>
+
+    <div class="pz__group">
+      <a class="a-badge" id="pz-qa" href="../design-system/qa.html" title="Ouvrir le rapport Design QA">
+        <svg class="a-ic a-ic--state" aria-hidden="true" width="12" height="12"><use data-a-icon="prf-shield"/></svg>QA : lecture…
+      </a>
+      <span class="a-badge" id="pz-noema-status">NOEMA : connexion…</span>
+      <button type="button" class="a-icon-btn" id="pz-theme" aria-label="Thème : changer de thème">
+        <svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="set-theme"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Z2–Z4 · MAIN ─────────────────────────────────────── -->
+  <div class="pz__main">
+
+    <div class="pz__cell">
+      <nav class="pz__rail" aria-label="Panneau de gauche">
+        <button type="button" class="a-icon-btn" id="pz-toggle-bureau" aria-expanded="true" aria-controls="pz-bureau" aria-label="Bureau : rétracter le panneau">
+          <svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="med-library"/></svg>
+        </button>
+      </nav>
+
+      <section class="pz__pane" id="pz-bureau" aria-labelledby="pz-bureau-h">
+        <h2 class="t-h2" id="pz-bureau-h">Bureau</h2>
+
+        <div class="pz__group" role="group" aria-label="Source des médias">
+          <button type="button" class="a-pill a-pill--button" id="pz-src-github" aria-pressed="true">GitHub</button>
+          <button type="button" class="a-pill a-pill--button" id="pz-src-local" aria-pressed="false">Dossier local</button>
+          <span class="t-meta u-muted" id="pz-bureau-count"></span>
+        </div>
+
+        <div class="pz__group" role="group" aria-label="Filtrer par type">
+          <button type="button" class="a-pill a-pill--button" data-mode="tout" aria-pressed="true">Tout</button>
+          <button type="button" class="a-pill a-pill--button" data-mode="image" aria-pressed="false">Visuel</button>
+          <button type="button" class="a-pill a-pill--button" data-mode="video" aria-pressed="false">Vidéo</button>
+          <button type="button" class="a-pill a-pill--button" data-mode="audio" aria-pressed="false">Audio</button>
+          <button type="button" class="a-pill a-pill--button" data-mode="vecteur" aria-pressed="false">Vecteur</button>
+        </div>
+
+        <div class="a-field">
+          <label class="a-field__label" for="pz-bureau-q">Filtrer par nom</label>
+          <input class="a-input" id="pz-bureau-q" type="search" placeholder="hero, logo, film…" autocomplete="off">
+        </div>
+
+        <p class="t-caption u-muted" id="pz-bureau-note"></p>
+
+        <div class="pz-cards" id="pz-bureau-grid" data-a-render="bureau">
+          <p class="t-body-sm u-muted">Lecture du catalogue média…</p>
+        </div>
+
+        <details id="pz-bureau-coverage-details">
+          <summary class="t-label">Couverture du scan</summary>
+          <div id="pz-bureau-coverage" class="l-stack"></div>
+        </details>
+      </section>
+    </div>
+
+    <main class="pz__stage l-canvas l-canvas--dots" aria-labelledby="pz-canvas-h">
+      <h2 class="u-sr" id="pz-canvas-h">Grille universelle — point zéro</h2>
+
+      <div class="composer__toolbar">
+        <button type="button" class="a-pill a-pill--button" id="pz-snap" aria-pressed="true">Magnétisme</button>
+        <button type="button" class="a-pill a-pill--button" id="pz-guides" aria-pressed="true">Repères</button>
+        <button type="button" class="a-pill a-pill--button" id="pz-zero" aria-pressed="false">Origine 0,0</button>
+        <span class="l-spacer"></span>
+        <span class="t-meta u-muted" id="pz-canvas-meta">une sélection, quatre projections</span>
+      </div>
+
+      <div class="pz__center" id="pz-center">
+        <div class="ugrid">
+          <div class="ugrid__page" id="pz-page" data-format="web" data-cols="12" data-zero="off" data-guides="on">
+            <div class="ugrid__cols" id="pz-cols" aria-hidden="true"></div>
+            <div class="ugrid__safe" aria-hidden="true"></div>
+            <div class="ugrid__bleed" aria-hidden="true"></div>
+            <div class="ugrid__thirds" aria-hidden="true"></div>
+            <span class="pz__zero" aria-hidden="true"><span class="pz__zero-label">0,0</span></span>
+            <span class="ugrid__snap" id="pz-snap-mark" data-a-snap="aimantation active" aria-hidden="true"></span>
+            <div class="pz-places" id="pz-places"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div class="pz__cell">
+      <section class="pz__pane pz__pane--end" id="pz-pane-end" aria-labelledby="pz-inspecteur-h">
+        <div class="pz__inspector">
+          <h2 class="t-h2" id="pz-inspecteur-h">Inspecteur</h2>
+          <div id="pz-inspector-body" data-a-render="inspecteur">
+            <p class="t-body-sm u-muted">Préparation de l'inspecteur…</p>
+          </div>
+        </div>
+
+        <div class="pz__noema" aria-labelledby="pz-noema-h">
+          <h2 class="t-h2" id="pz-noema-h">
+            <span class="noema-mark"><svg class="a-ic noema-mark__glyph" aria-hidden="true" width="20" height="20"><use data-a-icon="noe-mark"/></svg></span>
+            NOEMA
+          </h2>
+          <div class="noema-feed" id="pz-noema-feed" aria-live="polite"></div>
+          <div class="a-field">
+            <label class="a-field__label" for="pz-noema-text">Votre intention</label>
+            <textarea class="a-textarea" id="pz-noema-text" rows="2" placeholder="Une phrase dans vos mots — NOEMA propose, vous validez."></textarea>
+          </div>
+          <div class="pz__group">
+            <button type="button" class="a-btn a-btn--sm" id="pz-noema-read">Lire sans écrire</button>
+            <button type="button" class="a-btn a-btn--sm a-btn--primary" id="pz-noema-send">Proposer à la validation</button>
+          </div>
+          <div id="pz-noema-out" class="l-stack" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <nav class="pz__rail pz__rail--end" aria-label="Panneau de droite">
+        <button type="button" class="a-icon-btn" id="pz-toggle-inspector" aria-expanded="true" aria-controls="pz-pane-end" aria-label="Inspecteur et NOEMA : rétracter le panneau">
+          <svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="set-sliders"/></svg>
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ── Z5 · DOCK ─────────────────────────────────────────── -->
+  <footer class="dock">
+    <div class="dock__seg">
+      <button type="button" class="a-btn a-btn--sm" id="pz-dock-timeline" aria-expanded="false" aria-controls="pz-tray-timeline">
+        <svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="time-timeline"/></svg>
+        Timeline
+      </button>
+      <span class="t-meta u-muted" id="pz-dock-tl-meta"></span>
+    </div>
+
+    <div class="dock__seg dock__seg--center">
+      <button type="button" class="a-btn a-btn--primary" id="pz-import-btn" aria-expanded="false" aria-controls="pz-uimport">
+        <svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="act-add"/></svg>
+        Importer
+      </button>
+    </div>
+
+    <div class="dock__seg dock__seg--end">
+      <span class="t-meta u-muted" id="pz-dock-cards-meta"></span>
+      <button type="button" class="a-btn a-btn--sm" id="pz-dock-cartes" aria-expanded="false" aria-controls="pz-tray-cartes">
+        <svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="mem-card"/></svg>
+        Cartes
+      </button>
+    </div>
+
+    <div class="dock__tray" id="pz-tray-timeline" hidden aria-label="Timeline universelle">
+      <div class="dock__tray-head">
+        <p class="t-label">Timeline universelle</p>
+        <select class="a-select" id="pz-tl-mode" aria-label="Mode de la timeline">
+          <option value="READ">READ — lecture narrative</option>
+          <option value="PLAN" selected>PLAN — organisation</option>
+          <option value="COMPOSE">COMPOSE — montage</option>
+          <option value="REVIEW">REVIEW — lecture annotée</option>
+          <option value="LIVE">LIVE — jour J</option>
+          <option value="HISTORY">HISTORY — versions</option>
+        </select>
+        <span class="t-meta u-muted" id="pz-tl-meta"></span>
+        <span class="l-spacer"></span>
+        <button type="button" class="a-icon-btn" data-tray-close aria-label="Fermer la timeline">
+          <svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="nav-close"/></svg>
+        </button>
+      </div>
+      <div class="utl" id="pz-timeline-list" data-a-render="timeline">
+        <p class="t-body-sm u-muted">Projection du flux canonique…</p>
+      </div>
+    </div>
+
+    <div class="dock__tray" id="pz-tray-cartes" hidden aria-label="Cartes universelles">
+      <div class="dock__tray-head">
+        <p class="t-label">Cartes universelles</p>
+        <span class="t-meta u-muted" id="pz-cartes-meta"></span>
+        <span class="l-spacer"></span>
+        <button type="button" class="a-icon-btn" data-tray-close aria-label="Fermer les cartes">
+          <svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="nav-close"/></svg>
+        </button>
+      </div>
+      <div class="pz-cards pz-cards--rows" id="pz-cartes-list" data-a-render="cartes">
+        <p class="t-body-sm u-muted">Mémoire du projet…</p>
+      </div>
+    </div>
+
+    <div class="uimport" id="pz-uimport" hidden role="dialog" aria-label="Import universel">
+      <p class="t-label">Import universel</p>
+      <div class="a-menu" role="menu" aria-label="Type d'import">
+        <button type="button" class="a-menu__item" role="menuitem" data-import="dir">
+          <svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="med-library"/></svg>
+          Dossier local — rien n'est envoyé
+        </button>
+        <button type="button" class="a-menu__item" role="menuitem" data-import="files">
+          <svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-document"/></svg>
+          Fichiers — PDF, ZIP, images…
+        </button>
+        <button type="button" class="a-menu__item" role="menuitem" data-import="resolve">
+          <svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="rel-relation"/></svg>
+          Lien GitHub, URL ou texte collé
+        </button>
+      </div>
+      <div class="a-field" id="pz-uimport-field" hidden>
+        <label class="a-field__label" for="pz-uimport-text">Lien ou texte</label>
+        <input class="a-input" id="pz-uimport-text" type="text" placeholder="https://github.com/… ou une phrase" autocomplete="off">
+        <span class="a-field__hint">Lecture sans écriture : un dépôt du compte ouvre son filtre dans le Bureau ; toute autre entrée est transmise à NOEMA, rien n'est enregistré.</span>
+      </div>
+      <p class="t-caption uimport__note">PDF et ZIP : lecture locale classée, couverture publiée. La résolution d'URL distantes attend le Connector Engine — aucun envoi silencieux (P1 : extraction locale ou transmission honnête à NOEMA).</p>
+    </div>
+
+    <input type="file" id="pz-file-dir" webkitdirectory hidden aria-label="Choisir un dossier local à classer">
+    <input type="file" id="pz-file-multi" multiple hidden aria-label="Choisir des fichiers locaux à classer">
+  </footer>
+</div>
+</body>
+</html>

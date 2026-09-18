@@ -26,7 +26,7 @@ TOKENS → FOUNDATIONS → COMPONENTS → PATTERNS → LAYOUTS → EXPERIENCES
 cd design-system
 npm run build   # generate tokens + icons; refuses any colour that misses its contrast target
 npm run qa      # build + audit the 12 QA families over the shipped system
-npm run verify  # execute the scripts of all 34 audited screens in a DOM (needs the jsdom devDependency)
+npm run verify  # execute the scripts of all 35 audited screens in a DOM (needs the jsdom devDependency)
 npm run check   # qa then verify
 npm run serve   # serve the repository on http://0.0.0.0:8080/design-system/
 ```
@@ -36,9 +36,9 @@ contract · 9 typographic roles · a closed 10-step spacing scale · 86 glyphs i
 categories, no emoji · 29 fundamental components · the five AIME organs (Universal
 Card, Universal Timeline, Universal Grid, Composer, Universal Media) · the NOEMA
 layer with its six epistemic states · 13 patterns · a data-visualization language ·
-12 automatic Design QA families · 34 audited screens (19 documentation chapters,
+12 automatic Design QA families · 35 audited screens (19 documentation chapters,
 the art-direction brief page, 11 experience screens, the NOEMA loop screen, the
-Atlas media library, and the repository homepage).
+Atlas media library, the repository homepage, and the Point Zero shell).
 
 `design-system/direction.html` picks an artistic direction **inside** the system
 (theme, accent step in the fuchsia ramp, density, motion, radius level), previews
@@ -60,7 +60,7 @@ node diagnostic/diagnose.mjs --owner O --repo R       # a GitHub repository
 node diagnostic/survey.mjs                            # every repo of the account, ranked
 ```
 
-It is the same engine that audits the 31 screens of the system, not a copy, so a
+It is the same engine that audits the 35 screens of the system, not a copy, so a
 project is judged under the same conditions as the screens that ship. The report
 publishes a **density** (issues per screen), the families involved, the screens most
 affected, and an order of repair — never an invented score out of 100.
@@ -122,6 +122,32 @@ Behavioral smokes (viewer, local ingest, coverage, selection, exports) run in
 ```bash
 cd design-system && node qa/smoke-medias-v2.mjs
 ```
+
+## Point Zero
+
+`point-zero/` is the **universal shell** — phase P1 of the fusion target audited in
+`AUDIT/POINT-ZERO-FUSION-01.md` against `ARCHITECTURE/POINT-ZERO-INTERFACE-V1.md`.
+One screen that projects the existing engines instead of duplicating them.
+
+```bash
+node loop/server.mjs   # then open http://0.0.0.0:8090/point-zero/
+```
+
+Five zones, one selection: the **Bureau** on the left — the real transversal media
+catalogue (38 repositories, 366 referenced media, coverage table) plus the local
+folder mode, as cards with their functions — the **Universal Grid** at the center
+with nine format profiles and its 0,0 origin crosshair, the **inspector** on the
+right with **NOEMA at its foot** (live `/api/intend` + `/api/decide` while the loop
+server runs, honestly offline when it does not), and a **dock** holding the
+Universal Timeline, the Universal Cards and a single ＋ universal import (local
+folder, files, GitHub link, text or URL — everything a read-before-write).
+Retractable panels, golden-ratio quiet, no demo data anywhere: unknowns stay
+unknown and absences stay named (zero audio file is committed anywhere in the
+account — the shell says so rather than hiding it).
+
+It is the 35th audited screen. Its three patterns (`pz-*`, `dock`, `uimport`) live
+in `design-system/styles/pointzero.css`, are policed by the same system-prefix
+rule in `js/qa.js`, and pass the same 12 QA families — innovation exempts no one.
 
 ## Boucle NOEMA
 

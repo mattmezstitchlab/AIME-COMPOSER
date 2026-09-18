@@ -142,7 +142,11 @@ const KEYFRAMES = {
   'a-skeleton': 'fade',
 };
 
-const SYSTEM_PREFIX = /^(a-|l-|t-|u-|ds-|noema|ucard|utl|ugrid|umedia|composer|cnode|clink|inspector|viz|prov|nstate|sresults|rview|vdiff|ba__|ba-|cmdbar|ohead|mslot|aslot|spec__|approval|conf__|conf$)/;
+/* Préfixes système : toute classe qui en porte un doit être définie par le
+   système, sinon c'est un style que le système ne peut pas expliquer.
+   `pz`, `dock` et `uimport` rejoignent la liste avec la coquille POINT ZERO
+   (ARCHITECTURE/POINT-ZERO-INTERFACE-V1 §11). */
+const SYSTEM_PREFIX = /^(a-|l-|t-|u-|ds-|noema|ucard|utl|ugrid|umedia|composer|cnode|clink|inspector|viz|prov|nstate|sresults|rview|vdiff|ba__|ba-|cmdbar|ohead|mslot|aslot|spec__|approval|conf__|conf$|pz|dock|uimport)/;
 /* Emoji et dingbats : interdits partout. Les flèches typographiques sont
    autorisées dans le texte courant mais jamais à l'intérieur d'un contrôle. */
 const EMOJI = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{1F000}-\u{1F0FF}\u{2B00}-\u{2BFF}]/gu;
