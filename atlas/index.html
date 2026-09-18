@@ -1,18 +1,138 @@
 <!doctype html>
-<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NOEMA — Accueil</title>
-<style>:root{--bg:#080808;--line:#292929;--text:#f5f3ee;--muted:#8e8c87;--accent:#ff2f9e}*{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font:13px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,a{font:inherit}button{cursor:pointer}a{color:inherit}.shell{height:100%;display:grid;grid-template-rows:70px 1fr}.top{display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--line);background:rgba(8,8,8,.97);z-index:10}.brandLink{color:inherit;text-decoration:none;display:inline-flex;align-items:center;border-radius:8px}.brandLink:focus-visible{outline:2px solid var(--accent);outline-offset:5px}.brand{font-size:18px;font-weight:850;letter-spacing:-.04em}.brand i{color:var(--accent);font-style:normal}.nav{display:flex;gap:8px;overflow:auto}.nav button{border:1px solid var(--line);background:#111;color:#eee;border-radius:999px;padding:9px 13px;white-space:nowrap}.nav button.active{background:var(--accent);border-color:var(--accent)}.stage{position:relative;min-height:0;overflow:hidden}.home{height:100%;overflow:auto}.homeInner{max-width:1180px;margin:0 auto;padding:clamp(52px,8vw,110px) 28px 70px}.eyebrow{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent)}h1{font-size:clamp(54px,9vw,128px);line-height:.86;letter-spacing:-.075em;margin:18px 0 26px;max-width:1000px}h1 span{color:#777}.intro{max-width:650px;color:#aaa;font-size:18px;line-height:1.55;margin:0}.homeActions{display:flex;gap:10px;flex-wrap:wrap;margin-top:30px}.primary,.secondary{border-radius:999px;padding:11px 17px}.primary{border:1px solid var(--accent);background:var(--accent);color:#fff;font-weight:750}.secondary{border:1px solid var(--line);background:#111;color:#eee}.section{margin-top:90px}.sectionLabel{font-size:9px;text-transform:uppercase;letter-spacing:.18em;color:var(--muted);margin-bottom:14px}.modules{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.module{border:1px solid var(--line);background:linear-gradient(145deg,#111,#0b0b0b);border-radius:20px;padding:20px;text-align:left;color:inherit;min-height:190px;transition:.18s}.module:hover{border-color:#555;transform:translateY(-2px)}.module strong{display:block;font-size:21px;letter-spacing:-.045em;margin:35px 0 8px}.module p{color:#777;margin:0;font-size:11px;line-height:1.5}.module small{font-size:9px;text-transform:uppercase;letter-spacing:.13em;color:var(--accent)}.principles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.principle{border-top:1px solid var(--line);padding-top:14px}.principle b{font-size:14px}.principle p{color:#777;font-size:11px;max-width:300px}.hint{position:absolute;left:24px;bottom:18px;color:var(--muted);font-size:10px;pointer-events:none}.frame{display:none;width:100%;height:100%;border:0;background:var(--bg)}.stage.in-frame .home{display:none}.stage.in-frame .frame{display:block}.stage.in-frame .hint{display:none}@media(max-width:900px){.modules{grid-template-columns:repeat(2,1fr)}.principles{grid-template-columns:1fr 1fr}}@media(max-width:650px){.top{padding:0 12px}.brand{font-size:16px}.nav{max-width:60vw}.homeInner{padding:55px 20px 60px}.modules,.principles{grid-template-columns:1fr}h1{font-size:58px}.intro{font-size:16px}}</style>
-</head><body>
-<!-- SHELL DU PLAYGROUND — seul propriétaire de la navigation. La Grille Universelle reste une capacité de la Timeline/Composer, pas un espace parallèle. -->
-<div class="shell"><header class="top"><a class="brandLink" href="./index.html" aria-label="NOEMA — accueil du Playground" title="Accueil du Playground"><div class="brand">NOEMA<i>•</i><span style="color:#777"> PLAYGROUND</span></div></a><nav class="nav" aria-label="Navigation du Playground"><button id="home" class="active" aria-current="page">Accueil</button><button id="composer">Composer</button><button id="card">Carte Universelle</button><button id="timeline">Timeline Universelle</button></nav></header><main class="stage" id="stage"><section class="home" id="homeView"><div class="homeInner"><div class="eyebrow">NOEMA · PLAYGROUND</div><h1>Composer le monde.<br><span>Une brique à la fois.</span></h1><p class="intro">Un espace expérimental pour réunir les primitives universelles de NOEMA, comprendre leurs relations et préparer leur convergence dans une expérience créative cohérente.</p><div class="homeActions"><button class="primary" id="start">Ouvrir le Composer</button><button class="secondary" id="explore">Explorer les briques</button></div><div class="section"><div class="sectionLabel">Les trois espaces principaux</div><div class="modules"><button class="module" data-view="composer"><small>01 · Créer</small><strong>Composer</strong><p>Assembler des briques, déplacer les nœuds, créer des connexions et préparer une composition.</p></button><button class="module" data-view="card"><small>02 · Comprendre</small><strong>Carte Universelle</strong><p>Explorer la mémoire d’une personne, d’un projet ou d’une entité sans créer de modèle parallèle.</p></button><button class="module" data-view="timeline"><small>03 · Orchestrer + mesurer</small><strong>Timeline + Grille</strong><p>Voir le projet dans le temps et disposer du même espace de référence pour formats, guides, repères et magnétisme.</p></button></div></div><div class="section"><div class="sectionLabel">Principes</div><div class="principles"><div class="principle"><b>Une seule source de vérité.</b><p>Les vues projettent les mêmes objets au lieu de créer des systèmes concurrents.</p></div><div class="principle"><b>La proposition n’est pas la décision.</b><p>NOEMA propose ; l’humain valide avant les décisions engageantes.</p></div><div class="principle"><b>Prototype honnête.</b><p>Les expériences locales restent explicitement distinguées des connexions réelles.</p></div></div></div></div></section><iframe class="frame" id="frame" title="NOEMA Playground"></iframe><div class="hint" id="hint">ACCUEIL · choisissez un espace pour commencer</div></main></div>
-<script>
-const stage=document.getElementById('stage'),frame=document.getElementById('frame');
-const buttons={home:document.getElementById('home'),composer:document.getElementById('composer'),card:document.getElementById('card'),timeline:document.getElementById('timeline')};
-const sources={composer:'./composer.html',card:'./universal-card.html',timeline:'./timeline.html'};
-const translations={'AIME-COMPOSER':'NOEMA','AIME':'NOEMA','WORKSPACE':'ESPACE DE TRAVAIL','CREATIVE WEB STUDIO':'STUDIO CRÉATIF WEB','Preview':'Aperçu','Save Version':'Enregistrer la version','Play':'Lecture','Playing…':'Lecture…','Reset':'Réinitialiser','Universal Grid':'Grille Universelle','Universal Timeline':'Timeline Universelle','Universal Card':'Carte Universelle','Compose':'Composer','Live':'Direct','Review':'Relecture','History':'Historique','Read':'Lecture','NOW':'MAINTENANT','Grid':'Grille','Guides':'Repères','Snap':'Magnétisme','Dots':'Points','CENTER':'CENTRE','MARGIN':'MARGE','SAFE':'ZONE SÛRE','BLEED':'FOND PERDU','MARKS':'REPÈRES','LINES':'LIGNES','Unit':'Unité','Step':'Pas','Subdivisions':'Subdivisions','Style':'Style','Legend':'Légende','MAGNETIC · ON':'MAGNÉTISME · ACTIF','MAGNETIC · OFF':'MAGNÉTISME · INACTIF','A4 · PRINT':'A4 · IMPRESSION','A5 · PRINT':'A5 · IMPRESSION','VIDEO':'VIDÉO'};
-function localizeFrame(){try{const d=frame.contentDocument;if(!d)return;d.documentElement.lang='fr';let embeddedStyle=d.getElementById('noema-playground-embedded-style');if(!embeddedStyle){embeddedStyle=d.createElement('style');embeddedStyle.id='noema-playground-embedded-style';embeddedStyle.textContent='.app>.top,.app>.footer{display:none!important}.app{grid-template-rows:1fr!important}';d.head.appendChild(embeddedStyle)}const brand=d.querySelector('.brand');if(brand){brand.innerHTML=brand.innerHTML.replace(/AIME-COMPOSER|AIME/g,'NOEMA').replace(/UNIVERSAL GRID/g,'GRILLE UNIVERSELLE').replace(/TIMELINE UNIVERSELLE/g,'TIMELINE UNIVERSELLE').replace(/CARTE UNIVERSELLE/g,'CARTE UNIVERSELLE')}const walker=d.createTreeWalker(d.body,NodeFilter.SHOW_TEXT);const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);nodes.forEach(n=>{let s=n.nodeValue;for(const [a,b] of Object.entries(translations))s=s.split(a).join(b);n.nodeValue=s});d.title=d.title.replace(/AIME-COMPOSER|AIME/g,'NOEMA')}catch(_){}}
-function activate(key){Object.entries(buttons).forEach(([k,b])=>{const on=k===key;b.classList.toggle('active',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});if(key==='home'){frame.removeAttribute('src');frame.title='NOEMA Playground';stage.classList.remove('in-frame');document.title='NOEMA — Accueil';return}frame.src=sources[key];frame.title=buttons[key].textContent;stage.classList.add('in-frame');document.title='NOEMA — '+buttons[key].textContent}
-function returnToPlayground(){activate('home');buttons.home.focus()}
-function wireFrameReturn(){try{frame.contentDocument?.querySelectorAll('[data-playground-return]').forEach(el=>{el.onclick=e=>{e.preventDefault();e.stopPropagation();returnToPlayground()}});localizeFrame();setTimeout(localizeFrame,120);setTimeout(localizeFrame,500)}catch(_){}}
-frame.addEventListener('load',wireFrameReturn);document.querySelector('.top .brandLink').onclick=e=>{e.preventDefault();activate('home')};Object.entries(buttons).forEach(([key,b])=>b.addEventListener('click',()=>activate(key)));document.querySelectorAll('[data-view]').forEach(el=>el.addEventListener('click',()=>activate(el.dataset.view)));document.getElementById('start').onclick=()=>activate('composer');document.getElementById('explore').onclick=()=>document.querySelector('.modules').scrollIntoView({behavior:'smooth',block:'center'});
-</script>
-</body></html>
+<html lang="fr" data-aime-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="a-root" content="../design-system/">
+<title>Médiathèque — AIME-COMPOSER</title>
+<link rel="stylesheet" href="../design-system/tokens/tokens.css">
+<link rel="stylesheet" href="../design-system/styles/foundations.css">
+<link rel="stylesheet" href="../design-system/styles/layout.css">
+<link rel="stylesheet" href="../design-system/styles/components.css">
+<link rel="stylesheet" href="../design-system/styles/aime.css">
+<link rel="stylesheet" href="../design-system/styles/noema.css">
+<link rel="stylesheet" href="../design-system/styles/patterns.css">
+<link rel="stylesheet" href="../design-system/styles/dataviz.css">
+<link rel="stylesheet" href="../design-system/styles/doc.css">
+<script src="../design-system/js/aime-ui.js" defer></script>
+<script src="media.js" defer></script>
+</head>
+<body>
+
+<header class="ds-top">
+  <a class="ds-brand" href="../index.html"><span>AIME<i>·</i>COMPOSER</span><small>V1</small></a>
+  <nav class="l-row l-row--nowrap l-hide-mobile" aria-label="Surfaces">
+    <a class="a-text-btn" href="../index.html">Accueil</a>
+    <a class="a-text-btn" href="../loop/">Boucle NOEMA</a>
+    <a class="a-text-btn" href="../diagnostic/README.md">Diagnostic</a>
+  </nav>
+  <span class="l-spacer"></span>
+  <span class="ds-top__tools">
+    <button type="button" class="a-icon-btn" id="m-theme" aria-label="Changer de thème"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="set-theme"/></svg></button>
+    <a class="a-btn a-btn--sm a-btn--primary" href="../design-system/index.html"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-document"/></svg>Design System</a>
+  </span>
+</header>
+
+<main class="ds-main l-page">
+
+  <header class="ohead">
+    <nav aria-label="Fil d'ariane"><ol class="a-crumbs"><li><a href="../index.html">Accueil</a><span class="a-crumbs__sep" aria-hidden="true">/</span></li><li><span aria-current="page">Médiathèque</span></li></ol></nav>
+    <div class="ohead__title-row">
+      <span class="ohead__mark"><svg class="a-ic a-ic--lg" aria-hidden="true" width="24" height="24"><use data-a-icon="med-library"/></svg></span>
+      <div class="ohead__titles"><span class="t-meta" id="m-count">chargement du catalogue…</span><h1 class="t-h1">Médiathèque universelle</h1></div>
+      <span class="l-spacer"></span>
+      <span class="ohead__actions">
+        <a class="a-btn a-btn--sm" href="../design-system/experiences/media-library.html"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="med-library"/></svg>L'organe dans le Design System</a>
+        <a class="a-btn a-btn--sm a-btn--ghost" href="../AUDIT/MEDIA-ATLAS-01.md"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-proof"/></svg>Audit des mécanismes</a>
+      </span>
+    </div>
+  </header>
+
+  <section class="ds-block" aria-labelledby="catalogue">
+    <h2 class="t-h2" id="catalogue">Un seul catalogue — vos dépôts, et votre poste</h2>
+    <p class="t-body u-muted">Chaque visuel, vidéo, piste audio et vecteur relevé dans les arbres git des dépôts du compte — référencé là où il vit, jamais copié ici — plus, à la demande, le contenu d'un dossier de votre poste. Les images montrent leur fichier réel ; les vidéos et les pistes audio <span class="u-strong">se lisent dans la page</span> ; un fichier inaccessible affiche sa tuile de type plutôt qu'une image simulée.</p>
+
+    <div class="l-row" role="group" aria-label="Source des médias">
+      <button type="button" class="a-pill a-pill--button" data-m-source="github" aria-current="true">Dépôts GitHub</button>
+      <button type="button" class="a-pill a-pill--button" data-m-source="local">Dossier local</button>
+      <span class="l-spacer"></span>
+      <span class="l-row l-row--nowrap" id="m-local-tools" hidden>
+        <span class="t-caption u-muted" id="m-local-meta"></span>
+        <button type="button" class="a-btn a-btn--sm" id="m-local-pick"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="com-inbox"/></svg>Parcourir un dossier…</button>
+        <input id="m-local-input" type="file" multiple webkitdirectory aria-label="Choisir un dossier local à répertorier" tabindex="-1" class="u-sr">
+      </span>
+    </div>
+
+    <div class="ds-rule" id="m-local-rule" hidden>
+      <p class="ds-rule__title">Mode local — la règle du Bureau universel</p>
+      <p>Le dossier est une surface d'entrée, pas une base : les originaux sont préservés, rien n'est copié, rien n'est envoyé, rien n'est synchronisé. La provenance (le chemin relatif sur votre poste) reste attachée à chaque média. Lire, classer, voir, relier, proposer — puis <span class="u-strong">vous validez</span>.</p>
+    </div>
+
+    <div class="l-row l-row--between">
+      <div class="a-search l-measure-md">
+        <svg class="a-ic a-search__icon" aria-hidden="true" width="20" height="20"><use data-a-icon="src-search"/></svg>
+        <label class="u-sr" for="m-q">Rechercher un média</label>
+        <input class="a-search__input" id="m-q" type="search" placeholder="Nom, dépôt, chemin…" autocomplete="off">
+      </div>
+      <div class="a-field">
+        <label class="a-field__label" for="m-repo">Provenance</label>
+        <select class="a-select" id="m-repo"><option value="">Toutes les provenances</option></select>
+      </div>
+    </div>
+
+    <div class="l-row" role="group" aria-label="Filtrer par type">
+      <button type="button" class="a-pill a-pill--button" data-m-kind="" aria-current="true">Tous</button>
+      <button type="button" class="a-pill a-pill--button" data-m-kind="image">Images</button>
+      <button type="button" class="a-pill a-pill--button" data-m-kind="video">Vidéos</button>
+      <button type="button" class="a-pill a-pill--button" data-m-kind="vecteur">Vecteurs</button>
+      <button type="button" class="a-pill a-pill--button" data-m-kind="audio">Audio</button>
+      <span class="l-spacer"></span>
+      <span class="t-caption u-muted" id="m-shown"></span>
+    </div>
+
+    <div class="l-row l-row--between" id="m-selbar" hidden>
+      <span class="l-row">
+        <span class="a-badge a-badge--accent" id="m-selcount">0</span>
+        <span class="t-body-sm u-muted">média(s) sélectionné(s) — à transmettre à un agent ou à récupérer</span>
+      </span>
+      <span class="l-row l-row--nowrap">
+        <button type="button" class="a-btn a-btn--sm" id="m-copy-links"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-clipboard"/></svg>Copier les liens</button>
+        <button type="button" class="a-btn a-btn--sm" id="m-copy-brief"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="prj-brief"/></svg>Copier le brief agent</button>
+        <button type="button" class="a-btn a-btn--sm a-btn--ghost" id="m-dl-sh"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="act-export"/></svg>Script (.sh)</button>
+        <button type="button" class="a-btn a-btn--sm a-btn--ghost" id="m-sel-visible">Tout cocher (visibles)</button>
+        <button type="button" class="a-btn a-btn--sm a-btn--ghost" id="m-sel-clear"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-close"/></svg>Effacer</button>
+      </span>
+    </div>
+
+    <div class="ds-demo">
+      <div class="ds-demo__stage ds-demo__stage--grid" id="m-grid">
+        <p class="t-body-sm u-muted">Chargement du catalogue…</p>
+      </div>
+      <p class="ds-demo__caption"><span class="t-label">Source</span><span class="t-caption" id="m-source">atlas/media.json — généré par atlas/build-media.mjs depuis les arbres git des dépôts, jamais écrit à la main.</span></p>
+    </div>
+
+    <div class="ds-rule">
+      <p class="ds-rule__title">Règle de la médiathèque</p>
+      <p>Un média existe une fois, là où il vit. Cette surface référence et laisse voir — elle n'absorbe rien dans le dépôt d'audit. L'extraction d'assets vers le Composer reste une décision humaine, tracée.</p>
+    </div>
+  </section>
+
+  <section class="ds-block" aria-labelledby="couverture">
+    <h2 class="t-h2" id="couverture">Couverture du scan — chaque dépôt, nommé</h2>
+    <p class="t-body u-muted">Le scan est <span class="u-strong">transversal</span> : il ouvre la branche par défaut de chaque dépôt du compte et relève tous les fichiers médias de tous les dossiers, sans exception (arbres lus en récursif, avec descente sous-arbre si GitHub tronquait). Ce tableau ne contourne pas une absence : un dépôt à « 0 » est un dépôt <span class="u-strong">sans média commité</span>, pas un dépôt oublié.</p>
+    <p class="t-body-sm" id="m-audio-note">Lecture de la couverture…</p>
+    <div class="ds-table-wrap ds-table-wrap--scroll">
+      <table class="a-table">
+        <caption class="u-sr">Médias relevés par dépôt du compte, avec l'état de lecture de chaque arbre</caption>
+        <thead><tr><th scope="col">Dépôt</th><th scope="col">Branche</th><th scope="col">Médias</th><th scope="col">État de lecture</th></tr></thead>
+        <tbody id="m-coverage">
+          <tr><td colspan="4">Chargement de la couverture…</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="ds-demo__caption"><span class="t-label">Provenance</span><span class="t-caption" id="m-coverage-caption">mêmes données que le catalogue ci-dessus.</span></p>
+  </section>
+
+</main>
+</body>
+</html>

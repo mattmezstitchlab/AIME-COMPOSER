@@ -99,6 +99,7 @@ export const icons = [
 
   /* ── ACTION ─────────────────────────────────────────────────── */
   { id: 'act-execute', cat: 'ACTION', label: 'Exécuter', body: P('M13 4.2h5.4a1 1 0 0 1 1 1v13.6a1 1 0 0 1-1 1H13') + P('M4.2 12H15') + P('M11.4 8.4 15 12l-3.6 3.6') },
+  { id: 'act-add', cat: 'ACTION', label: 'Ajouter', body: P('M12 5.2v13.6M5.2 12h13.6') },
   { id: 'act-check', cat: 'ACTION', label: 'Valider', body: P('M5 12.6 9.8 17.2 19 6.8') },
   { id: 'act-play', cat: 'ACTION', label: 'Lecture', body: P('M8.2 5.4v13.2L18.4 12z') },
   { id: 'act-export', cat: 'ACTION', label: 'Exporter', body: P('M12 15.6V4.2M8.2 8 12 4.2 15.8 8') + P('M5 14v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5') },

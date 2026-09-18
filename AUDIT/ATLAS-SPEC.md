@@ -1,3 +1,8 @@
+> **Supersedé le 2026-09-17** — les cinq écrans pré-système de `atlas/` ont été
+> remplacés par la Médiathèque (`atlas/index.html` + `atlas/build-media.mjs`),
+> construite avec le Design System et auditée avec lui. Ce document reste la
+> trace de la spécification d'origine.
+
 # AIME-COMPOSER — Visual Atlas Specification
 
 ## Purpose

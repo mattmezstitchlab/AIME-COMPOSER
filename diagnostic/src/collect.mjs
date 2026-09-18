@@ -1,8 +1,9 @@
 /**
- * AIME / NOEMA — COLLECTE V1
+ * AIME / NOEMA — COLLECTE V2
  *
  * Parcourt un projet et en extrait ce que le Design System sait juger :
- * les écrans HTML et les feuilles CSS.
+ * les écrans HTML, les feuilles CSS/SCSS, les sources de composants
+ * (JSX, TSX, Vue, Svelte, Astro) et les manifests de configuration.
  *
  * Deux règles de fond :
  *
@@ -24,6 +25,11 @@ export const IGNORED_DIRS = new Set([
   '.next', '.nuxt', '.output', '.svelte-kit', '.parcel-cache', '.vite',
   '.turbo', '.cache', '.npm', '.venv', 'venv', '__pycache__', '.work',
 ]);
+
+/** Extensions de sources de composants — là où vivent les écrans des moteurs. */
+export const SOURCE_EXT = new Set(['.jsx', '.tsx', '.vue', '.svelte', '.astro']);
+export const CSS_EXT = new Set(['.css', '.scss']);
+export const PAGE_EXT = new Set(['.html', '.htm']);
 
 /** Fichiers trop volumineux pour être du markup écrit à la main. */
 export const MAX_BYTES = 2 * 1024 * 1024;
@@ -61,6 +67,9 @@ export function collect(root, { maxBytes = MAX_BYTES } = {}) {
   const abs = resolve(root);
   const pages = [];
   const cssFiles = [];
+  const sources = [];
+  const packages = [];
+  const configs = [];
   const skipped = [];
 
   const walk = (dir) => {
@@ -84,8 +93,21 @@ export function collect(root, { maxBytes = MAX_BYTES } = {}) {
       }
       if (!entry.isFile()) continue;
 
-      const ext = extname(entry.name).toLowerCase();
-      if (!['.html', '.htm', '.css'].includes(ext)) continue;
+      const lower = entry.name.toLowerCase();
+      const ext = extname(lower);
+      /* La génération se reconnaît d'abord à son nom : un bundle ou un
+         fichier minifié n'est jamais une décision humaine à juger. */
+      if (/\.min\.(js|css)$/.test(lower) || /\.(bundle|chunk)\.js$/.test(lower)) {
+        skipped.push({ path: rel, reason: 'fichier généré (minifié/bundle)' });
+        continue;
+      }
+
+      const wanted =
+        PAGE_EXT.has(ext) || CSS_EXT.has(ext) || SOURCE_EXT.has(ext) ||
+        lower === 'package.json' ||
+        /^(tailwind|next|nuxt|astro|svelte|vite)\.config\.(js|ts|cjs|mjs)$/.test(lower) ||
+        lower === 'angular.json';
+      if (!wanted) continue;
 
       let size;
       try {
@@ -105,8 +127,11 @@ export function collect(root, { maxBytes = MAX_BYTES } = {}) {
         skipped.push({ path: rel, reason: 'illisible' });
         continue;
       }
-      if (ext === '.css') cssFiles.push({ name: rel, text, density: densityOf(text) });
-      else pages.push({ name: rel, html: text, density: densityOf(text) });
+      if (lower === 'package.json') { packages.push({ name: rel, text }); continue; }
+      if (/config|angular\.json/.test(lower) && ![...PAGE_EXT, ...CSS_EXT, ...SOURCE_EXT].includes(ext)) { configs.push({ name: rel, text }); continue; }
+      if (PAGE_EXT.has(ext)) pages.push({ name: rel, html: text, density: densityOf(text), kind: 'document' });
+      else if (CSS_EXT.has(ext)) cssFiles.push({ name: rel, text, density: densityOf(text), scss: ext === '.scss' });
+      else sources.push({ name: rel, text, density: densityOf(text), ext });
     }
   };
 
@@ -116,8 +141,11 @@ export function collect(root, { maxBytes = MAX_BYTES } = {}) {
   const byName = (a, b) => a.name.localeCompare(b.name);
   pages.sort(byName);
   cssFiles.sort(byName);
+  sources.sort(byName);
+  packages.sort(byName);
+  configs.sort(byName);
 
-  return { root: abs, pages, cssFiles, skipped };
+  return { root: abs, pages, cssFiles, sources, packages, configs, skipped };
 }
 
 /** Ce que le collecteur exclut — utile au rapport et aux tests. */

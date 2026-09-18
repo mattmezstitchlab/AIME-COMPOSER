@@ -103,6 +103,19 @@
 .umedia[data-format='a4'] { aspect-ratio: 210 / 297; }
 .umedia img, .umedia video { width: 100%; height: 100%; object-fit: cover; }
 .umedia--contain img { object-fit: contain; }
+/* Visionneuse universelle : la tuile devient lecteur (vidéo/audio du
+   chapitre 13 du contrat Bureau universel). Le média reste à sa source,
+   la page ne fait que projeter la lecture. */
+.umedia--player img, .umedia--player video { object-fit: contain; }
+.umedia--player .umedia__label { inset-block-end: auto; inset-block-start: var(--aime-space-2); z-index: 1; }
+.umedia__audio {
+  position: absolute;
+  inset-inline: var(--aime-space-2);
+  inset-block-end: var(--aime-space-2);
+  width: calc(100% - (var(--aime-space-2) * 2));
+  block-size: var(--aime-control-lg);
+}
+.umedia__video { width: 100%; block-size: 100%; }
 .umedia__label {
   position: absolute; inset-block-end: var(--aime-space-2); inset-inline-start: var(--aime-space-2);
   display: inline-flex; align-items: center; height: 20px;

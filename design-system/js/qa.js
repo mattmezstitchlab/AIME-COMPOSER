@@ -278,8 +278,7 @@ export function audit(input) {
   }
 
   /* ── TYPOGRAPHY ────────────────────────────────────────────── */
-  const sizes = new Set((tokensJson?.typography?.roles || []).map((t) => t.size));
-  for (const f of allCss) {
+  const sizes = new Set((tokensJson?.typography?.roles || []).map((t) => t.size));  for (const f of allCss) {
     for (const r of rulesByFile.get(f.name)) {
       for (const d of decls(r.body)) {
         if (d.prop === 'font-size') {
@@ -396,6 +395,18 @@ export function audit(input) {
 
   /* ── HIERARCHY ─────────────────────────────────────────────── */
   for (const p of pages) {
+    /* Un fragment n'est pas un écran : exiger un <h1> par composant
+       serait un faux écart en cascade. La hiérarchie d'un fragment est
+       vérifiée en interne (ordre des niveaux), jamais son titre unique. */
+    if (p.fragment) {
+      const levels = [...p.html.matchAll(/<h([1-6])[\s>]/g)].map((m) => Number(m[1]));
+      for (let i = 1; i < levels.length; i++) {
+        if (levels[i] - levels[i - 1] > 1) {
+          add('HIERARCHY', p.name, lineOf(p.html, p.html.indexOf(`<h${levels[i]}`)), `saut de niveau h${levels[i - 1]} → h${levels[i]}`);
+        }
+      }
+      continue;
+    }
     const hier = stripRegions(p.html, 'ds-demo__stage');
     const h1 = (hier.match(/<h1[\s>]/g) || []).length;
     if (h1 !== 1) add('HIERARCHY', p.name, 0, `${h1} <h1> — un écran doit avoir exactement un titre de niveau 1`);
@@ -411,6 +422,10 @@ export function audit(input) {
 
   /* ── RESPONSIVE ────────────────────────────────────────────── */
   for (const p of pages) {
+    /* Le viewport n'appartient qu'aux documents complets : un composant
+       de route React n'a pas de <head> à porter — ce serait un écart
+       qui ne porte sur rien. */
+    if (p.fragment || p.kind === 'component') continue;
     if (!/name="viewport"/.test(p.html)) add('RESPONSIVE', p.name, 0, 'meta viewport absent');
   }
   const bps = Object.values(tokensJson?.breakpoints || {}).filter(Boolean);
@@ -469,6 +484,88 @@ export function audit(input) {
           add('CONSISTENCY', p.name, lineOf(p.html, m.index), `style en ligne portant une valeur : ${prop}: ${value}`);
         }
       }
+    }
+  }
+
+  /* ── SOURCES EXTRAITES (React, Vue, Svelte, Tailwind, CSS-in-JS) ──
+     `atoms` est une liste d'observations normalisées venues de sources
+     que le parseur CSS ne lit pas — classes utilitaires, styles inline
+     d'objets JSON, littéraux dans du JSX. Chaque atome est jugé par la
+     famille native avec le barème des tokens — rien n'est recopié :
+     l'échelle vient de tokens.json, les seuils sont ceux des blocs
+     ci-dessus. Un atome mal formé n'est pas deviné : l'extracteur le
+     range dans « non résolu », jamais ici. */
+  const spacingScale = new Set(tokensJson?.space?.scale || []);
+  const durations = new Set(Object.values(tokensJson?.motion?.duration || {}));
+  const radiiSet = new Set(Object.values(tokensJson?.radius || {}));
+  for (const a of input.atoms || []) {
+    const src = a.source || 'source extraite';
+    switch (a.kind) {
+      case 'color-literal':
+        add('COLOR', a.file, a.line, `couleur littérale « ${a.value} » (${src}) — utiliser un rôle (--aime-color-*)`);
+        break;
+      case 'color-palette':
+        add('COLOR', a.file, a.line, `couleur nommée « ${a.value} » (${src}) — palette externe au système, sauf pont officiel`);
+        break;
+      case 'spacing-px':
+        if (!spacingScale.has(a.px)) {
+          add('SPACING', a.file, a.line, `${a.context} = ${a.px}px (${src}) — hors échelle d'espacement`);
+        }
+        break;
+      case 'size-px': {
+        const abs = Math.abs(a.px);
+        if (abs > 16 && abs % 4 !== 0) {
+          add('ALIGNMENT', a.file, a.line, `${a.context} = ${a.px}px (${src}) — ni multiple de 4, ni repère optique ≤ 16 px`);
+        }
+        break;
+      }
+      case 'radius-px':
+        if (!radiiSet.has(a.px)) {
+          add('ALIGNMENT', a.file, a.line, `rayon ${a.px}px (${src}) — hors des quatre niveaux`);
+        }
+        break;
+      case 'font-size-px':
+        if (!sizes.has(a.px)) {
+          add('TYPOGRAPHY', a.file, a.line, `taille ${a.px}px (${src}) — hors des 9 rôles typographiques`);
+        }
+        break;
+      case 'line-height': {
+        const n = Number(a.value);
+        if (Number.isFinite(n) && (n < 1 || n > 1.6)) {
+          add('TYPOGRAPHY', a.file, a.line, `line-height ${n} (${src}) — hors de l'intervalle 1.0 – 1.6`);
+        }
+        break;
+      }
+      /* Une durée d'utilitaire est jugée sur l'échelle des six durées du
+         système (80 · 140 · 200 · 320 · 900 · 150 ms) : dans l'échelle,
+         elle correspond à un token du système ; hors échelle, c'est un
+         écart. (En CSS, une durée littérale reste un écart quel que soit
+         le nombre — convention différente parce que le token existe.) */
+      case 'duration-ms':
+        if (!durations.has(a.ms) && a.ms !== 0 && a.ms !== 1) {
+          add('MOTION', a.file, a.line, `${a.context} = ${a.ms}ms (${src}) — hors des six durées du système`);
+        }
+        break;
+      /* Même règle que le CSS : outline:none sans substitution. Un
+         atome ne connaît pas sa feuille, la possibilité d'un anneau --
+         --aime-focus-ring est rappelée dans le message. */
+      case 'outline-none':
+        add('FOCUS', a.file, a.line, `« ${a.value} » (${src}) — anneau supprimé sans substitution (--aime-focus-ring)`);
+        break;
+      case 'emoji':
+        add('ICONOGRAPHY', a.file, a.line, `emoji « ${a.value} » (${src}) — utiliser la famille SVG AIME`);
+        break;
+      case 'icon-unknown':
+        add('ICONOGRAPHY', a.file, a.line, `icône inexistante : #${a.value} (${src})`);
+        break;
+      case 'svg-unnamed':
+        add('ICONOGRAPHY', a.file, a.line, `SVG ni décoratif (aria-hidden) ni nommé (role="img" + label) (${src})`);
+        break;
+      case 'inline-value':
+        add('CONSISTENCY', a.file, a.line, `style en ligne portant une valeur : ${a.prop}: ${a.value} (${src})`);
+        break;
+      default:
+        break;
     }
   }
 
