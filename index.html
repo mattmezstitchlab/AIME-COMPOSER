@@ -14,11 +14,79 @@
 <link rel="stylesheet" href="design-system/styles/patterns.css">
 <link rel="stylesheet" href="design-system/styles/dataviz.css">
 <link rel="stylesheet" href="design-system/styles/doc.css">
+<style>
+.home-hero {
+  display: grid;
+  gap: var(--aime-space-4);
+  padding-block-start: var(--aime-space-2);
+}
+.home-composer {
+  border: var(--aime-border-default);
+  border-radius: var(--aime-radius-large);
+  background: var(--aime-color-surface);
+  padding: var(--aime-space-3);
+  display: grid;
+  gap: var(--aime-space-3);
+  box-shadow: var(--aime-shadow-raise);
+  transition: border-color var(--aime-motion-fast) var(--aime-ease-out), box-shadow var(--aime-motion-fast) var(--aime-ease-out);
+}
+.home-composer:focus-within {
+  border-color: var(--aime-color-accent);
+  box-shadow: var(--aime-focus-ring);
+}
+.home-composer__box {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--aime-space-2);
+}
+.home-composer__add {
+  flex: none;
+  margin-block-start: var(--aime-space-1);
+}
+.home-composer__field {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: grid;
+  gap: var(--aime-space-1);
+}
+.home-composer__input {
+  width: 100%;
+  min-height: 88px;
+  border: 0;
+  padding: var(--aime-space-1) var(--aime-space-2);
+  background: transparent;
+  color: var(--aime-color-text);
+  font-size: var(--aime-text-body-size);
+  line-height: var(--aime-text-body-lh);
+  resize: vertical;
+}
+.home-composer__input:focus {
+  outline: none;
+}
+.home-composer__input::placeholder {
+  color: var(--aime-color-text-subtle);
+}
+.home-composer__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--aime-space-3);
+  flex-wrap: wrap;
+  padding-block-start: var(--aime-space-2);
+  border-top: var(--aime-border-subtle);
+}
+.home-modes {
+  display: flex;
+  align-items: center;
+  gap: var(--aime-space-2);
+  flex-wrap: wrap;
+}
+</style>
 <script src="design-system/js/aime-ui.js" defer></script>
 <script src="home.js" defer></script>
 </head>
 <body>
-<noscript><p class="t-body-sm">Cette page utilise JavaScript pour la conversation avec NOEMA. <a class="a-text-btn" href="index.html">Recharger la page</a>.</p></noscript>
+<noscript><p class="t-body-sm">Cette page utilise JavaScript pour la conversation avec NOEMA et les raccourcis d'entrée. <a class="a-text-btn" href="index.html">Recharger la page</a>.</p></noscript>
 
 <header class="ds-top">
   <a class="ds-brand" href="index.html"><span>AIME<i>·</i>COMPOSER</span><small>V1</small></a>
@@ -37,49 +105,78 @@
 
 <main class="ds-main l-page" id="contenu">
 
-  <header class="ds-hero">
+  <!-- HERO CENTRAL — LA PORTE UNIVERSELLE DU PRODUIT -->
+  <header class="ds-hero home-hero">
     <div class="ds-eyebrow">
       <span class="noema-mark"><svg class="a-ic a-ic--sm noema-mark__glyph" aria-hidden="true" width="16" height="16"><use data-a-icon="noe-mark"/></svg><span class="noema-mark__word">AIME-COMPOSER</span></span>
       <span class="a-badge a-badge--accent">V1</span>
-      <span class="a-badge">La couche qui audite et fait converger</span>
+      <span class="a-badge" id="h-hero-badge">NOEMA : connexion…</span>
     </div>
-    <h1 class="t-display">Le système, montré en train de fonctionner.</h1>
-    <p class="t-body u-muted l-measure-xl">Dites quelque chose à NOEMA, en vos mots — puis, plus bas, quatre entrées expliquent simplement ce que ce dépôt sait faire.</p>
+    <h1 class="t-display">La porte universelle du produit.</h1>
+    <p class="t-body u-muted l-measure-xl">Un point d'entrée unique pour décrire une intention, ausculter un dépôt, joindre vos fichiers ou régler un style. Le complexe et le technique vivent derrière.</p>
   </header>
 
-  <section class="ds-block l-measure-xl" aria-labelledby="parler">
-    <h2 class="t-h2" id="parler">Parler à NOEMA</h2>
-    <div class="a-field">
-      <label class="a-field__label" for="h-noema-text">Votre intention — une phrase dans vos mots, pas un formulaire</label>
-      <textarea class="a-textarea" id="h-noema-text" placeholder="Camille Vasseur est saxophoniste ; il me faut la capacité de la salle ; envoyer l'annonce pour le 24 septembre"></textarea>
-      <span class="a-field__hint">« Lire sans écrire » montre ce que NOEMA comprend — rien n'est enregistré. Ce qu'elle ne comprend pas vous est dit, jamais deviné.</span>
+  <!-- BLOC CENTRAL : STYLE MANUS / COMPOSER -->
+  <section class="ds-block l-measure-xl" aria-labelledby="atelier-composer">
+    <h2 class="u-sr" id="atelier-composer">Atelier d'entrée universel</h2>
+
+    <div class="home-composer">
+      <div class="home-composer__box">
+        <div class="home-composer__add">
+          <button type="button" class="a-icon-btn a-icon-btn--edge" id="h-plus-btn" data-a-pop="#h-plus-menu" aria-expanded="false" aria-haspopup="true" aria-label="Ajouter une source ou choisir une entrée"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="act-add"/></svg></button>
+        </div>
+        <div class="home-composer__field">
+          <label class="u-sr" for="h-noema-text">Décris ce que tu veux faire, colle un lien, ou joins un dossier…</label>
+          <textarea class="home-composer__input" id="h-noema-text" rows="3" placeholder="Décris ce que tu veux faire, colle un lien, ou joins un dossier…"></textarea>
+          <input type="file" id="h-file-picker" class="u-sr" aria-label="Choisir un fichier">
+          <input type="file" id="h-folder-picker" class="u-sr" webkitdirectory directory aria-label="Choisir un dossier local">
+        </div>
+      </div>
+
+      <div class="home-composer__bar">
+        <!-- MODES EN PASTILLES SÉLECTIONNABLES -->
+        <div class="home-modes" role="group" aria-label="Modes de traitement">
+          <button type="button" class="a-pill a-pill--button" data-h-mode="diag" aria-pressed="false"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="prf-shield"/></svg>Diagnostic</button>
+          <button type="button" class="a-pill a-pill--button" data-h-mode="media" aria-pressed="false"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="med-library"/></svg>Médiathèque</button>
+          <button type="button" class="a-pill a-pill--button" data-h-mode="da" aria-pressed="false"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="set-sliders"/></svg>Direction artistique</button>
+          <button type="button" class="a-pill a-pill--button" data-h-mode="noema" aria-pressed="false"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="cmp-compose"/></svg>Boucle NOEMA</button>
+        </div>
+
+        <div class="l-row">
+          <button type="button" class="a-btn a-btn--sm" id="h-noema-read">Lire sans écrire</button>
+          <button type="button" class="a-btn a-btn--sm a-btn--primary" id="h-noema-submit">Lancer</button>
+        </div>
+      </div>
     </div>
-    <div class="l-row">
-      <button type="button" class="a-icon-btn" data-a-pop="#h-plus-menu" aria-expanded="false" aria-haspopup="true" aria-label="Choisir une intention ou un accès"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="act-add"/></svg></button>
-      <button type="button" class="a-btn a-btn--sm" id="h-noema-read">Lire sans écrire</button>
-      <button type="button" class="a-btn a-btn--sm a-btn--primary" id="h-noema-submit">Proposer à la validation</button>
-      <span class="l-spacer"></span>
-      <a class="a-text-btn" href="loop/"><span class="t-caption">La boucle complète</span><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-arrow-right"/></svg></a>
-    </div>
+
+    <!-- SORTIE DU ROUTEUR ET DE LA CONVERSATION NOEMA -->
     <div class="l-stack" id="h-noema-out" aria-live="polite">
-      <p class="t-body-sm u-muted">Si le badge « NOEMA en ligne » s'affiche en haut de page, la réponse vient du vrai moteur ; sinon la conversation reste visible en lecture seule.</p>
+      <p class="t-body-sm u-muted">Texte libre, lien GitHub, dossier local ou mode choisi : chaque action est branchée sur le réel et n'invente rien.</p>
     </div>
   </section>
 
+  <!-- MENU DÉROULANT DU BOUTON + DU CHAMP -->
   <div class="a-pop" id="h-plus-menu" hidden>
     <ul class="a-menu">
-      <li class="a-menu__label">Intentions prêtes</li>
+      <li class="a-menu__label">Joindre ou brancher</li>
+      <li><button type="button" class="a-menu__item" data-h-action="folder"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="com-inbox"/></svg>Dossier local</button></li>
+      <li><button type="button" class="a-menu__item" data-h-action="file"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-document"/></svg>Fichier</button></li>
+      <li><button type="button" class="a-menu__item" data-h-action="github"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-version"/></svg>Lien GitHub</button></li>
+      <li><button type="button" class="a-menu__item" data-h-action="url"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-external"/></svg>Coller une URL</button></li>
+      <li class="a-menu__sep" role="presentation"></li>
+      <li class="a-menu__label">Surfaces</li>
+      <li><a class="a-menu__item" href="design-system/direction.html"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="set-sliders"/></svg>Direction artistique</a></li>
+      <li><a class="a-menu__item" href="atlas/"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="med-library"/></svg>Médiathèque universelle</a></li>
+      <li><a class="a-menu__item" href="loop/"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="cmp-compose"/></svg>Boucle NOEMA</a></li>
+      <li class="a-menu__sep" role="presentation"></li>
+      <li class="a-menu__label">Exemples d'intentions NOEMA</li>
       <li><button type="button" class="a-menu__item" data-h-intent="Camille Vasseur est saxophoniste au Conservatoire de Lyon"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="ppl-person"/></svg>Mémoriser une personne</button></li>
       <li><button type="button" class="a-menu__item" data-h-intent="il me faut la capacité de la Salle des Fêtes"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="mem-card"/></svg>Déclarer une donnée manquante</button></li>
       <li><button type="button" class="a-menu__item" data-h-intent="envoyer l'annonce du concert pour le 24 septembre"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="com-broadcast"/></svg>Demander une action</button></li>
-      <li class="a-menu__sep" role="presentation"></li>
-      <li class="a-menu__label">Aller</li>
-      <li><a class="a-menu__item" href="atlas/"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="med-library"/></svg>Médiathèque universelle</a></li>
-      <li><a class="a-menu__item" href="design-system/direction.html"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="set-sliders"/></svg>Direction artistique</a></li>
-      <li><a class="a-menu__item" href="loop/"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="cmp-compose"/></svg>Ouvrir la boucle complète</a></li>
     </ul>
   </div>
 
+  <!-- SECTION SECONDAIRE COMPACTE : LES QUATRE ENTRÉES DU PRODUIT -->
   <section class="ds-block" aria-labelledby="entrees">
     <h2 class="t-h2" id="entrees">Les quatre entrées</h2>
     <p class="t-body u-muted l-measure-xl">Chacune est la vraie surface, pas une vitrine ; chacune dit en une phrase ce qu'elle fait et pour qui.</p>

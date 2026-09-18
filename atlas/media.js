@@ -560,9 +560,11 @@
     if (count && state.source === 'github') count.textContent = 'catalogue indisponible — le mode local, lui, n\'a besoin de rien';
   }
 
+  const initialSource = new URLSearchParams(window.location.search).get('source') === 'local' ? 'local' : 'github';
+  setSource(initialSource);
+
   if (typeof fetch !== 'function') {
     /* jsdom (vérification DOM) n'a pas fetch : la page reste docile. */
-    setSource('github');
     unavailable();
     return;
   }
