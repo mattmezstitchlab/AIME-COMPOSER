@@ -62,10 +62,13 @@ const reset = () => post('/api/reset', {});
 /* ══ STATIQUE ═══════════════════════════════════════════════════ */
 console.log('\nSERVEUR — statique');
 
-await test('la racine sert Point Zero — la coquille a absorbé l\'écran de la boucle', async () => {
+await test('la racine mène à Point Zero — par redirection, pour que ses modules relatifs résolvent', async () => {
+  const raw = await fetch(`${BASE}/?resolve=1`, { redirect: 'manual' });
+  eq(raw.status, 302, 'la racine ne redirige pas');
+  eq(raw.headers.get('location'), '/point-zero/?resolve=1', 'la redirection ne conserve pas la requête');
   const r = await get('/');
-  eq(r.status, 200, 'la racine ne répond pas 200');
-  ok(r.body.includes('Point Zero — AIME'), 'la racine ne sert pas la coquille');
+  eq(r.status, 200, 'la racine suivie ne répond pas 200');
+  ok(r.body.includes('Point Zero — AIME'), 'la racine ne mène pas à la coquille');
   ok(r.body.includes('id="pz-noema-observe"'), 'la coquille servie ne porte pas le rail NOEMA');
 });
 

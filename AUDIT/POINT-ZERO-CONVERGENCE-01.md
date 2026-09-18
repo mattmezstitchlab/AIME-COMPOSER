@@ -288,6 +288,8 @@ Gates après suppression : QA 12/12 sur 33 écrans · verify DOM 33/33 · smokes
 
 **Dans le même mouvement, la documentation du design system est devenue une seule page verticale** (demande utilisateur) : 19 chapitres + `direction.html` + `qa.html` fusionnés par `design-system/src/merge-doc.mjs` dans `design-system/index.html` (20 chapitres, 197 ancres uniques préfixées par chapitre, un seul `h1`, scroll-spy dans `js/doc.js`), les 20 pages supprimées, toutes les références retargetées (`experiences/`, `direction.js`, `pz.js`, résolveur, README). Deux orphelins préexistants corrigés à la source (`aria-labelledby="grammar"` sans cible, onglets `fa-t1/2` sans panneaux). Périmètre QA : **14 écrans**.
 
+**Régression trouvée à l'œil, corrigée dans la foulée :** depuis la Vague 2, `loop/server.mjs` servait *le contenu* de `point-zero/index.html` sous `/` ; la coquille y résolvait ses modules relatifs (`pz.js`, `pz-import.mjs`) en `/pz.js` → 404, et restait figée sur « Préparation de l'inspecteur… » avec le Bureau en « lecture du catalogue… ». Les tests ne le voyaient pas (ils vérifiaient le HTML servi, pas l'exécution du module). La racine **redirige** désormais (302) vers `/point-zero/` en conservant la requête ; test `api.mjs` re-ciblé (redirection manuelle + suivi).
+
 Gates : QA 12/12 sur 14 écrans · verify DOM 14/14 · Bureau 52/52 · NOEMA 50/50 · seuil 17/17 · résolveur 109/109 · boucle 91 + 36. Limite connue : le scroll-spy (`IntersectionObserver`) n'est pas exerçable en jsdom — vérifié par lecture seulement.
 
 ### Vague 4 — décision sur les références : expériences et atelier

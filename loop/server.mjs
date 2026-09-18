@@ -72,9 +72,15 @@ const MIME = {
 function serveStatic(req, res) {
   const url = new URL(req.url, `http://${req.headers.host}`);
   const path = decodeURIComponent(url.pathname);
-  /* La racine sert Point Zero : l'écran de la boucle a été absorbé par la
-     coquille (AUDIT/POINT-ZERO-CONVERGENCE-01.md, Vague 2). */
-  let file = join(REPO, path === '/' ? 'point-zero/index.html' : path);
+  /* La racine mène à Point Zero : l'écran de la boucle a été absorbé par la
+     coquille (AUDIT/POINT-ZERO-CONVERGENCE-01.md, Vague 2). Redirection, pas
+     copie : servie sous `/`, la coquille résoudrait `pz.js` en `/pz.js` (404)
+     et resterait figée sur « Préparation de l'inspecteur… ». */
+  if (path === '/') {
+    res.writeHead(302, { location: `/point-zero/${url.search}${url.hash}` });
+    return res.end();
+  }
+  let file = join(REPO, path);
   /* Un chemin qui se termine par / ou pointe un dossier sert son index. */
   if (existsSync(file) && statSync(file).isDirectory()) file = join(file, 'index.html');
   if (!file.startsWith(REPO) || !existsSync(file) || !statSync(file).isFile()) {
