@@ -30,7 +30,7 @@ const MEDIA = {
   ],
 };
 
-function makeDom(htmlPath, { fetchImpl } = {}) {
+function makeDom(htmlPath, { fetchImpl, search = '' } = {}) {
   /* jsdom n'exécute pas les <script src> sans chargeur de ressources :
      on inline le JS réel des pages À LA FIN DU BODY (position équivalente
      au `defer` d'origine : tout le DOM existe quand le script tourne). */
@@ -48,8 +48,11 @@ function makeDom(htmlPath, { fetchImpl } = {}) {
   html = html.replace('</body>', `${bodies.join('\n')}\n</body>`);
   const clipboard = { writes: [] };
   const clicks = [];
+  const targetUrl = htmlPath.includes('atlas')
+    ? `http://localhost/atlas/index.html${search}`
+    : `http://localhost/index.html${search}`;
   const dom = new JSDOM(html, {
-    url: htmlPath.includes('atlas') ? 'http://localhost/atlas/index.html' : 'http://localhost/index.html',
+    url: targetUrl,
     runScripts: 'dangerously',
     beforeParse(window) {
       window.URL.createObjectURL = (blob) => `blob:local-${Math.random().toString(36).slice(2, 8)}`;
@@ -181,6 +184,21 @@ console.log('\nMÉDIATHÈQUE V2 — visionneuse, local, couverture');
   t('audio 0 : dit la vérité (arbres lus en entier, médias hors git, mode local)',
     note2.includes('0 piste commitée') && note2.includes('hors git') && note2.includes('mode local'));
   t('audio 0 : retour GitHub propre', dom2.dom.window.document.querySelector('[data-m-source="github"]').getAttribute('aria-current') === 'true');
+
+  /* Deep-link ?source=local (grammaire de routage de la porte universelle) */
+  const domLocalParam = makeDom('/home/user/AIME-COMPOSER/atlas/index.html', { search: '?source=local' });
+  await drain(domLocalParam.dom);
+  const localParamDoc = domLocalParam.dom.window.document;
+  t('deep-link ?source=local active le mode local dès l’arrivée',
+    localParamDoc.querySelector('[data-m-source="local"]').getAttribute('aria-current') === 'true' &&
+    localParamDoc.querySelector('#m-local-rule').hidden === false);
+
+  const domDefaultParam = makeDom('/home/user/AIME-COMPOSER/atlas/index.html');
+  await drain(domDefaultParam.dom);
+  const defaultParamDoc = domDefaultParam.dom.window.document;
+  t('sans paramètre ou inconnu : reste en mode GitHub par défaut (non-régression)',
+    defaultParamDoc.querySelector('[data-m-source="github"]').getAttribute('aria-current') === 'true' &&
+    defaultParamDoc.querySelector('#m-local-rule').hidden === true);
 }
 
 console.log('\nACCUEIL SOBRE — entrées expliquées');
@@ -197,6 +215,31 @@ console.log('\nACCUEIL SOBRE — entrées expliquées');
   t('menu « + » : lien Direction artistique', [...document.querySelectorAll('#h-plus-menu a')].some((a) => a.getAttribute('href') === 'design-system/direction.html'));
   t('organes/démos retirés (sobre)', !document.querySelector('#h-card') && !document.querySelector('#h-timeline') && !document.querySelector('#organes'));
   t('diagnostic reste une entrée expliquée', rows[3]?.textContent.includes('jamais un score inventé'));
+
+  /* Bloc central style Manus / Composer & routage */
+  t('hero central : placeholder du composer style Manus présent',
+    document.querySelector('#h-noema-text')?.getAttribute('placeholder')?.includes('Décris ce que tu veux faire'));
+  t('hero central : bouton « + » présent avec popover',
+    !!document.querySelector('#h-plus-btn') && document.querySelector('#h-plus-btn')?.getAttribute('data-a-pop') === '#h-plus-menu');
+  t('hero central : 4 modes en pastilles (Diagnostic, Médiathèque, DA, Boucle)',
+    document.querySelectorAll('[data-h-mode]').length === 4);
+  t('hero central : badge NOEMA en ligne/démo survit dans le hero',
+    !!document.querySelector('#h-hero-badge'));
+
+  /* Routage réel */
+  const input = document.querySelector('#h-noema-text');
+  const submit = document.querySelector('#h-noema-submit');
+  const out = document.querySelector('#h-noema-out');
+
+  input.value = 'https://github.com/mattmezstitchlab/AIME-COMPOSER';
+  submit.click();
+  t('routage : Lien GitHub route vers commande de diagnostic réelle',
+    out.innerHTML.includes('diagnostic/diagnose.mjs') && out.innerHTML.includes('mattmezstitchlab'));
+
+  input.value = 'https://mon-site-vitrine.fr';
+  submit.click();
+  t('routage : Lien URL de site affiche honnêtement « en préparation »',
+    out.innerHTML.includes('en préparation') && out.innerHTML.includes('diagnostic de site en ligne'));
 }
 
 console.log(`\n${fail === 0 ? '✓' : '✗'} SMOKES MÉDIATHÈQUE V2 + ACCUEIL : ${pass}/${pass + fail}`);
