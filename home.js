@@ -1,24 +1,22 @@
 /**
  * AIME-COMPOSER — page d'accueil du dépôt.
- * Refonte de l'accueil : la porte universelle pédagogique style Manus / composer.
+ * Refonte de la porte universelle : résolveur pur + aperçu universel.
  *
  * Responsabilités :
  *   1. Résoudre les icônes déclaratives `data-a-icon`.
  *   2. Maintenir la préférence de thème clair / sombre.
  *   3. Gérer le bloc central style Manus :
- *      - menu « + » (Dossier local, Fichier, Lien GitHub, Coller URL, intentions prêtes) ;
- *      - sélection exclusive des pastilles de modes (Diagnostic, Médiathèque, DA, Boucle) ;
- *      - routage branché sur le réel, jamais simulé :
- *        * texte seul sans mode → conversation NOEMA (branchée sur la boucle) ;
- *        * mode DA → ouverture de design-system/direction.html ;
- *        * mode Médiathèque ou action Dossier local / Fichier → atlas/index.html?source=local (ou catalogue) ;
- *        * Lien GitHub / owner/repo → diagnostic réel (commande vérifiable) ;
- *        * URL web d'un site → annonce honnête « diagnostic de site en ligne : en préparation » (moteur EAA à venir) ;
- *        * mode non implémenté → pastille ou annonce honnête, jamais un bouton mort ;
- *   4. Surveiller l'état de la boucle NOEMA (/api/state) et mettre à jour
- *      les badges (« NOEMA en ligne · démo » ou « NOEMA hors ligne »).
+ *      - menu « + » (Dossier local → atlas/?source=local, Lien GitHub, Coller URL, intentions prêtes) ;
+ *      - sélection exclusive des pastilles de modes (Diagnostic, Médiathèque, Direction artistique, Boucle NOEMA)
+ *        avec contrat aria-current (cf design-system/components.html) ;
+ *      - résolveur pur resolveAction(raw, activeMode) -> { intention, label, destination, aperçu } ;
+ *      - label du bouton Lancer contextuel via le résolveur ;
+ *      - Aperçu universel (ex Lire sans écrire) : affiche l'action résolue sans naviguer ni écrire ;
+ *      - Garde-fou diag : Diagnostic GitHub uniquement si parseGitHub réussit.
+ *   4. Surveiller l'état de la boucle NOEMA (/api/state) et mettre à jour les badges.
  *
  * Script classique (defer) compatible jsdom.
+ * Le résolveur est dupliqué dans home-resolver.mjs pour les tests Node — garder synchro.
  */
 (function () {
   const select = (sel) => document.querySelector(sel);
@@ -105,61 +103,10 @@
   const field = select('#h-noema-text');
   const out = select('#h-noema-out');
   const modePills = selectAll('[data-h-mode]');
-  const filePicker = select('#h-file-picker');
-  const folderPicker = select('#h-folder-picker');
+  const submitBtn = select('#h-noema-submit');
+  const previewBtn = select('#h-noema-read');
 
-  /* ── Gestion des modes en pastilles ─────────────────────────── */
-  let activeMode = null;
-
-  function setMode(mode) {
-    if (activeMode === mode) {
-      activeMode = null; // bascule désactivation
-    } else {
-      activeMode = mode;
-    }
-    modePills.forEach((p) => {
-      const match = p.dataset.hMode === activeMode;
-      p.setAttribute('aria-pressed', match ? 'true' : 'false');
-      p.classList.toggle('is-active', match);
-    });
-  }
-
-  modePills.forEach((p) => {
-    p.addEventListener('click', () => {
-      setMode(p.dataset.hMode);
-      if (activeMode && !field.value.trim()) {
-        renderModeHint(activeMode);
-      }
-    });
-  });
-
-  function renderModeHint(mode) {
-    if (!out) return;
-    if (mode === 'diag') {
-      out.innerHTML = `<div class="ds-rule">
-        <p class="ds-rule__title">Mode Diagnostic actif</p>
-        <p>Collez un lien GitHub (<span class="u-strong">https://github.com/owner/repo</span> ou <span class="u-strong">owner/repo</span>) ou le chemin d'un dossier local pour lancer la mesure sans jamais écrire dans le projet.</p>
-      </div>`;
-    } else if (mode === 'media') {
-      out.innerHTML = `<div class="ds-rule">
-        <p class="ds-rule__title">Mode Médiathèque actif</p>
-        <p>Cliquez sur « Lancer » pour ouvrir le catalogue universel (38 dépôts du compte) ou utilisez le « + » pour joindre un dossier local sans aucun transfert réseau.</p>
-      </div>`;
-    } else if (mode === 'da') {
-      out.innerHTML = `<div class="ds-rule">
-        <p class="ds-rule__title">Mode Direction artistique actif</p>
-        <p>Cliquez sur « Lancer » pour régler thème, accent, rayons et densité dans l'Atelier DA et exporter le brief agent ou le CSS conforme EAA.</p>
-      </div>`;
-    } else if (mode === 'noema') {
-      out.innerHTML = `<div class="ds-rule">
-        <p class="ds-rule__title">Mode Boucle NOEMA actif</p>
-        <p>Exprimez une intention en vos mots : mémoriser une personne, signaler une donnée manquante ou demander une action. NOEMA propose, l'humain valide.</p>
-      </div>`;
-    }
-    resolveIcons(out);
-  }
-
-  /* ── Analyseurs d'URL et de références ───────────────────────── */
+  /* ── Analyseurs d'URL et de références (copie de home-resolver.mjs) ───── */
   function parseGitHub(s) {
     const trimmed = (s || '').trim();
     const m1 = trimmed.match(/^(?:https?:\/\/)?(?:www\.)?github\.com\/([a-zA-Z0-9_.-]+)\/([a-zA-Z0-9_.-]+)(?:\/.*)?$/i);
@@ -181,9 +128,272 @@
     return null;
   }
 
+  const LABELS = {
+    da: 'Ouvrir la Direction artistique',
+    media: 'Ouvrir la Médiathèque',
+    diag: 'Lancer le diagnostic',
+    noema: 'Proposer à NOEMA',
+  };
+
+  function resolveAction(raw, activeMode) {
+    const trimmed = String(raw ?? '').trim();
+    const mode = activeMode || 'noema';
+    const gh = parseGitHub(trimmed);
+    const httpUrl = parseHttpUrl(trimmed);
+    if (gh) {
+      return {
+        intention: 'diag-github',
+        label: LABELS.diag,
+        destination: `diagnostic:github:${gh.owner}/${gh.repo}`,
+        owner: gh.owner,
+        repo: gh.repo,
+        command: `node diagnostic/diagnose.mjs --owner ${gh.owner} --repo ${gh.repo}`,
+        raw: trimmed,
+        mode,
+        aperçu: {
+          title: `Diagnostic GitHub — ${gh.owner}/${gh.repo}`,
+          body: `Le moteur de diagnostic mesure le projet sans y écrire. Commande vérifiable :`,
+          command: `node diagnostic/diagnose.mjs --owner ${gh.owner} --repo ${gh.repo}`,
+          destination: `diagnostic:github:${gh.owner}/${gh.repo}`,
+        },
+      };
+    }
+    if (httpUrl) {
+      return {
+        intention: 'diag-site',
+        label: LABELS.diag,
+        destination: httpUrl,
+        url: httpUrl,
+        raw: trimmed,
+        mode,
+        aperçu: {
+          title: `Diagnostic de site en ligne — en préparation`,
+          body: `URL détectée : ${httpUrl}. Le diagnostic de site en ligne (moteur EAA / WCAG 2.1 AA) est en préparation. Le diagnostic actuel analyse les arbres de sources via le terminal.`,
+          url: httpUrl,
+          destination: httpUrl,
+        },
+      };
+    }
+    if (mode === 'da') {
+      return {
+        intention: 'da',
+        label: LABELS.da,
+        destination: 'design-system/direction.html',
+        raw: trimmed,
+        mode,
+        aperçu: {
+          title: 'Direction artistique — l’atelier',
+          body: `Ouvrira l’atelier DA : thème, accent, densité, rayons. Export du brief agent ou du tokens.custom.css.`,
+          destination: 'design-system/direction.html',
+        },
+      };
+    }
+    if (mode === 'media') {
+      return {
+        intention: 'media',
+        label: LABELS.media,
+        destination: 'atlas/',
+        raw: trimmed,
+        mode,
+        aperçu: {
+          title: 'Médiathèque',
+          body: `Ouvrira le catalogue universel (arbres git des dépôts) et le mode Dossier local — référencement sans copie, rien n’est envoyé.`,
+          destination: 'atlas/',
+        },
+      };
+    }
+    if (mode === 'diag') {
+      if (!trimmed) {
+        return {
+          intention: 'diag-empty',
+          label: LABELS.diag,
+          destination: 'diagnostic/README.md',
+          raw: trimmed,
+          mode,
+          aperçu: {
+            title: 'Diagnostic — choisir une cible',
+            body: `Collez un lien GitHub (https://github.com/owner/repo ou owner/repo) pour lancer la mesure sans jamais écrire dans le projet.`,
+            destination: 'diagnostic/README.md',
+          },
+        };
+      }
+      if (trimmed.includes(' ')) {
+        return {
+          intention: 'noema',
+          label: LABELS.noema,
+          destination: 'noema:intent',
+          raw: trimmed,
+          mode: 'diag',
+          fallback: true,
+          aperçu: {
+            title: 'Intention pour NOEMA',
+            body: `Texte libre détecté en mode Diagnostic — sera proposé à NOEMA (aucune commande fabriquée) : « ${trimmed} »`,
+            destination: 'noema:intent',
+          },
+        };
+      }
+      return {
+        intention: 'diag-invalid',
+        label: LABELS.diag,
+        destination: null,
+        raw: trimmed,
+        mode,
+        error: 'Format attendu : owner/repo — ou écris ton intention pour NOEMA',
+        aperçu: {
+          title: 'Diagnostic — format invalide',
+          body: 'Format attendu : owner/repo — ou écris ton intention pour NOEMA',
+          error: 'Format attendu : owner/repo — ou écris ton intention pour NOEMA',
+          destination: null,
+        },
+      };
+    }
+    if (mode === 'noema') {
+      if (!trimmed) {
+        return {
+          intention: 'noema-empty',
+          label: LABELS.noema,
+          destination: 'loop/',
+          raw: trimmed,
+          mode,
+          aperçu: {
+            title: 'Boucle NOEMA — ouvrir la boucle',
+            body: `Aucune intention saisie. Ouvrira la Boucle NOEMA : NOEMA propose, vous validez.`,
+            destination: 'loop/',
+          },
+        };
+      }
+      return {
+        intention: 'noema',
+        label: LABELS.noema,
+        destination: 'noema:intent',
+        raw: trimmed,
+        mode,
+        aperçu: {
+          title: 'Intention pour NOEMA',
+          body: `Sera proposé à NOEMA : « ${trimmed} » — rien n’est un fait tant qu’un humain n’a pas validé.`,
+          destination: 'noema:intent',
+        },
+      };
+    }
+    if (!trimmed) {
+      return {
+        intention: 'noema-empty',
+        label: LABELS.noema,
+        destination: 'loop/',
+        raw: trimmed,
+        mode,
+        aperçu: {
+          title: 'Boucle NOEMA — ouvrir la boucle',
+          body: `Aucune intention saisie. Ouvrira la Boucle NOEMA.`,
+          destination: 'loop/',
+        },
+      };
+    }
+    return {
+      intention: 'noema',
+      label: LABELS.noema,
+      destination: 'noema:intent',
+      raw: trimmed,
+      mode,
+      aperçu: {
+        title: 'Intention pour NOEMA',
+        body: `Sera proposé à NOEMA : « ${trimmed} »`,
+        destination: 'noema:intent',
+      },
+    };
+  }
+
+  // Expose pour jsdom/tests (non bloquant)
+  if (typeof window !== 'undefined') {
+    window.AIME = window.AIME || {};
+    window.AIME.resolveAction = resolveAction;
+    window.AIME.parseGitHub = parseGitHub;
+    window.AIME.parseHttpUrl = parseHttpUrl;
+  }
+
+  /* ── Gestion des modes en pastilles (contrat aria-current) ───────── */
+  let activeMode = 'noema';
+
+  function syncPills() {
+    modePills.forEach((p) => {
+      const match = p.dataset.hMode === activeMode;
+      if (match) p.setAttribute('aria-current', 'true');
+      else p.removeAttribute('aria-current');
+      p.classList.toggle('is-active', match);
+    });
+  }
+
+  function setMode(mode) {
+    if (activeMode === mode) {
+      // En mode NOEMA défaut, on ne désactive pas : NOEMA reste sélectionné
+      // Pour les autres, un second clic revient à NOEMA (défaut explicite)
+      if (mode === 'noema') return;
+      activeMode = 'noema';
+    } else {
+      activeMode = mode;
+    }
+    syncPills();
+    updateSubmitLabel();
+    if (!field.value.trim()) {
+      renderModeHint(activeMode);
+    } else {
+      // Si champ non vide, rafraîchit le label sans écraser la sortie
+      updateSubmitLabel();
+    }
+  }
+
+  // Init : NOEMA actif
+  syncPills();
+
+  modePills.forEach((p) => {
+    p.addEventListener('click', () => {
+      setMode(p.dataset.hMode);
+    });
+  });
+
+  function renderModeHint(mode) {
+    if (!out) return;
+    if (mode === 'diag') {
+      out.innerHTML = `<div class="ds-rule">
+        <p class="ds-rule__title">Mode Diagnostic actif</p>
+        <p>Collez un lien GitHub (<span class="u-strong">https://github.com/owner/repo</span> ou <span class="u-strong">owner/repo</span>) pour lancer la mesure sans jamais écrire dans le projet. Format attendu : <span class="u-mono">owner/repo</span>.</p>
+      </div>`;
+    } else if (mode === 'media') {
+      out.innerHTML = `<div class="ds-rule">
+        <p class="ds-rule__title">Mode Médiathèque actif</p>
+        <p>Ouvrira le catalogue universel des dépôts ou le mode Dossier local (classer, voir et écouter ce qui vit sur votre poste — rien n’est envoyé).</p>
+      </div>`;
+    } else if (mode === 'da') {
+      out.innerHTML = `<div class="ds-rule">
+        <p class="ds-rule__title">Mode Direction artistique actif</p>
+        <p>Ouvrira l’atelier DA : réglez thème, accent, rayons et densité, puis exportez le brief agent ou le CSS conforme EAA.</p>
+      </div>`;
+    } else if (mode === 'noema') {
+      out.innerHTML = `<div class="ds-rule">
+        <p class="ds-rule__title">Mode Boucle NOEMA actif</p>
+        <p>Exprimez une intention en vos mots : mémoriser une personne, signaler une donnée manquante ou demander une action. NOEMA propose, l’humain valide.</p>
+      </div>`;
+    }
+    resolveIcons(out);
+  }
+
+  // Hint initial
+  renderModeHint(activeMode);
+
+  function updateSubmitLabel() {
+    if (!submitBtn || !field) return;
+    const r = resolveAction(field.value, activeMode);
+    submitBtn.textContent = r.label;
+    submitBtn.setAttribute('aria-label', `${r.label} — ${r.aperçu?.destination || r.destination || ''}`);
+    submitBtn.title = r.aperçu?.title || '';
+  }
+
+  function navigateTo(url) {
+    window.location.href = url;
+  }
+
   /* ── Menu « + » (actions et intentions) ─────────────────────── */
   document.addEventListener('click', (e) => {
-    const popOpener = e.target.closest('#h-plus-btn');
     const pop = select('#h-plus-menu');
     const itemAction = e.target.closest('[data-h-action]');
     const itemIntent = e.target.closest('[data-h-intent]');
@@ -194,87 +404,36 @@
       select('#h-plus-btn')?.setAttribute('aria-expanded', 'false');
 
       if (act === 'folder') {
-        if (folderPicker) folderPicker.click();
-        else navigateTo('atlas/index.html?source=local');
-      } else if (act === 'file') {
-        if (filePicker) filePicker.click();
-        else navigateTo('atlas/index.html?source=local');
+        // Plus de picker local ici : l'unique picker vit dans atlas/?source=local
+        navigateTo('atlas/index.html?source=local');
       } else if (act === 'github') {
         setMode('diag');
         if (field) {
           field.value = 'mattmezstitchlab/AIME-COMPOSER';
           field.focus();
+          updateSubmitLabel();
         }
       } else if (act === 'url') {
         setMode('diag');
         if (field) {
           field.value = 'https://';
           field.focus();
+          updateSubmitLabel();
         }
       }
       return;
     }
 
     if (itemIntent) {
+      setMode('noema');
       if (field) {
         field.value = itemIntent.dataset.hIntent;
         field.focus();
+        updateSubmitLabel();
       }
       if (pop) pop.hidden = true;
       select('#h-plus-btn')?.setAttribute('aria-expanded', 'false');
       return;
-    }
-  });
-
-  function navigateTo(url) {
-    window.location.href = url;
-  }
-
-  /* Gestion des sélecteurs de fichiers réels */
-  folderPicker?.addEventListener('change', (e) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      const firstPath = files[0].webkitRelativePath || files[0].name;
-      const rootFolder = firstPath.split('/')[0] || 'dossier local';
-      if (out) {
-        out.innerHTML = `<div class="noema-card noema-rail" data-certainty="confirmed">
-          <div class="noema-card__head">
-            <span class="noema-card__kind">${ic('com-inbox')}Dossier local sélectionné</span>
-            <span class="nstate" data-state="confirmed">${ic('noe-confirmed', 'a-ic a-ic--state')}Vérifié</span>
-          </div>
-          <p class="noema-card__title">« ${esc(rootFolder)} » (${files.length} fichiers)</p>
-          <p class="noema-card__body">Contrat Bureau universel : vos fichiers restent strictement sur votre poste. L'Atelier d'entrée universel et la Médiathèque répertorient sans transférer.</p>
-          <div class="noema-card__foot">
-            <a class="a-btn a-btn--sm a-btn--primary" href="atlas/index.html?source=local">${ic('med-library')}Ouvrir dans la Médiathèque locale</a>
-          </div>
-        </div>`;
-        resolveIcons(out);
-      }
-    } else {
-      navigateTo('atlas/index.html?source=local');
-    }
-  });
-
-  filePicker?.addEventListener('change', (e) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      const file = files[0];
-      if (out) {
-        out.innerHTML = `<div class="noema-card noema-rail" data-certainty="confirmed">
-          <div class="noema-card__head">
-            <span class="noema-card__kind">${ic('doc-document')}Fichier prêt</span>
-            <span class="nstate" data-state="confirmed">${ic('noe-confirmed', 'a-ic a-ic--state')}Vérifié</span>
-          </div>
-          <p class="noema-card__title">${esc(file.name)} (${Math.round(file.size / 1024)} Ko)</p>
-          <p class="noema-card__body">Fichier local reconnu. La Médiathèque locale permet de le classer et de produire son brief agent sans copie concurrente.</p>
-          <div class="noema-card__foot">
-            <a class="a-btn a-btn--sm a-btn--primary" href="atlas/index.html?source=local">${ic('med-library')}Ouvrir la Médiathèque</a>
-          </div>
-        </div>`;
-        resolveIcons(out);
-      }
-    } else {
-      navigateTo('atlas/index.html?source=local');
     }
   });
 
@@ -329,11 +488,11 @@
     if (submitted) {
       parts.push(`<p class="t-body-sm u-muted">${written.length
         ? `${written.length} proposition(s) déposée(s) à l'état proposed — rien n'est un fait tant qu'un humain n'a pas validé.`
-        : 'Rien n\u2019a été écrit.'}
+        : 'Rien n’a été écrit.'}
         La décision se prend <a class="a-text-btn" href="loop/">dans la boucle</a>.</p>`);
     }
     if (!cands.length && !unparsed.length) {
-      parts.push('<p class="t-body-sm u-muted">NOEMA n\u2019a rien retenu de cette phrase — elle préfère se taire plutôt que deviner.</p>');
+      parts.push('<p class="t-body-sm u-muted">NOEMA n’a rien retenu de cette phrase — elle préfère se taire plutôt que deviner.</p>');
     }
     out.innerHTML = parts.join('');
     resolveIcons(out);
@@ -361,36 +520,50 @@
     }
   }
 
-  /* ── ROUTAGE PRINCIPAL : LE DISPATCH DE LA PORTE ─────────────── */
-  function route(dry = false) {
+  /* ── Aperçu universel (ex Lire sans écrire) : jamais une navigation ───── */
+  function renderPreview() {
     if (!field || !out) return;
-    const raw = (field.value || '').trim();
+    const raw = field.value || '';
+    const r = resolveAction(raw, activeMode);
+    const dest = r.aperçu?.destination || r.destination || '';
+    const isDiagInvalid = r.intention === 'diag-invalid';
+    const badge = isDiagInvalid ? 'a-badge a-badge--error' : 'a-badge';
+    const cardKind = isDiagInvalid ? `${ic('com-alert')}Format invalide` : `${ic(r.intention.startsWith('diag') ? 'prf-shield' : r.intention === 'media' ? 'med-library' : r.intention === 'da' ? 'set-sliders' : 'noe-proposed')}Aperçu — ${esc(r.label)}`;
+    const body = esc(r.aperçu?.body || '');
+    const command = r.aperçu?.command ? `<pre class="ds-code">${esc(r.aperçu.command)}</pre>` : '';
+    const urlLine = r.url ? `<p class="t-caption u-muted">URL : ${esc(r.url)}</p>` : '';
+    const destLine = dest && dest !== 'noema:intent' ? `<p class="t-caption u-muted">Destination : <span class="u-mono">${esc(dest)}</span></p>` : '';
+    const rawLine = r.raw ? `<p class="t-body-sm">« ${esc(r.raw)} »</p>` : '<p class="t-body-sm u-muted">Aucune saisie.</p>';
+    out.innerHTML = `<div class="noema-card noema-rail" data-certainty="${isDiagInvalid ? 'uncertain' : 'proposed'}">
+        <div class="noema-card__head">
+          <span class="noema-card__kind">${cardKind}</span>
+          <span class="${badge}">Aperçu</span>
+        </div>
+        <p class="noema-card__title">${esc(r.aperçu?.title || r.label)}</p>
+        ${rawLine}
+        <p class="noema-card__body">${body}</p>
+        ${command}
+        ${urlLine}
+        ${destLine}
+        <p class="t-caption u-muted">Aperçu : rien n’a été écrit ni navigué. Cliquez sur « ${esc(r.label)} » pour exécuter.</p>
+      </div>`;
+    resolveIcons(out);
+  }
 
-    // 1. Si mode Direction artistique
-    if (activeMode === 'da') {
-      navigateTo('design-system/direction.html');
-      return;
-    }
-
-    // 2. Si mode Médiathèque
-    if (activeMode === 'media') {
-      navigateTo('atlas/');
-      return;
-    }
-
-    // 3. Détection Lien GitHub / owner/repo
-    const gh = parseGitHub(raw);
-    if (gh || (activeMode === 'diag' && raw && !parseHttpUrl(raw))) {
-      const owner = gh ? gh.owner : (raw.includes('/') ? raw.split('/')[0] : 'owner');
-      const repo = gh ? gh.repo : (raw.includes('/') ? raw.split('/')[1] : raw);
+  /* ── Exécution réelle (Lancer) : navigue ou parle à NOEMA ─────────── */
+  function executeAction() {
+    if (!field || !out) return;
+    const raw = field.value || '';
+    const r = resolveAction(raw, activeMode);
+    if (r.intention === 'diag-github') {
       out.innerHTML = `<div class="noema-card noema-rail" data-certainty="confirmed">
         <div class="noema-card__head">
           <span class="noema-card__kind">${ic('prf-shield')}Diagnostic GitHub</span>
           <span class="nstate" data-state="confirmed">${ic('noe-confirmed', 'a-ic a-ic--state')}Vérifié</span>
         </div>
-        <p class="noema-card__title">Cible : ${esc(owner)}/${esc(repo)}</p>
+        <p class="noema-card__title">Cible : ${esc(r.owner)}/${esc(r.repo)}</p>
         <p class="noema-card__body">Le moteur de diagnostic mesure le projet sans y écrire. Exécutez la commande officielle dans un terminal :</p>
-        <pre class="ds-code">node diagnostic/diagnose.mjs --owner ${esc(owner)} --repo ${esc(repo)}</pre>
+        <pre class="ds-code">${esc(r.command)}</pre>
         <p class="t-caption u-muted">La mesure relève la densité d'écarts par écran sur les 12 familles du Design System.</p>
         <div class="noema-card__foot">
           <a class="a-btn a-btn--sm" href="diagnostic/README.md">${ic('doc-document')}Documentation du diagnostic</a>
@@ -399,16 +572,13 @@
       resolveIcons(out);
       return;
     }
-
-    // 4. Détection Lien URL d'un site en ligne
-    const httpUrl = parseHttpUrl(raw);
-    if (httpUrl) {
+    if (r.intention === 'diag-site') {
       out.innerHTML = `<div class="noema-card noema-card--alert noema-rail" data-certainty="uncertain">
         <div class="noema-card__head">
           <span class="noema-card__kind">${ic('com-alert')}Diagnostic de site en ligne</span>
           <span class="a-badge a-badge--warning">en préparation</span>
         </div>
-        <p class="noema-card__title">URL détectée : ${esc(httpUrl)}</p>
+        <p class="noema-card__title">URL détectée : ${esc(r.url)}</p>
         <p class="noema-card__body"><span class="u-strong">diagnostic de site en ligne : en préparation</span> (moteur EAA à venir). Le diagnostic actuel analyse les arbres de sources (HTML, React, Tailwind, Vue, Svelte) via le terminal ; le scan d'URL rendue en direct arrive avec l'axe B (moteur EAA / WCAG 2.1 AA).</p>
         <div class="noema-card__foot">
           <a class="a-text-btn" href="diagnostic/README.md"><span class="t-caption">Voir le périmètre actuel du diagnostic</span>${ic('nav-arrow-right', 'a-ic a-ic--sm')}</a>
@@ -417,31 +587,54 @@
       resolveIcons(out);
       return;
     }
-
-    // 5. Si mode Diagnostic sans saisie
-    if (activeMode === 'diag' && !raw) {
-      navigateTo('diagnostic/README.md');
+    if (r.intention === 'diag-invalid') {
+      out.innerHTML = `<div class="noema-card noema-rail" data-certainty="uncertain">
+        <div class="noema-card__head">
+          <span class="noema-card__kind">${ic('com-alert')}Format invalide</span>
+          <span class="a-badge a-badge--error">à corriger</span>
+        </div>
+        <p class="noema-card__title">${esc(r.error)}</p>
+        <p class="noema-card__body">Exemple valide : <span class="u-mono">mattmezstitchlab/AIME-COMPOSER</span> ou <span class="u-mono">https://github.com/owner/repo</span>. Sinon, exprimez votre intention pour NOEMA.</p>
+        <p class="t-caption u-muted">Saisie : « ${esc(r.raw)} »</p>
+      </div>`;
+      resolveIcons(out);
       return;
     }
-
-    // 6. Si mode Boucle sans saisie
-    if (activeMode === 'noema' && !raw) {
-      navigateTo('loop/');
+    if (r.intention === 'diag-empty') {
+      navigateTo(r.destination);
       return;
     }
-
-    // 7. Par défaut (texte libre, intention) → Conversation NOEMA
-    talk(dry);
+    if (r.intention === 'da') {
+      navigateTo(r.destination);
+      return;
+    }
+    if (r.intention === 'media') {
+      navigateTo(r.destination);
+      return;
+    }
+    if (r.intention === 'noema-empty') {
+      navigateTo(r.destination);
+      return;
+    }
+    // noema (avec texte) — y compris fallback diag -> noema
+    if (r.intention === 'noema') {
+      talk(false);
+      return;
+    }
   }
 
-  select('#h-noema-read')?.addEventListener('click', () => route(true));
-  select('#h-noema-submit')?.addEventListener('click', () => route(false));
+  // Listeners
+  previewBtn?.addEventListener('click', () => renderPreview());
+  submitBtn?.addEventListener('click', () => executeAction());
 
+  field?.addEventListener('input', () => updateSubmitLabel());
   field?.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
-      route(false);
+      executeAction();
     }
   });
 
+  // Init label
+  updateSubmitLabel();
 })();

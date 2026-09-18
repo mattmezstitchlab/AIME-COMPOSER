@@ -266,6 +266,7 @@
   border-color: var(--aime-color-accent); color: var(--aime-color-accent-text); background: var(--aime-color-accent-subtle);
 }
 
+/* Pill = mode ou segment sélectionnable — contrat : aria-current="true" (Tag = aria-pressed). .is-active est le repli CSS. */
 .a-pill {
   display: inline-flex; align-items: center; gap: var(--aime-space-2);
   height: var(--aime-control-sm);

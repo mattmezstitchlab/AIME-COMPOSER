@@ -128,23 +128,21 @@
         <div class="home-composer__field">
           <label class="u-sr" for="h-noema-text">Décris ce que tu veux faire, colle un lien, ou joins un dossier…</label>
           <textarea class="home-composer__input" id="h-noema-text" rows="3" placeholder="Décris ce que tu veux faire, colle un lien, ou joins un dossier…"></textarea>
-          <input type="file" id="h-file-picker" class="u-sr" aria-label="Choisir un fichier">
-          <input type="file" id="h-folder-picker" class="u-sr" webkitdirectory directory aria-label="Choisir un dossier local">
         </div>
       </div>
 
       <div class="home-composer__bar">
-        <!-- MODES EN PASTILLES SÉLECTIONNABLES -->
+        <!-- MODES EN PASTILLES SÉLECTIONNABLES — contrat aria-current (cf design-system/components.html) -->
         <div class="home-modes" role="group" aria-label="Modes de traitement">
-          <button type="button" class="a-pill a-pill--button" data-h-mode="diag" aria-pressed="false"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="prf-shield"/></svg>Diagnostic</button>
-          <button type="button" class="a-pill a-pill--button" data-h-mode="media" aria-pressed="false"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="med-library"/></svg>Médiathèque</button>
-          <button type="button" class="a-pill a-pill--button" data-h-mode="da" aria-pressed="false"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="set-sliders"/></svg>Direction artistique</button>
-          <button type="button" class="a-pill a-pill--button" data-h-mode="noema" aria-pressed="false"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="cmp-compose"/></svg>Boucle NOEMA</button>
+          <button type="button" class="a-pill a-pill--button" data-h-mode="diag"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="prf-shield"/></svg>Diagnostic</button>
+          <button type="button" class="a-pill a-pill--button" data-h-mode="media"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="med-library"/></svg>Médiathèque</button>
+          <button type="button" class="a-pill a-pill--button" data-h-mode="da"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="set-sliders"/></svg>Direction artistique</button>
+          <button type="button" class="a-pill a-pill--button is-active" data-h-mode="noema" aria-current="true"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="cmp-compose"/></svg>Boucle NOEMA</button>
         </div>
 
         <div class="l-row">
-          <button type="button" class="a-btn a-btn--sm" id="h-noema-read">Lire sans écrire</button>
-          <button type="button" class="a-btn a-btn--sm a-btn--primary" id="h-noema-submit">Lancer</button>
+          <button type="button" class="a-btn a-btn--sm" id="h-noema-read" title="Aperçu — affiche l'action résolue sans naviguer ni écrire">Aperçu</button>
+          <button type="button" class="a-btn a-btn--sm a-btn--primary" id="h-noema-submit" aria-label="Proposer à NOEMA">Proposer à NOEMA</button>
         </div>
       </div>
     </div>
@@ -160,13 +158,12 @@
     <ul class="a-menu">
       <li class="a-menu__label">Joindre ou brancher</li>
       <li><button type="button" class="a-menu__item" data-h-action="folder"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="com-inbox"/></svg>Dossier local</button></li>
-      <li><button type="button" class="a-menu__item" data-h-action="file"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-document"/></svg>Fichier</button></li>
       <li><button type="button" class="a-menu__item" data-h-action="github"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-version"/></svg>Lien GitHub</button></li>
       <li><button type="button" class="a-menu__item" data-h-action="url"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-external"/></svg>Coller une URL</button></li>
       <li class="a-menu__sep" role="presentation"></li>
       <li class="a-menu__label">Surfaces</li>
       <li><a class="a-menu__item" href="design-system/direction.html"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="set-sliders"/></svg>Direction artistique</a></li>
-      <li><a class="a-menu__item" href="atlas/"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="med-library"/></svg>Médiathèque universelle</a></li>
+      <li><a class="a-menu__item" href="atlas/"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="med-library"/></svg>Médiathèque</a></li>
       <li><a class="a-menu__item" href="loop/"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="cmp-compose"/></svg>Boucle NOEMA</a></li>
       <li class="a-menu__sep" role="presentation"></li>
       <li class="a-menu__label">Exemples d'intentions NOEMA</li>
@@ -183,23 +180,26 @@
     <div class="ds-demo">
       <div class="ds-demo__stage ds-demo__stage--col" role="list" aria-label="Les quatre entrées du dépôt">
         <div class="l-row l-row--top l-row--between" role="listitem">
-          <span class="l-row l-row--top"><span class="a-badge">01</span><span><span class="t-body u-strong">Médiathèque universelle</span><br><span class="t-caption u-muted l-measure-lg">Tous les médias de vos 38 dépôts GitHub — chaque image, vidéo, piste audio et vecteur référencé là où il vit, jamais copié — plus un mode « dossier local » pour classer, voir et écouter ce qui vit sur votre poste. La sélection se transmet à un agent en un clic (liens, brief structuré avec manifeste JSON, script de récupération).</span></span></span>
+          <span class="l-row l-row--top"><span class="a-badge">01</span><span><span class="t-body u-strong">Médiathèque</span><br><span class="t-caption u-muted l-measure-lg">Tous les médias de vos 38 dépôts GitHub — chaque image, vidéo, piste audio et vecteur référencé là où il vit, jamais copié — plus un mode « dossier local » pour classer, voir et écouter ce qui vit sur votre poste. La sélection se transmet à un agent en un clic (liens, brief structuré avec manifeste JSON, script de récupération).</span></span></span>
           <a class="a-text-btn" href="atlas/"><span class="t-caption">atlas/</span><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-arrow-right"/></svg></a>
         </div>
         <div class="l-row l-row--top l-row--between" role="listitem">
-          <span class="l-row l-row--top"><span class="a-badge">02</span><span><span class="t-body u-strong">Design System</span><br><span class="t-caption u-muted l-measure-lg">La grammaire complète en 21 chapitres, auditée en continu — et la <span class="u-strong">Direction artistique</span> : on y règle thème, accent, densité et rayons, puis on <span class="u-strong">exporte le brief ou le CSS</span> pour le transmettre tel quel à un agent ou à un autre projet. C'est ainsi qu'un style se partage sans être réinterprété ; la conformité EAA / WCAG y est un moteur, pas un badge.</span></span></span>
-          <a class="a-text-btn" href="design-system/index.html"><span class="t-caption">design-system/</span><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-arrow-right"/></svg></a>
+          <span class="l-row l-row--top"><span class="a-badge">02</span><span><span class="t-body u-strong">Design System</span><span class="t-caption u-muted"> (la doc)</span> &amp; <span class="t-body u-strong">Direction artistique</span><span class="t-caption u-muted"> (l’atelier)</span><br><span class="t-caption u-muted l-measure-lg">La grammaire complète en 21 chapitres, auditée en continu — et, dans l’atelier, on y règle thème, accent, densité et rayons, puis on <span class="u-strong">exporte le brief ou le CSS</span> pour le transmettre tel quel à un agent ou à un autre projet. C’est ainsi qu’un style se partage sans être réinterprété ; la conformité EAA / WCAG y est un moteur, pas un badge.</span></span></span>
+          <span class="l-row l-row--nowrap">
+            <a class="a-text-btn" href="design-system/index.html"><span class="t-caption">design-system/</span><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-arrow-right"/></svg></a>
+            <a class="a-text-btn" href="design-system/direction.html"><span class="t-caption">direction.html</span><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-arrow-right"/></svg></a>
+          </span>
         </div>
         <div class="l-row l-row--top l-row--between" role="listitem">
-          <span class="l-row l-row--top"><span class="a-badge">03</span><span><span class="t-body u-strong">Boucle NOEMA</span><br><span class="t-caption u-muted l-measure-lg">Le moteur et l'écran de la conversation : NOEMA propose sous vos yeux, <span class="u-strong">vous validez</span>, la mémoire retient ce qui a été décidé. Aucune écriture sans accord humain ; chaque décision garde sa trace dans le journal.</span></span></span>
+          <span class="l-row l-row--top"><span class="a-badge">03</span><span><span class="t-body u-strong">Boucle NOEMA</span><br><span class="t-caption u-muted l-measure-lg">Le moteur et l’écran de la conversation : NOEMA propose sous vos yeux, <span class="u-strong">vous validez</span>, la mémoire retient ce qui a été décidé. Aucune écriture sans accord humain ; chaque décision garde sa trace dans le journal.</span></span></span>
           <a class="a-text-btn" href="loop/"><span class="t-caption">loop/</span><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-arrow-right"/></svg></a>
         </div>
         <div class="l-row l-row--top l-row--between" role="listitem">
-          <span class="l-row l-row--top"><span class="a-badge">04</span><span><span class="t-body u-strong">Diagnostic</span><br><span class="t-caption u-muted l-measure-lg">Le juge qui valide ces écrans, appliqué à vos propres projets : un dépôt GitHub ou un dossier local est mesuré sans jamais y écrire — densité d'écarts publiée, jamais un score inventé sur 100.</span></span></span>
+          <span class="l-row l-row--top"><span class="a-badge">04</span><span><span class="t-body u-strong">Diagnostic</span><br><span class="t-caption u-muted l-measure-lg">Le juge qui valide ces écrans, appliqué à vos propres projets : un dépôt GitHub ou un dossier local est mesuré sans jamais y écrire — densité d’écarts publiée, jamais un score inventé sur 100.</span></span></span>
           <a class="a-text-btn" href="diagnostic/README.md"><span class="t-caption">diagnostic/</span><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-arrow-right"/></svg></a>
         </div>
       </div>
-      <p class="ds-demo__caption"><span class="t-label">Contrat</span><span class="t-caption">Chaque surface est une projection du même Design System : aucune n'invente une valeur, elle la reçoit. Cette page est auditée comme les autres écrans du dépôt.</span></p>
+      <p class="ds-demo__caption"><span class="t-label">Contrat</span><span class="t-caption">Chaque surface est une projection du même Design System : aucune n’invente une valeur, elle la reçoit. Cette page est auditée comme les autres écrans du dépôt.</span></p>
     </div>
   </section>
 
