@@ -54,7 +54,7 @@ taille des cibles — ne sont pas vérifiés. Ils demandent un navigateur réel.
 | `tokens/tokens.json` | La même bibliothèque, lisible par machine (moteur EAA, sync Figma, QA) |
 | `tokens/CONTRAST-REPORT.md` | Preuve de contraste de chaque paire de rôles |
 | `assets/aime-icons.svg` | Sprite de la famille d'icônes |
-| `styles/` | Couches 2 à 5 : foundations · layout · components · aime · noema · patterns · dataviz · doc |
+| `styles/` | Couches 2 à 5 : foundations · layout · components · aime · noema · patterns · dataviz · doc · pointzero |
 | `js/qa.js` | Design QA. Pur texte, donc exécutable à l'identique en Node et dans le navigateur |
 | `qa/run-qa.mjs` | Exécuteur : `npm run qa` |
 | `qa/verify-dom.mjs` | Exécuteur : `npm run verify` — exécution réelle des scripts des écrans |
@@ -105,10 +105,10 @@ Afficher 87 % de certitude serait une fausse précision.
 
 - Tokens : 23 primitives, 21 rôles × 2 thèmes, 4 états × 5 déclinaisons, 9 rôles
   typographiques, échelle d'espace fermée, 4 rayons, 6 durées, layout et breakpoints.
-- Iconographie : 85 pictogrammes, 17 catégories, contrat de grille unique.
+- Iconographie : 86 pictogrammes, 17 catégories, contrat de grille unique.
 - Couches CSS 2 à 5 : 29 composants fondamentaux, 5 organes AIME, couche NOEMA,
   13 patterns, langage de data visualisation, moteur de layout responsive.
-- Design QA : 12 familles statiques, plus une vérification DOM des 32 écrans — dont `loop/index.html` et la page d'accueil du dépôt.
+- Design QA : 12 familles statiques, plus une vérification DOM des 35 écrans — dont `loop/index.html`, la page d'accueil du dépôt, la Médiathèque et la coquille Point Zero.
 - 19 chapitres de documentation, du chapitre 00 au chapitre 19.
 - 10 écrans d'expérience (`experiences/`) : Playground, Composer, Carte Universelle,
   Timeline, Grille, Bureau, Médiathèque, NOEMA, site public, portail client — plus

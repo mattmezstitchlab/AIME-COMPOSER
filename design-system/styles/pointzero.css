@@ -1,0 +1,297 @@
+/* ══════════════════════════════════════════════════════════════
+   POINT ZERO — coquille universelle (35e écran audité).
+
+   Patterns introduits (POINT-ZERO-INTERFACE-V1 §11) :
+     pz-*     coquille et ses cinq zones
+     dock*    dock inférieur : Timeline ◂ · ＋ · Cartes ▸
+     uimport* popover d'import universel
+
+   Aucune valeur ne quitte les tokens : couleurs = rôles, espaces =
+   échelle fermée, durées = var(--aime-motion-*). Les greffes de
+   format prolongent .ugrid__page (organe Grille Universelle) sans
+   créer de nouvel éditeur — un profil n'est pas une application.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── PZ.1 · COQUILLE ───────────────────────────────────────────
+   Z1 header / Z2-Z4 main / Z5 dock. Le canvas est la seule zone
+   jamais rétractable. */
+.pz {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  block-size: 100dvh;
+  overflow: hidden;
+  background: var(--aime-color-background);
+}
+
+/* ── Z1 · HEADER ─────────────────────────────────────────────── */
+.pz__head {
+  display: flex;
+  align-items: center;
+  gap: var(--aime-space-3);
+  flex-wrap: wrap;
+  min-height: var(--aime-space-8);
+  padding-inline: var(--aime-space-3);
+  border-bottom: var(--aime-border-default);
+  background: var(--aime-color-background);
+}
+.pz__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--aime-space-2);
+  font-family: var(--aime-text-label-family);
+  font-size: var(--aime-text-label-size);
+  font-weight: var(--aime-font-semibold);
+  letter-spacing: var(--aime-text-label-ls);
+  text-transform: uppercase;
+  color: var(--aime-color-text);
+  text-decoration: none;
+}
+.pz__brand i { font-style: normal; color: var(--aime-color-accent); }
+.pz__brand small {
+  font-family: var(--aime-font-mono);
+  font-size: var(--aime-text-meta-size);
+  font-weight: var(--aime-font-regular);
+  color: var(--aime-color-text-subtle);
+}
+.pz__group {
+  display: flex;
+  align-items: center;
+  gap: var(--aime-space-2);
+  min-width: 0;
+}
+
+/* ── Z2–Z4 · MAIN : rail — panneau — canvas — panneau — rail ── */
+.pz__main {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  min-height: 0;
+}
+.pz__cell {
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Rail de rappel : le panneau rétracté laisse une poignée visible. */
+.pz__rail {
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  gap: var(--aime-space-2);
+  padding-block: var(--aime-space-2);
+  inline-size: var(--aime-space-8);
+  border-inline-end: var(--aime-border-subtle);
+  background: var(--aime-color-surface-sunken);
+}
+.pz__rail--end {
+  border-inline-end: 0;
+  border-inline-start: var(--aime-border-subtle);
+}
+
+/* Panneaux latéraux. La rétraction = attribut [hidden] : le rail
+   conserve l'accès, le focus ne reste jamais piégé dedans. */
+.pz__pane {
+  display: grid;
+  align-content: start;
+  gap: var(--aime-space-3);
+  inline-size: 336px;
+  padding: var(--aime-space-3);
+  overflow-y: auto;
+  background: var(--aime-color-surface);
+  border-inline-end: var(--aime-border-default);
+}
+.pz__pane[hidden] { display: none; }
+.pz__pane--end {
+  inline-size: 360px;
+  padding: 0;
+  gap: 0;
+  grid-template-rows: minmax(0, 1fr) auto;
+  border-inline-end: 0;
+  border-inline-start: var(--aime-border-default);
+}
+
+/* Inspecteur : au-dessus, défile ; NOEMA : en bas, présente. */
+.pz__inspector {
+  display: grid;
+  align-content: start;
+  gap: var(--aime-space-3);
+  padding: var(--aime-space-3);
+  overflow-y: auto;
+  min-height: 0;
+}
+.pz__noema {
+  display: grid;
+  gap: var(--aime-space-2);
+  padding: var(--aime-space-3);
+  border-top: var(--aime-border-default);
+  max-block-size: 48%;
+  overflow-y: auto;
+  background: var(--aime-color-surface-sunken);
+}
+
+/* ── Z3 · CANVAS — la grille et son point zéro ──────────────── */
+.pz__stage {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+}
+.pz__center {
+  display: grid;
+  place-items: center;
+  padding: var(--aime-space-6);
+  overflow: auto;
+  min-height: 0;
+}
+
+/* Origine 0,0 : le réticule rouge du mode origine-centre (GRILLE §1).
+   Tracé sur la page, jamais sur les données. */
+.pz__zero { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+.pz__zero::before,
+.pz__zero::after {
+  content: '';
+  position: absolute;
+  background: var(--aime-color-error-border);
+  opacity: .6;
+}
+.pz__zero::before { inline-size: 1px; inset-block: 0; inset-inline-start: 50%; }
+.pz__zero::after { block-size: 1px; inset-inline: 0; inset-block-start: 50%; }
+.pz__zero-label {
+  position: absolute;
+  inset-block-start: calc(50% + var(--aime-space-1));
+  inset-inline-start: calc(50% + var(--aime-space-1));
+  font-family: var(--aime-font-mono);
+  font-size: var(--aime-text-meta-size);
+  color: var(--aime-color-error-text);
+  background: var(--aime-color-surface);
+  padding-inline: var(--aime-space-1);
+  border: var(--aime-border-width) dashed var(--aime-color-error-border);
+  border-radius: var(--aime-radius-small);
+}
+
+/* Placements : des références posées sur la page — la position est
+   une donnée transmise par --pz-x / --pz-y / --pz-w (sans unité),
+   jamais une valeur décidée par l'écran. */
+.pz-places { position: absolute; inset: 0; z-index: 2; }
+.pz-place {
+  position: absolute;
+  inset-inline-start: calc(var(--pz-x, 0) * 1px);
+  inset-block-start: calc(var(--pz-y, 0) * 1px);
+  inline-size: calc(var(--pz-w, 128) * 1px);
+  margin: 0;
+  padding: 0;
+  border: var(--aime-border-default);
+  border-radius: var(--aime-radius-medium);
+  overflow: hidden;
+  background: var(--aime-color-surface);
+  cursor: pointer;
+}
+.pz-place:hover { border-color: var(--aime-color-border-strong); }
+.pz-place.is-selected {
+  border-color: var(--aime-color-accent);
+  border-width: var(--aime-border-width-strong);
+  box-shadow: var(--aime-focus-ring);
+}
+.pz-place img { display: block; inline-size: 100%; block-size: auto; }
+.pz-place.is-dragging { box-shadow: var(--aime-shadow-drag); cursor: grabbing; z-index: 4; }
+
+/* Couverture publiée d'un import local (P4). */
+.pz-cov {
+  padding: var(--aime-space-4);
+  border: var(--aime-border-default);
+  border-radius: var(--aime-radius-large);
+  background: var(--aime-color-surface-elevated);
+}
+.pz-place__label {
+  display: block;
+  font-size: var(--aime-text-caption-size);
+  color: var(--aime-color-text-muted);
+  padding: var(--aime-space-1) var(--aime-space-2);
+  overflow-wrap: anywhere;
+}
+
+/* Grille de cartes compactes (Bureau, tiroir Cartes). */
+.pz-cards {
+  display: grid;
+  gap: var(--aime-space-3);
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+}
+.pz-cards--rows { grid-template-columns: minmax(0, 1fr); }
+
+/* ── Z5 · DOCK : Timeline ◂ · ＋ Import · Cartes ▸ ──────────── */
+.dock {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--aime-space-2);
+  padding: var(--aime-space-2) var(--aime-space-3);
+  border-top: var(--aime-border-default);
+  background: var(--aime-color-surface);
+}
+.dock__seg { display: flex; align-items: center; gap: var(--aime-space-2); min-width: 0; }
+.dock__seg--center { justify-content: center; }
+.dock__seg--end { justify-content: flex-end; }
+
+/* Tiroirs : un seul ouvert, au-dessus du dock, hauteur bornée —
+   la règle « pas une deuxième application dans l'application ». */
+.dock__tray {
+  position: absolute;
+  inset-inline: var(--aime-space-3);
+  inset-block-end: calc(100% + var(--aime-space-2));
+  z-index: var(--aime-z-dropdown);
+  display: grid;
+  gap: var(--aime-space-3);
+  max-block-size: 44vh;
+  overflow-y: auto;
+  padding: var(--aime-space-3);
+  background: var(--aime-color-surface-elevated);
+  border: var(--aime-border-default);
+  border-radius: var(--aime-radius-large);
+  box-shadow: var(--aime-shadow-raise);
+}
+.dock__tray[hidden] { display: none; }
+.dock__tray-head {
+  display: flex;
+  align-items: center;
+  gap: var(--aime-space-2);
+  flex-wrap: wrap;
+}
+
+/* ── UIMPORT · popover du ＋ ─────────────────────────────────── */
+.uimport {
+  position: absolute;
+  inset-inline: var(--aime-space-3);
+  inset-block-end: calc(100% + var(--aime-space-2));
+  z-index: var(--aime-z-dropdown);
+  margin-inline: auto;
+  max-inline-size: 480px;
+  display: grid;
+  gap: var(--aime-space-2);
+  padding: var(--aime-space-3);
+  background: var(--aime-color-surface-elevated);
+  border: var(--aime-border-default);
+  border-radius: var(--aime-radius-large);
+  box-shadow: var(--aime-shadow-raise);
+}
+.uimport[hidden] { display: none; }
+.uimport__note { color: var(--aime-color-text-subtle); }
+
+/* ── Greffe de format : seul profil absent du socle ugrid ────── */
+.ugrid__page[data-format='web-m'] { aspect-ratio: 390 / 844; max-inline-size: 280px; }
+
+/* ── Responsive : les panneaux deviennent des overlays ───────── */
+@media (max-width: 1023px) {
+  .pz__pane {
+    position: fixed;
+    inset-block: var(--aime-space-8) 0;
+    inset-inline-start: 0;
+    z-index: var(--aime-z-drawer);
+    max-inline-size: 84vw;
+    box-shadow: var(--aime-shadow-drag);
+  }
+  .pz__pane--end { inset-inline-start: auto; inset-inline-end: 0; }
+  .pz__center { padding: var(--aime-space-4); }
+}
