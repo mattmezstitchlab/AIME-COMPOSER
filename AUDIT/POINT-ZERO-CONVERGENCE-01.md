@@ -115,7 +115,7 @@ Légende : ✓ = présent dans la coquille (CONFIRMED, code) · ◐ = présent p
 | Doublons par empreinte | ✓ | dossier contextuel `Doublons` |
 | URL `?source=local` (deep-link depuis l'accueil) | ✗ | la coquille persiste la source en `localStorage`, pas en URL |
 
-### 4.3 Boucle NOEMA (`loop/`) — 9 manques
+### 4.3 Boucle NOEMA (`loop/`) — 9 manques *(état au 18 sept. matin ; tous absorbés par l'addendum V2-a ci-dessous)*
 
 | Fonction de l'écran loop | Dans la coquille | Preuve / écart |
 |---|---|---|
@@ -220,6 +220,30 @@ Non touché, volontairement : `diagnostic/report.mjs` (mesure le dépôt tel qu'
 - `run-qa.mjs`/`verify-dom.mjs` parcourent `loop/` : la suppression retire un écran du périmètre, les textes de comptage suivent ;
 - liens de l'accueil, fil d'ariane de la page supprimée, README section Boucle.
 **Ce qui reste :** tout `loop/src/`, `seed.mjs`, `server.mjs`, les tests adaptés.
+
+#### Addendum V2-a — tranche de parité LIVRÉE (18 sept. 2026, validation « ok »)
+
+Les neuf manques de §4.3 sont absorbés, en projection pure : `pz.js` ne contient aucune règle métier nouvelle — chaque acte est un appel à `loop/src/http.mjs`, chaque écran une re-projection de `state` par une fonction unique `applyState(state)` (rail, cartes, actions, retenues, journal, preuves, sujets, compteurs, inspecteur).
+
+| Manque §4.3 | Livré dans la coquille | Preuve (smoke `design-system/qa/smoke-point-zero-loop.mjs`, **vraie boucle** sur monde jetable) |
+|---|---|---|
+| 1. « Faire observer NOEMA » | bouton **Observer** en tête du rail Z4 → `/api/observe` ; toast « écrites / retenues » | 5 tests — dont « aucun fait n'a été écrit, seules des `prop-` sont apparues » |
+| 2. Actions : autoriser **puis** exécuter | onglet **Actions** du tiroir Cartes : périmètre · risque · réversibilité du registre, bouton Autoriser (`/api/authorize`, `grant:true`) puis, séparément, Exécuter (`/api/execute`) ; badge de compte sur l'onglet | 7 tests — dont « valider une intention ne l'exécute pas » et « exécution anonyme refusée (400) » |
+| 3. Retenues | onglet **Retenues** : kind · cible · confiance · titre ; l'absence est nommée | 2 tests |
+| 4. Journal | onglet **Journal** : table 5 colonnes (horodatage · opération · type/id · acteur · cause) sur les 40 dernières entrées du serveur | 3 tests |
+| 5. Monde | onglet **Monde** : toutes les entités, source · auteur, badge de provenance porté par la forme (`nstate`) | 3 tests |
+| 6. Les huit droits | onglet **Droits** : sujet (personnes · projets · objets) + 8 boutons → `/api/memory/<droit>` ; le refus serveur est affiché tel quel (`a-state--error`), jamais adouci | 13 tests — dont « PAUSER puis PARTAGER : le serveur refuse, la coquille le montre », « droit anonyme → 400 », « huit `right:*` au journal » |
+| 7. Preuves | onglet **Preuves** (`viz-proof`) : type · référence · cible cliquable (`data-card`) | 3 tests |
+| 8. Réinitialisation | bouton **Réinitialiser** (ghost) : 1er clic arme 6 s + « Confirmer la réinitialisation » ; 2e clic → `/api/reset` ; toutes les projections suivent | 3 tests |
+| 9. Granularités | `<select>` 7 granularités (ANNÉE→MINUTE) envoyé au moteur ; buckets, capacités et retards publiés ; « +1 jour » n'apparaît que si le moteur publie `MOVE` (READ : aucun bouton) | 6 tests |
+
+Règle cœur re-démontrée depuis la coquille : décision, exécution et droit **sans acteur → 400** (3 tests) ; chaque requête POST porte `actor: point.zero.shell` (décision d'attribution : la coquille signe en son nom, distinct du `a.meunier` de l'écran loop). Total **50/50**.
+
+**Défaut préexistant corrigé au passage (`loop/src/noema.mjs`) :** `propose()` écrivait les propositions d'observation avec un identifiant calculé par un compteur **local** au module (`prop-0001…`), remis à zéro à chaque observation, alors que `store.create` numérote par `db.sequence`. Conséquence : la première intention soumise après une observation retombait sur `prop-000N` déjà pris — et si cette proposition avait été **acceptée**, le store refusait (à raison) de rétrograder un fait confirmé : l'intention échouait avec « exige une décision humaine (cause: 'supersede') ». L'identifiant vient désormais du store ; l'écran loop souffrait du même défaut sans le montrer. Boucle `npm test` : 91 + 36 verts, inchangés.
+
+**Gates re-mesurées après la tranche :** QA 12/12 · verify DOM 34/34 · smokes Bureau 41/41 · smokes NOEMA 50/50 · boucle 36/36 API.
+
+**Reste avant suppression de `loop/index.html` (feu vert humain requis) :** revue dans un navigateur réel (le tiroir en 6 onglets, le tiroir timeline en PLAN avec déplacement) ; puis, dans le **même changement**, les dépendances mécaniques listées ci-dessus : racine `/` de `loop/server.mjs` → `point-zero/index.html`, les trois tests de `loop/test/api.mjs`, `smoke-deployed.mjs` re-ciblé sur `/point-zero/` et son titre, `run-qa.mjs`/`verify-dom.mjs` (33 écrans), liens de l'accueil, README section Boucle, `loop/ui.mjs` (n'a plus de lecteur).
 
 ### Vague 3 — la coquille absorbe l'accueil → l'accueil devient un seuil
 

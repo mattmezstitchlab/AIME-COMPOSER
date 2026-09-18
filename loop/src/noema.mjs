@@ -344,7 +344,11 @@ export function propose(store, opts = {}) {
     const key = `${d.kind}:${d.target_id}`;
     if (openKeys.has(key)) continue;
     openKeys.add(key);
-    written.push(store.create('proposal', d.draft, { actor, cause: 'observation' }));
+    /* L'identifiant définitif vient du store (db.sequence), jamais du
+       brouillon : sinon une intention créée ensuite par `store.create`
+       retombe sur un `prop-000N` déjà pris, parfois déjà confirmé. */
+    const { id: _draftId, ...fields } = d.draft;
+    written.push(store.create('proposal', fields, { actor, cause: 'observation' }));
   }
 
   return { written, withheld: withheld.map((d) => ({ kind: d.kind, target_id: d.target_id, confidence: d.confidence })), observed: drafts.length };

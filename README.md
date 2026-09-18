@@ -146,8 +146,9 @@ Five zones, one selection: the **Bureau** on the left — the real transversal m
 catalogue (38 repositories, 366 referenced media, coverage table) plus the local
 folder mode, as cards with their functions — the **Universal Grid** at the center
 with nine format profiles and its 0,0 origin crosshair, the **inspector** on the
-right with **NOEMA at its foot** (live `/api/intend` + `/api/decide` while the loop
-server runs, honestly offline when it does not), and a **dock** holding the
+right with **NOEMA at its foot** (the whole loop, live, while the loop server
+runs — observe, intend, decide, authorize then execute, the eight memory rights,
+journal, proofs, reset — honestly offline when it does not), and a **dock** holding the
 Universal Timeline, the Universal Cards and a single ＋ universal import (local
 folder, files, GitHub link, text or URL — everything a read-before-write).
 Retractable panels, golden-ratio quiet, no demo data anywhere: unknowns stay
@@ -175,6 +176,19 @@ was deleted:
 
 ```bash
 cd design-system && node qa/smoke-point-zero-bureau.mjs
+```
+
+Its NOEMA rail and Cards drawer reached **function parity with the `loop/` screen**
+(wave 2 of the same audit): the nine functions the shell lacked — observe,
+authorize *then* execute, withheld, journal, world, the eight memory rights,
+proofs, reset, timeline granularities — are projected in pure form, every act an
+API call, every rule still living in `loop/src/http.mjs`. Proven by
+`design-system/qa/smoke-point-zero-loop.mjs` (50 checks, jsdom against the **real
+loop** on a throw-away world, including the "no actor → 400" rule from the shell).
+`loop/index.html` is still there: its deletion awaits an explicit human go.
+
+```bash
+cd design-system && node qa/smoke-point-zero-loop.mjs
 ```
 
 It is the 34th audited screen. Its patterns (`pz-*`, `dock`, `uimport`) live in

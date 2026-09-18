@@ -16,10 +16,15 @@
  *   4. Z4 — Inspecteur : projection de la sélection unique (canvas, média,
  *      placement, carte) ; les champs de géométrie éditent la présentation
  *      locale, jamais une donnée canonique.
- *   5. Z4b — Rail NOEMA : propositions ouvertes + intention (intend/decide)
- *      contre la boucle réelle ; hors ligne, il le dit et n'invente rien.
- *   6. Z5 — Dock : Timeline (/api/timeline, 6 modes), Cartes (mémoire
- *      /api/state), ＋ Import universel.
+ *   5. Z4b — Rail NOEMA : observer, propositions ouvertes (valider /
+ *      reporter / refuser) + intention (intend/decide) contre la boucle
+ *      réelle, réinitialisation à deux clics ; hors ligne, il le dit et
+ *      n'invente rien.
+ *   6. Z5 — Dock : Timeline (/api/timeline, 6 modes × 7 granularités,
+ *      déplacer/achever), Cartes = la mémoire de la boucle en six vues
+ *      (monde, actions autoriser/exécuter, retenues, journal, preuves, les
+ *      huit droits), ＋ Import universel. Parité complète avec l'écran
+ *      loop/ (Vague 2 de AUDIT/POINT-ZERO-CONVERGENCE-01.md).
  *
  * Ce module ne contient aucune règle métier : tout vient des moteurs
  * (loop API, atlas media.json, QA-REPORT.json, pz-import.mjs pour les
@@ -1371,57 +1376,332 @@ function offlineBlock(what) {
   </div>`;
 }
 
+/* Une réponse de la boucle porte toujours `state` : toutes les projections
+   se remettent à jour ensemble — rail, cartes, actions, retenues, journal,
+   preuves, sujets des droits. Une projection oubliée mentirait. */
+function applyState(state) {
+  if (!state) return;
+  Noema.state = state;
+  Noema.runtime = state.runtime || Noema.runtime;
+  renderRail();
+  renderCartes();
+  renderActions();
+  renderWithheld();
+  renderJournal();
+  renderProofs();
+  fillSubjects();
+  renderNoemaCounts();
+  if (Selection.kind === 'card' && Selection.ref) {
+    const fresh = (state.entities || []).find((x) => x.id === Selection.ref.id);
+    if (fresh) { Selection.ref = fresh; renderInspector(); }
+  }
+}
+
+const isProposal = (e) => e.type === 'proposal' || e.id?.startsWith('prop-');
+const isAction = (e) => e.type === 'action' || e.id?.startsWith('act-');
+const isProof = (e) => e.type === 'proof' || e.id?.startsWith('prf-');
+
+function renderNoemaCounts() {
+  const box = $('#pz-noema-counts');
+  if (!box) return;
+  if (!Noema.live) { box.textContent = ''; return; }
+  const ents = Noema.state?.entities || [];
+  const open = ents.filter((e) => isProposal(e) && e.status === 'open').length;
+  const proofs = ents.filter(isProof).length;
+  const acts = ents.filter((e) => isAction(e) && e.status !== 'executed').length;
+  const when = Noema.state?.now ? new Date(Noema.state.now).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' }) : '—';
+  box.textContent = `${open} en attente · ${ents.length} entités · ${proofs} preuve(s)${acts ? ` · ${acts} action(s)` : ''} · observation du ${when}`;
+}
+
 function renderRail() {
   const feed = $('#pz-noema-feed');
   if (!feed) return;
   if (!Noema.live) { feed.innerHTML = offlineBlock('Le rail de propositions'); resolveIcons(feed); return; }
-  const open = (Noema.state?.entities || []).filter((e) => e.type === 'proposal' && e.status === 'open');
+  const open = (Noema.state?.entities || []).filter((e) => isProposal(e) && e.status === 'open');
   if (!open.length) {
     feed.innerHTML = `<p class="t-caption u-muted">Aucune proposition ouverte — NOEMA se tait quand elle n'a rien à dire.</p>`;
     return;
   }
   feed.innerHTML = open.map((p) => {
-    const [label, iconId] = KIND_LABEL[p.kind] || [p.kind || 'Proposition', 'noe-proposed'];
-    return `<article class="noema-card noema-rail" data-certainty="proposed">
+    const kind = p.requested_change?.kind || p.kind;
+    const [label, iconId] = KIND_LABEL[kind] || [kind || 'Proposition', 'noe-proposed'];
+    const title = p.requested_change?.title || p.title || kind || p.id;
+    const body = p.requested_change?.body || p.body || '';
+    const ev = p.evidence || [];
+    return `<article class="noema-card noema-rail" data-certainty="proposed" data-id="${esc(p.id)}">
       <div class="noema-card__head">
         <span class="noema-card__kind">${ic(iconId)}${esc(label)}</span>
-        <span class="nstate" data-state="proposed">${ic('noe-proposed', 'a-ic a-ic--state')}Proposé</span>
+        ${stateBadge(p.provenance?.state || 'proposed')}
+        <span class="l-spacer"></span>
+        <span class="t-caption u-muted">confiance ${esc(CONF_FR[p.confidence] || p.confidence || 'faible')}</span>
       </div>
-      <p class="noema-card__title">${esc(p.title || p.kind || p.id)}</p>
-      <p class="t-caption u-muted">confiance ${esc(CONF_FR[p.confidence] || p.confidence || 'faible')}</p>
+      <p class="noema-card__title">${esc(title)}</p>
+      ${body ? `<p class="noema-card__body">${esc(body)}</p>` : ''}
+      ${ev.length ? `<ul class="noema-card__list">${ev.map((e) => `<li><strong>${esc(e.state || '')}</strong> — ${esc(e.note || '')} <span class="u-mono t-caption">${esc(e.ref || '')}</span></li>`).join('')}</ul>` : ''}
       <div class="noema-card__foot">
         <button type="button" class="a-btn a-btn--sm a-btn--primary" data-decide="accepted" data-target="${esc(p.id)}">Valider</button>
+        <button type="button" class="a-btn a-btn--sm" data-decide="deferred" data-target="${esc(p.id)}">Reporter</button>
         <button type="button" class="a-btn a-btn--sm a-btn--ghost" data-decide="rejected" data-target="${esc(p.id)}">Refuser</button>
         <span class="l-spacer"></span>
-        ${stateBadge(p.provenance?.state || 'proposed')}
+        <span class="t-caption u-mono">${esc(p.target_id || '')}</span>
       </div>
     </article>`;
   }).join('');
   resolveIcons(feed);
 }
 
+/* ── Observer · Réinitialiser (deux clics, jamais un seul) ─────── */
+$('#pz-noema-observe')?.addEventListener('click', async () => {
+  if (!Noema.live) { toast?.({ title: 'NOEMA hors ligne', text: 'Démarrez node loop/server.mjs — rien n\u2019est observé à vide.', tone: 'warning' }); return; }
+  try {
+    const d = await api('/api/observe', {});
+    applyState(d.state);
+    toast?.({ title: `${d.written?.length || 0} proposition(s) écrite(s)`, text: `${d.withheld?.length || 0} retenue(s) sous le seuil — jamais appliquées.`, tone: 'accent' });
+  } catch (err) {
+    toast?.({ title: 'Observation refusée', text: err.message, tone: 'error' });
+  }
+});
+const ResetArm = { until: 0 };
+$('#pz-noema-reset')?.addEventListener('click', async (e) => {
+  const btn = e.currentTarget;
+  if (!Noema.live) { toast?.({ title: 'NOEMA hors ligne', text: 'Rien à réinitialiser sans serveur.', tone: 'warning' }); return; }
+  if (Date.now() > ResetArm.until) {
+    ResetArm.until = Date.now() + 6000;
+    btn.textContent = 'Confirmer la réinitialisation';
+    btn.classList.add('a-btn--danger');
+    toast?.({ title: 'Réinitialiser le monde ?', text: 'Cliquez à nouveau dans les 6 s. Le monde de démonstration reviendra à son état initial.', tone: 'warning' });
+    setTimeout(() => { if (Date.now() >= ResetArm.until) { btn.textContent = 'Réinitialiser'; btn.classList.remove('a-btn--danger'); } }, 6200);
+    return;
+  }
+  ResetArm.until = 0;
+  btn.textContent = 'Réinitialiser';
+  btn.classList.remove('a-btn--danger');
+  try {
+    const d = await api('/api/reset', {});
+    applyState(d.state);
+    loadTimeline();
+    toast?.({ title: 'Monde réinitialisé', text: 'État initial restauré — le journal repart de la graine.', tone: 'success' });
+  } catch (err) {
+    toast?.({ title: 'Réinitialisation refusée', text: err.message, tone: 'error' });
+  }
+});
+
+/* ── Actions : autoriser / exécuter — deux actes attribués ─────── */
+const RISK_FR = { low: 'faible', medium: 'moyen', high: 'élevé' };
+const ACTION_STATE = {
+  pending_authorization: ['en attente d\u2019autorisation', 'warning'],
+  authorized: ['autorisée', 'accent'],
+  refused: ['refusée', 'error'],
+  executed: ['exécutée', 'success'],
+};
+function renderActions() {
+  const box = $('#pz-actions-list');
+  if (!box) return;
+  const count = $('#pz-actions-count');
+  if (!Noema.live) { box.innerHTML = offlineBlock('Les actions'); resolveIcons(box); if (count) count.hidden = true; return; }
+  const actions = (Noema.state?.entities || []).filter(isAction);
+  const pending = actions.filter((a) => a.status !== 'executed' && a.status !== 'refused').length;
+  if (count) { count.hidden = !pending; count.textContent = String(pending); }
+  if (!actions.length) {
+    box.innerHTML = '<p class="t-body-sm u-muted">Aucune action préparée. NOEMA ne crée jamais une action de son propre chef : elle naît d\u2019une intention validée.</p>';
+    return;
+  }
+  box.innerHTML = actions.map((a) => {
+    const [label, tone] = ACTION_STATE[a.status] || [a.status, 'warning'];
+    const pend = a.status === 'pending_authorization';
+    const authed = a.status === 'authorized';
+    return `<article class="noema-card noema-rail" data-certainty="${a.status === 'executed' ? 'confirmed' : 'proposed'}" data-id="${esc(a.id)}">
+      <div class="noema-card__head">
+        <span class="noema-card__kind">${ic('apr-approved')}Action</span>
+        <span class="a-badge a-badge--${tone}">${esc(label)}</span>
+        <span class="l-spacer"></span>
+        <span class="t-caption u-mono">${esc(a.scope || '')} · risque ${esc(RISK_FR[a.risk] || a.risk || '?')} · ${a.reversible ? 'réversible' : 'irréversible'}</span>
+      </div>
+      <p class="noema-card__title">${esc(a.label || '')} — ${esc(a.object || '')}</p>
+      <ul class="noema-card__list">
+        <li><strong>permission</strong> — <span class="u-mono">${esc(a.permission_required || '')}</span></li>
+        ${a.authorized_by ? `<li><strong>autorisée par</strong> — <span class="u-mono">${esc(a.authorized_by)}</span></li>` : ''}
+        ${a.executed_at ? `<li><strong>exécutée</strong> — <span class="u-mono">${esc(a.executed_at)}</span></li>` : ''}
+      </ul>
+      <div class="noema-card__foot">
+        ${pend ? `
+          <button type="button" class="a-btn a-btn--sm a-btn--primary" data-authorize="1" data-target="${esc(a.id)}">Autoriser</button>
+          <button type="button" class="a-btn a-btn--sm a-btn--ghost" data-authorize="0" data-target="${esc(a.id)}">Refuser</button>`
+        : authed ? `<button type="button" class="a-btn a-btn--sm a-btn--primary" data-execute="${esc(a.id)}">Exécuter</button>`
+        : '<span class="t-caption u-muted">aucune action possible</span>'}
+        <span class="l-spacer"></span>
+        <span class="t-caption u-mono">${esc(a.id)}</span>
+      </div>
+    </article>`;
+  }).join('');
+  resolveIcons(box);
+}
+
+/* ── Retenues : sous le seuil, montrées comme telles ───────────── */
+function renderWithheld() {
+  const box = $('#pz-withheld-list');
+  if (!box) return;
+  if (!Noema.live) { box.innerHTML = offlineBlock('Les retenues'); resolveIcons(box); return; }
+  const w = Noema.state?.observation?.withheld || [];
+  if (!w.length) { box.innerHTML = '<p class="t-body-sm u-muted">Rien de retenu : tout ce qui a été observé atteint le seuil.</p>'; return; }
+  box.innerHTML = w.map((x) => {
+    const [label, iconId] = KIND_LABEL[x.kind] || [x.kind, 'noe-inferred'];
+    return `<div class="l-row l-row--between u-pad u-surface" data-withheld="${esc(x.target_id || '')}">
+      <span class="l-row">${ic(iconId)}<span><span class="t-body-sm u-muted">${esc(x.title)}</span><br><span class="t-caption u-muted">${esc(label)}</span></span></span>
+      <span class="l-row"><span class="t-caption u-muted">confiance ${esc(CONF_FR[x.confidence] || x.confidence || 'faible')}</span><span class="a-badge">sous le seuil</span></span>
+    </div>`;
+  }).join('');
+  resolveIcons(box);
+}
+
+/* ── Journal : append-only, projeté tel quel ───────────────────── */
+function renderJournal() {
+  const body = $('#pz-journal-body');
+  if (!body) return;
+  if (!Noema.live) { body.innerHTML = '<tr><td colspan="5">NOEMA hors ligne — journal indisponible, rien n\u2019est inventé.</td></tr>'; return; }
+  const j = (Noema.state?.journal || []).slice().reverse();
+  body.innerHTML = j.length ? j.map((e) => `<tr>
+      <td class="u-mono">${esc(e.at)}</td><td>${esc(e.op)}</td><td class="u-mono">${esc(e.id)}</td><td class="u-mono">${esc(e.actor)}</td><td>${esc(e.cause || '')}</td>
+    </tr>`).join('') : '<tr><td colspan="5">Journal vide.</td></tr>';
+}
+
+/* ── Preuves : une par décision humaine ────────────────────────── */
+function renderProofs() {
+  const box = $('#pz-proofs-list');
+  if (!box) return;
+  if (!Noema.live) { box.innerHTML = offlineBlock('Les preuves'); resolveIcons(box); return; }
+  const proofs = (Noema.state?.entities || []).filter(isProof);
+  if (!proofs.length) { box.innerHTML = '<p class="t-body-sm u-muted">Aucune décision prise pour l\u2019instant — une preuve naît d\u2019une décision attribuée, jamais d\u2019une observation.</p>'; return; }
+  box.innerHTML = `<div class="viz-proof">${proofs.map((p) => `<div class="viz-proof__step" data-state="${esc(p.provenance?.state || 'confirmed')}">
+    <span class="viz-proof__dot" aria-hidden="true"></span>
+    <span class="viz-proof__body">
+      <span class="t-body-sm u-strong">${esc(p.proof_type || 'preuve')} — <button type="button" class="a-text-btn" data-card="${esc(p.target_id || '')}">${esc(p.target_id || '')}</button></span>
+      <span class="t-caption u-mono">${esc(p.evidence_ref || '')} · ${esc(p.captured_at || '')} · ${esc(p.validation_state || '')}</span>
+    </span>
+  </div>`).join('')}</div>`;
+}
+
+/* ── Les huit droits — exercés sur le serveur, montrés tels quels ─ */
+const RIGHTS = [
+  ['voir', 'Voir'], ['comprendre', 'Comprendre'], ['corriger', 'Corriger'], ['supprimer', 'Supprimer'],
+  ['pauser', 'Pauser'], ['limiter', 'Limiter'], ['partager', 'Partager'], ['revoquer', 'Révoquer'],
+];
+function fillSubjects() {
+  const sel = $('#pz-m-subject');
+  if (!sel) return;
+  const keep = sel.value;
+  const subjects = (Noema.state?.entities || []).filter((e) => e.id?.startsWith('ppl-') || e.id?.startsWith('prj-') || e.id?.startsWith('obj-'));
+  sel.innerHTML = subjects.map((e) => `<option value="${esc(e.id)}">${esc(e.display_name || e.title || e.content?.missing || e.id)} — ${esc(e.id)}</option>`).join('');
+  if (keep && subjects.some((x) => x.id === keep)) sel.value = keep;
+  const rights = $('#pz-m-rights');
+  if (rights && !rights.childElementCount) {
+    rights.innerHTML = RIGHTS.map(([k, l]) => `<button type="button" class="a-btn a-btn--sm" data-right="${esc(k)}">${esc(l)}</button>`).join('');
+  }
+  /* État de repos publié — un conteneur vide serait un silence ambigu. */
+  const out = $('#pz-m-out');
+  if (out && !out.dataset.exercised) {
+    out.innerHTML = Noema.live
+      ? `<p class="t-body-sm u-muted">${subjects.length} sujet(s) — choisissez un sujet puis un droit. Rien n\u2019est exercé sans acteur.</p>`
+      : offlineBlock('Les huit droits');
+    resolveIcons(out);
+  }
+}
+function renderRight(right, r) {
+  const out = $('#pz-m-out');
+  if (!out) return;
+  const fact = (k, v) => `<div class="ucard__fact"><dt>${esc(k)}</dt><dd>${v}</dd></div>`;
+  let html = '';
+  if (right === 'voir' && r.subject) {
+    html = `<div class="u-pad u-surface"><p class="t-body-sm u-strong">${esc(r.subject.label)}${r.subject.paused_until ? ` · en pause jusqu\u2019au ${esc(r.subject.paused_until)}` : ''}</p>
+      <dl class="ucard__facts">
+        ${fact('catégorie', `<span class="u-mono">${esc(r.subject.category || '—')}</span>`)}
+        ${fact('visibilité', `<span class="u-mono">${esc(r.subject.visibility || '—')}</span>`)}
+        ${fact('partagé avec', `<span class="u-mono">${esc((r.shared_with || []).map((g) => g.grantee).join(', ') || 'personne')}</span>`)}
+      </dl></div>
+      <p class="t-caption u-muted">Ce que le système sait — ${(r.known || []).length} information(s), chacune avec sa provenance et sa confiance.</p>
+      <div class="l-stack">${(r.known || []).map((k) => `<div class="l-row l-row--between u-pad u-surface">
+        <span class="t-body-sm">${esc(k.label)} <span class="t-caption u-mono">${esc(k.id)}</span></span>
+        <span class="l-row">${stateBadge(k.state)}${k.confidence ? `<span class="t-caption u-muted">${esc(CONF_FR[k.confidence] || k.confidence)}</span>` : ''}</span>
+      </div>`).join('') || '<p class="t-body-sm u-muted">Rien.</p>'}</div>`;
+  } else if (right === 'comprendre' && r.chain) {
+    html = `<p class="t-caption ${r.uncertain ? 'u-strong' : 'u-muted'}">${r.uncertain ? 'Cette chaîne contient des maillons non confirmés : ce n\u2019est pas un fait établi.' : 'Tous les maillons sont confirmés.'}</p>
+      <div class="viz-proof">${r.chain.map((c) => `<div class="viz-proof__step" data-state="${esc(c.state || 'proposed')}">
+        <span class="viz-proof__dot" aria-hidden="true"></span>
+        <span class="viz-proof__body">
+          <span class="t-body-sm u-strong">${esc(c.label || c.id)} <span class="t-caption u-mono">${esc(c.id)}</span></span>
+          <span class="t-caption u-mono">${esc(c.origin || '—')} · ${esc(c.state || '—')} · ${esc(c.confidence || '—')}</span>
+        </span></div>`).join('')}</div>
+      <p class="t-caption u-muted">La chaîne s\u2019arrête sur <span class="u-mono">${esc(r.terminates_on || '—')}</span>.</p>`;
+  } else {
+    const lines = Object.entries(r)
+      .filter(([k]) => !['state', 'chain', 'known', 'subject', 'shared_with'].includes(k))
+      .map(([k, v]) => fact(k, `<span class="u-mono">${esc(typeof v === 'object' ? JSON.stringify(v) : String(v))}</span>`)).join('');
+    html = `<div class="u-pad u-surface"><dl class="ucard__facts">${lines}</dl></div>`;
+  }
+  out.dataset.exercised = '1';
+  out.innerHTML = `<p class="t-caption u-muted">Droit « ${esc(right)} » exercé par <span class="u-mono">${esc(ACTOR)}</span> — tracé au journal.</p>${html}`;
+  resolveIcons(out);
+}
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('[data-right]');
+  if (!btn) return;
+  const right = btn.dataset.right;
+  const subject = $('#pz-m-subject')?.value;
+  const out = $('#pz-m-out');
+  if (!Noema.live) { toast?.({ title: 'NOEMA hors ligne', text: 'Aucun droit ne s\u2019exerce sans la boucle.', tone: 'warning' }); return; }
+  if (!subject) { toast?.({ title: 'Aucun sujet', text: 'Choisissez d\u2019abord un sujet.', tone: 'warning' }); return; }
+  /* Corps propre à chaque droit — rien n'est inventé côté écran : ce qui
+     manque est refusé par le serveur, et le refus est affiché. */
+  const bodies = {
+    voir: { subject_id: subject },
+    comprendre: { id: subject },
+    corriger: { id: subject, field: 'roles', value: ['saxophone'], reason: 'correction depuis Point Zero' },
+    supprimer: { id: subject, reason: 'suppression demandée depuis Point Zero' },
+    pauser: { subject_id: subject, until: new Date(Date.now() + 30 * 864e5).toISOString(), reason: 'pause demandée depuis Point Zero' },
+    limiter: { id: subject, category: 'projet', visibility: 'projet', reason: 'limitation depuis Point Zero' },
+    partager: { id: subject, grantee: 'client@atelier-nord.fr', purpose: 'suivi de projet', expires_at: new Date(Date.now() + 90 * 864e5).toISOString() },
+    revoquer: { grant_id: null },
+  };
+  const body = { ...bodies[right], actor: ACTOR };
+  if (right === 'revoquer') {
+    const grant = (Noema.state?.entities || []).find((g) => g.id?.startsWith('grt-') && g.status === 'active');
+    if (!grant) { toast?.({ title: 'Rien à révoquer', text: 'Aucun partage actif.', tone: 'warning' }); return; }
+    body.grant_id = grant.id;
+  }
+  try {
+    const d = await api(`/api/memory/${right}`, body);
+    renderRight(right, d);
+    applyState(d.state);
+  } catch (err) {
+    if (out) {
+      out.innerHTML = `<div class="a-state a-state--error"><span class="a-state__icon">${ic('com-alert', 'a-ic a-ic--lg')}</span>
+        <p class="t-h3">Droit refusé</p><p class="t-body-sm u-muted">${esc(err.message)}</p></div>`;
+      resolveIcons(out);
+    }
+  }
+});
+
 function fillProjects() {
   const sel = $('#pz-project');
   if (!sel) return;
-  const projects = (Noema.state?.entities || []).filter((e) => e.type === 'project');
+  const projects = (Noema.state?.entities || []).filter((e) => (e.type === 'project' || e.id?.startsWith('prj-')));
   const cur = store.get('project', '');
   sel.innerHTML = '<option value="">Tous les projets</option>' + projects
     .map((p) => `<option value="${esc(p.id)}"${p.id === cur ? ' selected' : ''}>${esc(p.title || p.id)}</option>`).join('');
 }
 
 async function bootNoema() {
+  let s = null;
   try {
-    const s = await api('/api/state');
-    Noema.state = s;
+    s = await api('/api/state');
     Noema.runtime = s.runtime || null;
     Noema.live = true;
   } catch {
     Noema.live = false;
   }
   setNoemaBadge();
-  fillProjects();
-  renderRail();
-  renderCartes();
+  if (s) { Noema.state = s; fillProjects(); }
+  applyState(s || { entities: [], journal: [], observation: {} });
   if (Noema.live) loadTimeline();
   else {
     const tl = $('#pz-timeline-list');
@@ -1446,7 +1726,7 @@ async function intend(dry) {
   if (!Noema.live) { toast?.({ title: 'NOEMA hors ligne', text: 'Démarrez node loop/server.mjs — aucune intention n\u2019est simulée.', tone: 'warning' }); return; }
   try {
     const d = await api('/api/intend', dry ? { text, dry_run: true } : { text, actor: ACTOR });
-    if (d.state) { Noema.state = d.state; renderRail(); renderCartes(); }
+    if (d.state && !dry) applyState(d.state);
     if (dry) {
       const cands = d.candidates || [];
       const un = d.unparsed || [];
@@ -1485,12 +1765,14 @@ async function loadTimeline() {
   const list = $('#pz-timeline-list');
   if (!list || !Noema.live) return;
   const mode = $('#pz-tl-mode')?.value || 'PLAN';
+  const gran = $('#pz-tl-gran')?.value || 'SEMAINE';
   const pid = $('#pz-project')?.value || '';
   try {
-    const d = await api(`/api/timeline?mode=${encodeURIComponent(mode)}&granularity=SEMAINE${pid ? `&project_id=${encodeURIComponent(pid)}` : ''}`);
+    const d = await api(`/api/timeline?mode=${encodeURIComponent(mode)}&granularity=${encodeURIComponent(gran)}${pid ? `&project_id=${encodeURIComponent(pid)}` : ''}`);
     const items = d.items || [];
     const meta = $('#pz-tl-meta');
-    if (meta) meta.textContent = `${items.length} élément(s) · semaine · source : ${esc(d.source_of_truth || 'event')}`;
+    const caps = d.capabilities?.length ? d.capabilities.join(' · ') : 'aucune — lecture seule';
+    if (meta) meta.textContent = `${items.length} élément(s) · ${(d.granularity || gran).toLowerCase()} · ${(d.buckets || []).length} période(s) · capacités ${caps} · source : ${d.source_of_truth || 'event'}${d.live ? ` · ${(d.live.late || []).length} en retard` : ''}`;
     const dmeta = $('#pz-dock-tl-meta');
     if (dmeta) dmeta.textContent = `${mode} · ${items.length}`;
     if (!items.length) {
@@ -1503,7 +1785,7 @@ async function loadTimeline() {
     list.innerHTML = `<div class="utl__list">${items.map((it) => {
       const when = fmtWhen(it.start);
       const kind = TL_KIND[it.type] || 'event';
-      const state = it.type === 'proposal' ? ' data-state="proposed"' : '';
+      const state = isProposal(it) ? ' data-state="proposed"' : '';
       const ent = it.entity_ref ? ` data-entity="${esc(it.entity_ref)}" tabindex="0"` : '';
       return `<article class="utl__item"${state}${ent}>
         <span class="utl__marker" data-kind="${esc(kind)}" aria-hidden="true"></span>
@@ -1511,7 +1793,8 @@ async function loadTimeline() {
           <span class="utl__when">${when ? esc(when) : '<span class="is-unknown">non positionné</span>'}</span>
           <span class="utl__title">${esc(it.title)}</span>
           ${it.late ? '<span class="a-badge a-badge--warning">en retard</span>' : ''}
-          ${(it.capabilities || []).includes('COMPLETE') ? `<button type="button" class="a-btn a-btn--sm" data-tcomplete="${esc(it.id)}">Achever</button>` : ''}
+          ${it.editable && (it.capabilities || []).includes('MOVE') ? `<button type="button" class="a-btn a-btn--sm a-btn--ghost" data-tmove="${esc(it.id)}">+1 jour</button>` : ''}
+          ${(it.capabilities || []).includes('COMPLETE') && it.status !== 'published' ? `<button type="button" class="a-btn a-btn--sm" data-tcomplete="${esc(it.id)}">Achever</button>` : ''}
         </div>
         <div class="utl__row"><span class="t-meta u-muted">${esc((it.capabilities || []).slice(0, 5).join(' · '))}${it.actor ? ` · ${esc(it.actor)}` : ''}</span></div>
       </article>`;
@@ -1521,6 +1804,7 @@ async function loadTimeline() {
   }
 }
 $('#pz-tl-mode')?.addEventListener('change', () => loadTimeline());
+$('#pz-tl-gran')?.addEventListener('change', () => loadTimeline());
 
 /* ── Z5b · CARTES — la mémoire du projet en cartes ────────────── */
 function renderCartes() {
@@ -1538,13 +1822,15 @@ function renderCartes() {
     const title = e.display_name || e.title || e.content?.name || e.description || e.type || e.id;
     const sub = `${e.type}${e.status ? ` · ${e.status}` : ''}`;
     const shape = ['person', 'organization', 'relation'].includes(e.type) ? ` data-type="${esc(e.type)}"` : '';
+    const prov = e.provenance?.state ? stateBadge(e.provenance.state) : '';
     return `<button type="button" class="ucard ucard--inline" data-card="${esc(e.id)}">
       <span class="ucard__mark"${shape}>${ic(TYPE_ICON[e.type] || 'mem-card')}</span>
       <span class="ucard__head">
-        <span class="ucard__type">${esc(e.type)}</span>
+        <span class="ucard__type">${esc(e.type || e.id.split('-')[0])}</span>
         <span class="ucard__title">${esc(title)}</span>
-        <span class="ucard__sub">${esc(sub)}</span>
+        <span class="ucard__sub">${esc(sub)} · ${esc(e.source || 'source inconnue')} · ${esc(e.created_by || '—')}</span>
       </span>
+      ${prov}
     </button>`;
   }).join('');
   resolveIcons(box);
@@ -1556,7 +1842,7 @@ document.addEventListener('click', async (e) => {
   if (dec) {
     try {
       const d = await api('/api/decide', { proposal_id: dec.dataset.target, decision: dec.dataset.decide, actor: ACTOR });
-      if (d.state) { Noema.state = d.state; renderRail(); renderCartes(); }
+      applyState(d.state);
       toast?.({ title: 'Décision enregistrée', text: `${dec.dataset.decide} · attribuée à ${ACTOR}`, tone: 'success' });
     } catch (err) {
       toast?.({ title: 'Décision refusée', text: err.message, tone: 'error' });
@@ -1569,7 +1855,7 @@ document.addEventListener('click', async (e) => {
       const d = await api('/api/timeline/complete', {
         item_id: tc.dataset.tcomplete, actor: ACTOR, mode: $('#pz-tl-mode')?.value || 'PLAN',
       });
-      if (d.state) { Noema.state = d.state; renderRail(); renderCartes(); }
+      applyState(d.state);
       loadTimeline();
       toast?.({ title: 'Événement achevé', text: 'Le fait canonique a été modifié — la projection suit.', tone: 'success' });
     } catch (err) {
@@ -1577,10 +1863,49 @@ document.addEventListener('click', async (e) => {
     }
     return;
   }
+  const auth = e.target.closest('[data-authorize]');
+  if (auth) {
+    try {
+      const grant = auth.dataset.authorize === '1';
+      const d = await api('/api/authorize', { action_id: auth.dataset.target, grant, actor: ACTOR, reason: grant ? 'autorisée depuis Point Zero' : 'refusée depuis Point Zero' });
+      applyState(d.state);
+      toast?.({ title: grant ? 'Action autorisée' : 'Action refusée', text: `attribuée à ${ACTOR} — rien n\u2019est encore exécuté.`, tone: grant ? 'accent' : 'warning' });
+    } catch (err) {
+      toast?.({ title: 'Autorisation refusée', text: err.message, tone: 'error' });
+    }
+    return;
+  }
+  const ex = e.target.closest('[data-execute]');
+  if (ex) {
+    try {
+      const d = await api('/api/execute', { action_id: ex.dataset.execute, actor: ACTOR });
+      applyState(d.state);
+      toast?.({ title: 'Exécutée', text: d.result?.detail || 'sortie de la machine, attribuée.', tone: 'success' });
+    } catch (err) {
+      toast?.({ title: 'Exécution refusée', text: err.message, tone: 'error' });
+    }
+    return;
+  }
+  const mv = e.target.closest('[data-tmove]');
+  if (mv) {
+    try {
+      const ev = (Noema.state?.entities || []).find((x) => x.id === mv.dataset.tmove);
+      if (!ev?.start_at) throw new Error('événement sans date canonique — rien à déplacer');
+      const next = new Date(new Date(ev.start_at).getTime() + 864e5).toISOString().slice(0, 10);
+      const d = await api('/api/timeline/move', { item_id: ev.id, start: next, actor: ACTOR, mode: $('#pz-tl-mode')?.value || 'PLAN' });
+      applyState(d.state);
+      loadTimeline();
+      toast?.({ title: 'Événement déplacé', text: `${ev.id} → ${next} — le fait canonique a changé, pas une copie.`, tone: 'success' });
+    } catch (err) {
+      toast?.({ title: 'Déplacement refusé', text: err.message, tone: 'error' });
+    }
+    return;
+  }
   const cd = e.target.closest('[data-card]');
   if (cd) {
     const ent = (Noema.state?.entities || []).find((x) => x.id === cd.dataset.card);
-    if (ent) select('card', ent);
+    if (ent) { select('card', ent); const pane = $('#pz-pane-end'); if (pane?.hidden) $('#pz-toggle-inspector')?.click(); }
+    else toast?.({ title: 'Entité hors mémoire chargée', text: cd.dataset.card, tone: 'warning' });
     return;
   }
   /* Synchronisation flux → carte : un clic sur un élément de la timeline

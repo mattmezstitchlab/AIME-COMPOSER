@@ -160,10 +160,16 @@
         </div>
 
         <div class="pz__noema" aria-labelledby="pz-noema-h">
-          <h2 class="t-h2" id="pz-noema-h">
-            <span class="noema-mark"><svg class="a-ic noema-mark__glyph" aria-hidden="true" width="20" height="20"><use data-a-icon="noe-mark"/></svg></span>
-            NOEMA
-          </h2>
+          <div class="pz__group">
+            <h2 class="t-h2" id="pz-noema-h">
+              <span class="noema-mark"><svg class="a-ic noema-mark__glyph" aria-hidden="true" width="20" height="20"><use data-a-icon="noe-mark"/></svg></span>
+              NOEMA
+            </h2>
+            <span class="l-spacer"></span>
+            <button type="button" class="a-btn a-btn--sm a-btn--primary" id="pz-noema-observe" title="NOEMA observe le monde et propose — elle n'écrit jamais un fait">Observer</button>
+            <button type="button" class="a-btn a-btn--sm a-btn--ghost" id="pz-noema-reset" title="Remet le monde de démonstration à son état initial — deux clics, jamais un seul">Réinitialiser</button>
+          </div>
+          <p class="t-caption u-muted" id="pz-noema-counts"></p>
           <div class="noema-feed" id="pz-noema-feed" aria-live="polite"></div>
           <div class="a-field">
             <label class="a-field__label" for="pz-noema-text">Votre intention</label>
@@ -221,6 +227,10 @@
           <option value="LIVE">LIVE — jour J</option>
           <option value="HISTORY">HISTORY — versions</option>
         </select>
+        <select class="a-select" id="pz-tl-gran" aria-label="Granularité de la timeline">
+          <option>ANNÉE</option><option>MOIS</option><option selected>SEMAINE</option>
+          <option>JOUR</option><option>HEURE</option><option>MINUTE</option><option>SECONDE</option>
+        </select>
         <span class="t-meta u-muted" id="pz-tl-meta"></span>
         <span class="l-spacer"></span>
         <button type="button" class="a-icon-btn" data-tray-close aria-label="Fermer la timeline">
@@ -232,7 +242,7 @@
       </div>
     </div>
 
-    <div class="dock__tray" id="pz-tray-cartes" hidden aria-label="Cartes universelles">
+    <div class="dock__tray" id="pz-tray-cartes" hidden aria-label="Cartes universelles — la mémoire de la boucle">
       <div class="dock__tray-head">
         <p class="t-label">Cartes universelles</p>
         <span class="t-meta u-muted" id="pz-cartes-meta"></span>
@@ -241,8 +251,55 @@
           <svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="nav-close"/></svg>
         </button>
       </div>
-      <div class="pz-cards pz-cards--rows" id="pz-cartes-list" data-a-render="cartes">
-        <p class="t-body-sm u-muted">Mémoire du projet…</p>
+      <div class="a-tabs" id="pz-mem-tabs">
+        <div class="a-tabs__list" role="tablist" aria-label="Vues de la mémoire">
+          <button type="button" class="a-tabs__tab" role="tab" id="pz-tab-monde" aria-selected="true" aria-controls="pz-panel-monde">Monde</button>
+          <button type="button" class="a-tabs__tab" role="tab" id="pz-tab-actions" aria-selected="false" aria-controls="pz-panel-actions">Actions <span class="a-badge" id="pz-actions-count" hidden>0</span></button>
+          <button type="button" class="a-tabs__tab" role="tab" id="pz-tab-retenu" aria-selected="false" aria-controls="pz-panel-retenu">Retenues</button>
+          <button type="button" class="a-tabs__tab" role="tab" id="pz-tab-journal" aria-selected="false" aria-controls="pz-panel-journal">Journal</button>
+          <button type="button" class="a-tabs__tab" role="tab" id="pz-tab-preuves" aria-selected="false" aria-controls="pz-panel-preuves">Preuves</button>
+          <button type="button" class="a-tabs__tab" role="tab" id="pz-tab-droits" aria-selected="false" aria-controls="pz-panel-droits">Droits</button>
+        </div>
+
+        <div class="a-tabs__panel" role="tabpanel" id="pz-panel-monde" aria-labelledby="pz-tab-monde">
+          <div class="pz-cards pz-cards--rows" id="pz-cartes-list" data-a-render="cartes">
+            <p class="t-body-sm u-muted">Mémoire du projet…</p>
+          </div>
+        </div>
+
+        <div class="a-tabs__panel" role="tabpanel" id="pz-panel-actions" aria-labelledby="pz-tab-actions" hidden>
+          <p class="t-caption u-muted">Valider une demande d'action ne l'exécute pas : elle attend une autorisation. Périmètre, risque et réversibilité viennent du registre. Autoriser et exécuter sont deux actes distincts, tous deux attribués.</p>
+          <div class="l-stack" id="pz-actions-list" data-a-render="actions"></div>
+        </div>
+
+        <div class="a-tabs__panel" role="tabpanel" id="pz-panel-retenu" aria-labelledby="pz-tab-retenu" hidden>
+          <p class="t-caption u-muted">Le silence est une capacité : ces ébauches n'atteignent pas le seuil de confiance — ni proposées, ni appliquées.</p>
+          <div class="l-stack" id="pz-withheld-list" data-a-render="retenues"></div>
+        </div>
+
+        <div class="a-tabs__panel" role="tabpanel" id="pz-panel-journal" aria-labelledby="pz-tab-journal" hidden>
+          <div class="ds-table-wrap">
+            <table class="a-table">
+              <caption class="u-sr">Journal append-only : chaque entrée porte un acteur et un horodatage</caption>
+              <thead><tr><th scope="col">Horodatage</th><th scope="col">Opération</th><th scope="col">Cible</th><th scope="col">Acteur</th><th scope="col">Cause</th></tr></thead>
+              <tbody id="pz-journal-body" data-a-render="journal"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="a-tabs__panel" role="tabpanel" id="pz-panel-preuves" aria-labelledby="pz-tab-preuves" hidden>
+          <div class="l-stack" id="pz-proofs-list" data-a-render="preuves"></div>
+        </div>
+
+        <div class="a-tabs__panel" role="tabpanel" id="pz-panel-droits" aria-labelledby="pz-tab-droits" hidden>
+          <p class="t-caption u-muted">La mémoire appartient à l'humain. Choisissez un sujet : ce que le système en sait, pourquoi il le croit, et ce que vous pouvez en faire. Chaque droit exercé est attribué et tracé.</p>
+          <div class="a-field">
+            <label class="a-field__label" for="pz-m-subject">Sujet</label>
+            <select class="a-select" id="pz-m-subject"></select>
+          </div>
+          <div class="l-row" id="pz-m-rights" role="group" aria-label="Les huit droits"></div>
+          <div class="l-stack" id="pz-m-out" aria-live="polite" data-a-render="droits"></div>
+        </div>
       </div>
     </div>
 
