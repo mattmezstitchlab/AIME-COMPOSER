@@ -42,8 +42,8 @@ Aucune écriture dans le projet examiné — c'est un test, pas une promesse.
 
 ## Hiérarchie — ce qui est non résolu, jamais un écart
 
-Quatre angles morts du collecteur, mesurés sur `byaime-one-page` (12 faux
-`HIERARCHY` sur 16, corrigés sans deviner) :
+Six angles morts du collecteur, mesurés sur `byaime-one-page` (12 faux
+`HIERARCHY` sur 16 au §7, puis 2 vrais du §8, corrigés sans deviner) :
 
 - **h1 composé** — une route importe un fragment local qui porte le h1
   (`SiteHero` pour Legal/Mentions, `ProjectStage` pour Home/app). Le scan
@@ -62,13 +62,41 @@ Quatre angles morts du collecteur, mesurés sur `byaime-one-page` (12 faux
 - **coquille SPA** — `index.html` du montage Vite (`<div id="root">` +
   `<script type="module" src="/src/main.tsx">`) n’a pas de h1 statique ;
   il vit dans le rendu. On publie `NON RÉSOLU — coquille SPA`, on n’ajoute
-  jamais un h1 artificiel au projet. Le rapport distingue alors
-  `4 écarts HIERARCHY + 4 non-résolus` (exemple byaime), codes sortie
-  inchangés.
+  jamais un h1 artificiel au projet.
+- **h1 par branche** — `App.tsx` porte 3 h1 dans des branches mutuellement
+  exclusives (invitation / RSVP / connexion indisponible) — un seul rend
+  à la fois, le scan statique compte 3. On publie
+  `NON RÉSOLU — h1 par branche`, jamais d'interpolation de contrôle
+  (pont §8.2, limité à `App.*` pour ne pas masquer un vrai doublon sur
+  une page métier).
+- **montage / bootstrap** — `main.tsx` (montage React, `createRoot`)
+  n'est pas un écran — c'est le point d'entrée. Même traitement que la
+  coquille SPA : publié `NON RÉSOLU — montage/bootstrap`, jamais `0 h1`
+  (pont §8.2, `main.*` exclu des écrans par `profile.mjs`).
 
 Tous ces cas sont comptés, nommés écran par écran dans
 `hierarchie_non_resolue` / `hierarchie_non_resolue_detail` et résumés dans
-`non_mesuré` — jamais devinés, jamais comptés comme écarts.
+`non_mesuré` — jamais devinés, jamais comptés comme écarts. Codes sortie
+inchangés : un projet avec uniquement des NON RÉSOLUS sort en 0 (byaime
+passe ainsi à **HIERARCHY 0 vrai écart** au §8).
+
+## Couche de tokens — adoption, pas dette
+
+Un projet qui vendore `src/styles/aime-tokens.css` (copie de
+`design-system/tokens/tokens.css`, 150 littéraux, provenance
+`AIME-COMPOSER 90ad4c0`) voyait `COLOR 328→478` — le pont punissait qui
+adoptait. La couche est désormais reconnue comme **REFERENCE** :
+
+- par marqueur de provenance en tête de fichier (`AIME-COMPOSER`,
+  `couche de tokens`, `Source : AIME-COMPOSER`, commit `90ad4c0`) ;
+- ou par empreinte : le contenu officiel est inclus tel quel (vendor =
+  header + fichier officiel, ou copie exacte).
+
+Cette couche est **exclue de COLOR** (comme `CONTRAST`) et **comptée en
+adoption** : `adoption.tokens_layer = true`,
+`adoption.tokens_layer_files[]`, `non_mesuré` = « couche de tokens
+présente ». Le bridge promet zéro écart pour qui n'utilise que le pont ;
+désormais il ne facture plus la couche elle-même (pont §8.1).
 
 ## Le pont officiel — converger vers zéro sans changer de moteur
 
@@ -79,20 +107,27 @@ typographiques, 6 durées. Un projet qui n'utilise que ce pont sort avec
 **zéro écart** sur les familles couvertes — démontré par les fixtures de
 tests, pas promis. La convergence dans le temps se mesure avec `--baseline`.
 
+La **couche de tokens** (`src/styles/aime-tokens.css`) est la marche
+d'adoption du pont : les rôles `--aime-*` sont disponibles sans changer
+de moteur, mesurée en adoption, jamais facturée.
+
 ## Ce que le rapport publie
 
 - **densité** (écarts / écran), jamais un score sur 100 — un 78/100
   inventé ne dirait pas ce qui ne va pas ;
 - **profil moteur**, **écrans/fragments**, bibliothèques d'icônes tierces
   (nommées, jamais comptées), constructions de classes **non résolues** et
-  hiérarchies **non résolues** (`h1 composé` / `coquille` / alias) ;
-- **adoption** : combien de classes système le projet utilise déjà ;
+  hiérarchies **non résolues** (`h1 composé` / `coquille` / alias /
+  `branche` / `montage`) ;
+- **adoption** : combien de classes système le projet utilise déjà, et
+  si la couche de tokens est présente (`tokens_layer`) ;
 - **répartition par famille**, et les écrans les plus touchés ;
 - **ordre de réparation** — pas une note : l'ordre dans lequel les
   chantiers ont le plus d'effet pour le moins d'effort ;
 - **fichiers écartés**, pour qu'aucune exclusion ne soit silencieuse ;
 - **`NON MESURÉ`** explicite : `CONTRAST` (référence), la mise en page
-  réelle (jsdom n'a pas de moteur de layout), les non-résolus.
+  réelle (jsdom n'a pas de moteur de layout), les non-résolus et la
+  couche de tokens (`couche de tokens présente`).
 
 Le classement par écran **somme au total publié** — propriété testée.
 

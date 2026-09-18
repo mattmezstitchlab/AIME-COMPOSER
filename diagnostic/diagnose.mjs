@@ -139,6 +139,9 @@ export function printReport(name, d, recs, baseline = null) {
   console.log(`  écarts sur écrans : ${d.screens.ecarts} · densité ${d.screens.density} par écran`);
   if (d.fragments.total) console.log(`  écarts sur fragments : ${d.fragments.ecarts} (rapporté à part — la densité par écran reste comparable)`);
   console.log(`  vocabulaire du système employé : ${d.adoption.system_classes_used}/${d.adoption.total_classes} classes · ${d.adoption.tokens_referenced || 0} référence(s) var(--aime-*) en utilitaires`);
+  if (d.adoption.tokens_layer) {
+    console.log(`  couche de tokens présente : ${d.adoption.tokens_layer_files.join(', ')} — REFERENCE (exclue de COLOR)`);
+  }
 
   console.log(`\n  FAMILLE          ÉCARTS  (écr · frag)`);
   const max = Math.max(...d.families.map((f) => f.count), 1);
