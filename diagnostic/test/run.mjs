@@ -505,6 +505,79 @@ test('hierarchy non-résolu publié séparément — jamais un écart, jamais de
   eq(d.ecarts, 0, 'ecarts non nul sur fixture composée conforme');
 });
 
+/* ══ HIERARCHY — ANGLES MORTS §8 pont (branche + bootstrap) ══ */
+console.log('\nHIERARCHY — ANGLES §8');
+
+test('h1 par branche — App.tsx 3 h1 exclusifs → NON RÉSOLU branche, jamais interpolé', () => {
+  const d = diagnoseV2(collect(FIX('hierarchy-branche')), REF);
+  const hier = d.families.find((f) => f.family === 'HIERARCHY');
+  eq(hier.count, 0, `App 3 h1 branchés comptés comme écart : ${hier.count}`);
+  eq(d.hierarchy_unresolved, 1, `branche non résolue attendue 1, reçu ${d.hierarchy_unresolved}`);
+  ok(d.hierarchy_unresolved_detail.some((s) => /branche/.test(s) && /App\.tsx/.test(s)), 'détail branche App manquant');
+  ok(d.non_measured.some((s) => /hiérarchie non résolue/i.test(s) && /App/.test(s)), 'non_mesuré ne publie pas la branche');
+  eq(d.screens.total, 1, `App branche doit rester 1 écran, reçu ${d.screens.total}`);
+  eq(d.ecarts, 0, 'ecarts non nul sur fixture branche conforme');
+});
+
+test('bootstrap main.tsx — NON RÉSOLU montage, jamais écran 0 h1', () => {
+  const d = diagnoseV2(collect(FIX('hierarchy-bootstrap')), REF);
+  const hier = d.families.find((f) => f.family === 'HIERARCHY');
+  eq(hier.count, 0, `main.tsx compté comme 0 h1 : ${hier.count}`);
+  eq(d.hierarchy_unresolved, 1, `bootstrap non compté comme non-résolue : ${d.hierarchy_unresolved}`);
+  ok(d.hierarchy_unresolved_detail.some((s) => /bootstrap|montage/.test(s) && /main\.tsx/.test(s)), 'détail bootstrap manquant');
+  ok(d.non_measured.some((s) => /hiérarchie non résolue/i.test(s)), 'non_mesuré ne publie pas le bootstrap');
+  // main.* n'est pas un écran : même traitement que coquille SPA
+  eq(d.screens.total, 1, `main.tsx doit ne pas compter comme écran : attendu 1 (App), reçu ${d.screens.total}`);
+  eq(d.fragments.total, 1, `main.tsx en fragment : attendu 1, reçu ${d.fragments.total}`);
+});
+
+test('bootstrap et branche cumulés — HIERARCHY 0 vrai écart', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'aime-branche-bootstrap-'));
+  writeFileSync(join(dir, 'package.json'), '{"dependencies":{"react":"^18"}}');
+  mkdirSync(join(dir, 'src'));
+  writeFileSync(join(dir, 'src/App.tsx'), 'export function App(){ if(1) return <h1>A</h1>; return <h1>B</h1>; }');
+  writeFileSync(join(dir, 'src/main.tsx'), 'import App from "./App"; console.log(App);');
+  const d = diagnoseV2(collect(dir), REF);
+  eq(d.families.find((f) => f.family === 'HIERARCHY').count, 0, 'cumul branche+bootstrap doit être 0');
+  eq(d.hierarchy_unresolved, 2, `attendu 2 non-résolus (branche + bootstrap), reçu ${d.hierarchy_unresolved}`);
+});
+
+/* ══ COUCHE TOKENS — REFERENCE §8.1 ══ */
+console.log('\nCOUCHE TOKENS');
+
+test('couche de tokens vendée — exclue de COLOR, comptée en adoption', () => {
+  const d = diagnoseV2(collect(FIX('tokens-layer')), REF);
+  const color = d.families.find((f) => f.family === 'COLOR');
+  eq(color.count, 0, `couche vendée facturée : COLOR ${color.count} attendu 0`);
+  eq(d.adoption.tokens_layer, true, 'adoption.tokens_layer false — couche non reconnue');
+  ok(d.adoption.tokens_layer_files.some((f) => /aime-tokens\.css/.test(f)), 'fichier couche non listé en adoption');
+  ok(d.non_measured.some((s) => /couche de tokens/i.test(s)), 'non_mesuré ne publie pas la couche de tokens');
+  eq(d.ecarts, 0, 'couche seule ne doit pas produire d’écarts');
+});
+
+test('couche tokens reconnue par empreinte (sans marqueur) — même REFERENCE', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'aime-tokens-fp-'));
+  writeFileSync(join(dir, 'package.json'), '{"dependencies":{"react":"^18"}}');
+  mkdirSync(join(dir, 'src'));
+  writeFileSync(join(dir, 'src/App.jsx'), 'export default function App(){return <h1>T</h1>}');
+  const refText = readFileSync(join(DESIGN_SYSTEM, 'tokens/tokens.css'), 'utf8');
+  writeFileSync(join(dir, 'src/styles.css'), refText);
+  const d = diagnoseV2(collect(dir), REF);
+  eq(d.families.find((f) => f.family === 'COLOR').count, 0, 'empreinte tokens.css non reconnue — COLOR non nul');
+  eq(d.adoption.tokens_layer, true, 'empreinte non comptée en adoption');
+});
+
+test('sans couche — couleur littérale toujours facturée (pas de faux REFERENCE)', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'aime-no-layer-'));
+  writeFileSync(join(dir, 'package.json'), '{"dependencies":{"react":"^18"}}');
+  mkdirSync(join(dir, 'src'));
+  writeFileSync(join(dir, 'src/App.jsx'), 'export default function App(){return <div className="text-white"><h1>T</h1></div>}');
+  writeFileSync(join(dir, 'src/other.css'), 'body{color:#ff0000}');
+  const d = diagnoseV2(collect(dir), REF);
+  ok(d.families.find((f) => f.family === 'COLOR').count > 0, 'couleur littérale non facturée sans couche');
+  eq(d.adoption.tokens_layer, false, 'faux positif couche');
+});
+
 
 /* ── Bilan ─────────────────────────────────────────────────────── */
 console.log(`\n${failures.length ? '✗' : '✓'} ${pass} test(s) réussi(s) · ${failures.length} échec(s)\n`);

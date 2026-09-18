@@ -33,12 +33,49 @@ function hasH1(html) {
   const re = new RegExp(`<(?:h1|${HEADING_ALIAS_PREFIXES.map((p) => `${p}\\.h1`).join('|')})[\\s>/]`);
   return re.test(html);
 }
+function countH1(html) {
+  const re = new RegExp(`<(?:h1|${HEADING_ALIAS_PREFIXES.map((p) => `${p}\\.h1`).join('|')})[\\s>/]`, 'g');
+  return (String(html).match(re) || []).length;
+}
 function isSpaCoquille(page) {
   if (!page.name.endsWith('index.html')) return false;
   const html = page.html || '';
   const hasRoot = /<div[^>]*id=["']root["']/.test(html);
   const hasModuleScript = /<script[^>]*type=["']module["'][^>]*src=/.test(html);
   return hasRoot && hasModuleScript && !hasH1(html);
+}
+/* ── TOKENS : couche d'adoption vendée ─────────────────────────
+   Un projet qui adopte en vendoring `tokens.css` officiel ne doit pas
+   être pénalisé : les 150 littéraux couleur du fichier de tokens sont
+   la décision du Design System, pas du projet.
+   La couche est reconnue par :
+   - marqueur de provenance en tête de fichier (AIME-COMPOSER, 90ad4c0,
+     couche de tokens, Source : AIME-COMPOSER) — voir byaime
+     `src/styles/aime-tokens.css` (pont §8.1, commit 90ad4c0)
+   - ou empreinte : le contenu officiel est inclus tel quel (vendor =
+     header provenance + fichier officiel).                           */
+function isTokensLayerFile(file, refCssText) {
+  if (!file || !file.text || !refCssText) return false;
+  const head = file.text.slice(0, 8000);
+  const hasProvenanceMarker =
+    /AIME-COMPOSER/i.test(head) && (/aime-tokens|tokens\.css|couche de tokens|provenance/i.test(head) || /90ad4c0/.test(head));
+  if (hasProvenanceMarker) {
+    if (/--aime-/.test(file.text)) return true;
+  }
+  const norm = (s) => s.replace(/\r\n/g, '\n').trim();
+  const refNorm = norm(refCssText);
+  const fileNorm = norm(file.text);
+  if (!refNorm) return false;
+  if (fileNorm === refNorm) return true;
+  if (fileNorm.includes(refNorm)) return true;
+  const afterFirstComment = fileNorm.replace(/^\/\*[\s\S]*?\*\/\s*/, '');
+  if (afterFirstComment === refNorm) return true;
+  if (afterFirstComment.includes(refNorm)) return true;
+  return false;
+}
+function isBootstrapFile(name) {
+  const base = String(name).split('/').pop();
+  return /^main\.(jsx|tsx|vue|svelte|js|ts|mjs|cjs)$/.test(base);
 }
 function parseImports(text) {
   const out = [];
@@ -130,7 +167,17 @@ export const DOM_REQUIRED = ['ALIGNMENT (rendu)', 'RESPONSIVE (rendu)', 'OVERFLO
  */
 export function diagnose(collected, reference) {
   const profile = profileProject(collected);
-  const ext = extractProject(collected, profile);
+  // ── Couche de tokens vendée : REFERENCE, pas dette ──────────
+  // Un projet qui vendore tokens.css (150 littéraux) voyait COLOR +150.
+  // Reconnaître la couche par marqueur provenance ou empreinte officielle
+  // comme REFERENCE : exclue de COLOR, comptée en adoption.
+  // Voir pont §8.1.
+  const refCssText = reference?.tokenCss?.text || '';
+  const tokensLayerFiles = (collected.cssFiles || []).filter((f) => isTokensLayerFile(f, refCssText));
+  const tokensLayerNames = new Set(tokensLayerFiles.map((f) => f.name));
+  const filteredCssFiles = (collected.cssFiles || []).filter((f) => !tokensLayerNames.has(f.name));
+  const filteredCollected = { ...collected, cssFiles: filteredCssFiles };
+  const ext = extractProject(filteredCollected, profile);
 
   /* Écrans = documents HTML + composants de route. Fragments = le reste,
      mesuré pareillement mais rapporté à part pour garder la densité par
@@ -168,6 +215,13 @@ export function diagnose(collected, reference) {
      3) alias — motion.h1 / styled.h1 déjà comptés comme h1 par qa.js
         (whitelist documentée) ; ici on s'assure que l'import d'un fragment
         à motion.h1 est bien détecté comme porteur de h1.
+     4) h1 par branche — App.tsx porte 3 h1 dans des branches mutuellement
+        exclusives (invite / RSVP / connexion indisponible) — un seul rend à
+        la fois. Le scan statique compte 3. On publie NON RÉSOLU — h1 par
+        branche, jamais d'interpolation de contrôle (pont §8.2).
+     5) bootstrap / montage — main.tsx (montage React) n'est pas un écran
+        (0 h1 mais pas une route). Même traitement que la coquille SPA
+        (pont §8.2) : publié comme NON RÉSOLU, jamais 0 h1.
      Les *.test.* sont déjà exclus des routes par profile.mjs.          */
   const fragmentNameSet = new Set(profile.fragments.map((s) => s.name));
   const allSources = collected.sources || [];
@@ -182,9 +236,9 @@ export function diagnose(collected, reference) {
   }
   // Routes composées : import local vers fragment porteur de h1
   for (const src of profile.screens) {
-    // Coquilles d'entrée (main) : le h1 n'est jamais dans ce fichier, mais
-    // ce n'est pas une route composée — c'est le montage. On le laisse en écart.
-    if (src.name.endsWith('main.tsx') || src.name.endsWith('main.jsx') || src.name.endsWith('main.ts') || src.name.endsWith('main.js')) continue;
+    // Bootstrap exclu : main.* n'est plus un écran (profile.mjs) mais on garde
+    // le garde pour compatibilité si un projet le liste encore comme écran
+    if (isBootstrapFile(src.name)) continue;
     const norm = normalizeComponent(src.text);
     if (hasH1(norm)) continue;
     const imports = parseImports(src.text);
@@ -200,13 +254,51 @@ export function diagnose(collected, reference) {
       patchedScreens.add(src.name);
     }
   }
-  // Injecter un h1 synthétique là où le h1 est composé/coquille, pour que
-  // le juge ne compte pas un faux 0 h1. Le h1 synthétique est marqué pour
-  // traçabilité, mais le rapport publie bien le NON RÉSOLU à part.
+  // h1 par branche : plusieurs h1 mutuellement exclusifs dans le même fichier
+  // Cas ciblé : App.tsx porte 3 h1 dans des branches exclusives (invite / RSVP / connexion).
+  // On ne devine jamais si les branches sont exclusives : si countH1 >1 on publie
+  // NON RÉSOLU — h1 par branche. Jamais d'interpolation de contrôle.
+  // Limité à App.* (point d'entrée à branches) pour ne pas masquer un vrai doublon
+  // sur une page métier où 2 h1 simultanés est bien un écart.
+  for (const src of profile.screens) {
+    if (patchedScreens.has(src.name)) continue;
+    const isAppEntry = /(^|\/)App\.(jsx|tsx|vue|svelte)$/.test(src.name);
+    if (!isAppEntry) continue;
+    const norm = normalizeComponent(src.text);
+    const cnt = countH1(norm);
+    if (cnt > 1) {
+      hierarchyUnresolved.push({ name: src.name, reason: `NON RÉSOLU — h1 par branche — ${src.name} porte ${cnt} <h1> dans des branches mutuellement exclusives — le scan statique ne résout pas le contrôle`, kind: 'branche' });
+      patchedScreens.add(src.name);
+    }
+  }
+  // Bootstrap / montage : main.* — même traitement que coquille, mais hors écrans
+  // Le profil l'exclut des écrans, on le publie comme NON RÉSOLU pour traçabilité.
+  // Si le projet contient un main.* qui serait encore compté comme écran (vieille
+  // définition du profil), on le patch aussi pour éviter le faux 0 h1.
+  for (const src of allSources) {
+    if (!isBootstrapFile(src.name)) continue;
+    if (hierarchyUnresolved.some((h) => h.name === src.name)) continue;
+    hierarchyUnresolved.push({ name: src.name, reason: `NON RÉSOLU — montage/bootstrap — ${src.name} est le montage React (point d'entrée, sans h1 statique) — le h1 vit dans le rendu — même traitement que la coquille SPA`, kind: 'bootstrap' });
+    // si ce fichier est encore considéré comme écran (ancien profil), patch pour éviter 0 h1
+    if (profile.screens.some((s) => s.name === src.name)) patchedScreens.add(src.name);
+  }
+  // Injecter un h1 synthétique là où le h1 est composé/coquille/branche/bootstrap,
+  // pour que le juge ne compte pas un faux 0 h1 ou n h1. Le h1 synthétique est
+  // marqué pour traçabilité, mais le rapport publie bien le NON RÉSOLU à part.
   if (patchedScreens.size) {
     for (const p of pages) {
       if (patchedScreens.has(p.name)) {
-        p.html = `<h1 data-hierarchy-unresolved="${hierarchyUnresolved.find((h) => h.name === p.name)?.kind || 'compose'}">h1-non-résolu</h1>\n` + p.html;
+        const entry = hierarchyUnresolved.find((h) => h.name === p.name);
+        const kind = entry?.kind || 'compose';
+        if (kind === 'branche') {
+          // Branche : plusieurs h1 → on ne garde qu'un seul h1 synthétique
+          // On supprime les h1 existants (y compris alias) pour arriver à exactement 1
+          let html = p.html;
+          html = html.replace(/<(?:h1|motion\.h1|styled\.h1)[\s>/][\s\S]*?<\/[^>]+>/gi, '<!-- h1 branche retiré -->');
+          p.html = `<h1 data-hierarchy-unresolved="branche">h1-non-résolu-branche</h1>\n` + html;
+        } else {
+          p.html = `<h1 data-hierarchy-unresolved="${kind}">h1-non-résolu</h1>\n` + p.html;
+        }
       }
     }
   }
@@ -318,7 +410,10 @@ export function diagnose(collected, reference) {
     nonMeasured.push(`${ext.unresolved} construction(s) dynamique(s) de classes — non résolues, jamais devinées`);
   }
   if (hierarchyUnresolved.length) {
-    nonMeasured.push(`${hierarchyUnresolved.length} écran(s) à hiérarchie non résolue — ${hierarchyUnresolved.map((h) => h.name).join(', ')} — h1 composé/coquille/alias : le h1 vit hors du fichier, jamais deviné`);
+    nonMeasured.push(`${hierarchyUnresolved.length} écran(s) à hiérarchie non résolue — ${hierarchyUnresolved.map((h) => h.name).join(', ')} — h1 composé/coquille/alias/branche/montage : le h1 vit hors du fichier ou dans des branches exclusives, jamais deviné`);
+  }
+  if (tokensLayerFiles.length) {
+    nonMeasured.push(`couche de tokens présente — ${tokensLayerFiles.map((f) => f.name).join(', ')} — fichier vendé AIME-COMPOSER (150 littéraux) exclu de COLOR comme REFERENCE, compté en adoption`);
   }
   if (profile.unknown) {
     nonMeasured.push('moteur non reconnu — jugement intégral sur HTML/CSS (repli garanti)');
@@ -379,6 +474,10 @@ export function diagnose(collected, reference) {
       ratio: used.size ? Number((systemClasses.length / used.size).toFixed(3)) : 0,
       sample: systemClasses.slice(0, 12),
       tokens_referenced: ext.tokenized,
+      tokens_layer: tokensLayerFiles.length > 0,
+      tokens_layer_files: tokensLayerFiles.map((f) => f.name),
+      tokens_layer_marker: tokensLayerFiles.length ? 'provenance AIME-COMPOSER ou empreinte tokens.css officiel' : null,
+      hierarchy_unresolved_kinds: [...new Set(hierarchyUnresolved.map((h) => h.kind))],
     },
     icon_libraries: ext.iconLibs,
     unresolved: ext.unresolved,

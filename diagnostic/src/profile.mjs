@@ -106,9 +106,14 @@ export function profileProject(collected) {
     if (/\.test\./.test(base) || /\.spec\./.test(base)) return false;
     if (/^_[A-Za-z]+/.test(base)) return false;                 /* _app, _document */
     if (/(^|\/)api\//.test(name)) return false;                 /* endpoints */
+    // Montage / bootstrap React : main.* n'est jamais un écran —
+    // c'est le points d'entrée qui monte l'app, le h1 vit dans le rendu.
+    // Même traitement que la coquille SPA index.html (NON RÉSOLU, jamais 0 h1).
+    // Voir docs/pont-architecture-aime.md §8.2.
+    if (/^main\.(jsx|tsx|vue|svelte|js|ts|mjs|cjs)$/.test(base)) return false;
     if (/(^|\/)app\//.test(name) && /^page\.[jt]sx?$/.test(base)) return true; /* Next App Router */
     if (/(^|\/)(pages|routes|views)\//.test(name)) return true;
-    if (/^(src\/)?(App|main)\.(jsx|tsx|vue|svelte)$/.test(name.replace(/\\/g, '/'))) return true;
+    if (/^(src\/)?App\.(jsx|tsx|vue|svelte)$/.test(name.replace(/\\/g, '/'))) return true;
     return false;
   };
   for (const s of sources) (isScreen(s.name) ? screens : fragments).push(s);
