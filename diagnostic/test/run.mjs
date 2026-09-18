@@ -358,7 +358,7 @@ test('un dépôt vide est « aucun écran », pas « inaccessible »', () => {
 console.log('\nUNIVERSEL V2');
 
 import { profileProject } from '../src/profile.mjs';
-import { extractProject } from '../src/extract.mjs';
+import { extractProject, focusPairing } from '../src/extract.mjs';
 import { baselineDiff, diagnose as diagnoseV2 } from '../src/diagnose.mjs';
 import { reportJson } from '../diagnose.mjs';
 
@@ -576,6 +576,76 @@ test('sans couche — couleur littérale toujours facturée (pas de faux REFEREN
   const d = diagnoseV2(collect(dir), REF);
   ok(d.families.find((f) => f.family === 'COLOR').count > 0, 'couleur littérale non facturée sans couche');
   eq(d.adoption.tokens_layer, false, 'faux positif couche');
+});
+
+/* ══ FOCUS — PAIRING §9 pont (la substitution, pas le token) ══ */
+console.log('\nFOCUS — PAIRING');
+
+test('pairing : paire valide = substitution, pas un écart', () => {
+  const r = focusPairing('focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring');
+  eq(r.outline.variant, 'focus-visible', 'retrait d\'outline non détecté');
+  ok(r.substitute, 'substitution focus-visible:ring-* non reconnue');
+  eq(r.ecart, null, 'une paire valide produit un écart');
+  /* shadow-* est un substituant reconnu, symétrique du ring (règle 1). */
+  const s = focusPairing('shadow-sm focus-visible:shadow-lg focus-visible:outline-none');
+  ok(s.substitute && s.ecart === null, 'focus-visible:shadow-* non reconnu comme substitution');
+});
+
+test('pairing : outline-none nu sans ring adjacent = écart', () => {
+  const r = focusPairing('outline-none');
+  ok(r.outline && r.outline.variant === null, 'outline nu non détecté');
+  ok(!r.substitute, 'un ring fantôme substitue un outline nu');
+  ok(/nu/.test(r.ecart), 'l\'écart nu n\'est pas nommé');
+});
+
+test('pairing : focus:outline-none sans substitution = écart (pointeur)', () => {
+  const r = focusPairing('focus:outline-none');
+  ok(r.outline && r.outline.variant === 'focus', 'suppression au pointeur non détectée');
+  ok(!r.substitute, 'le pointeur n\'est pas une substitution clavier');
+  ok(/pointeur/.test(r.ecart), 'l\'écart pointeur n\'est pas nommé');
+});
+
+test('pairing : paire incomplète — ring sans scope focus-visible: = écart', () => {
+  const r = focusPairing('focus-visible:outline-none ring-2');
+  ok(r.outline && !r.substitute, 'ring nu compté comme substitution clavier');
+  ok(r.ecart, 'la paire incomplète ne produit pas d\'écart');
+  /* `focus:ring-*` ne substituera jamais au clavier — même verdict. */
+  const s = focusPairing('focus-visible:outline-none focus:ring-2');
+  ok(s.outline && !s.substitute && s.ecart, 'focus:ring-* compté comme substitution focus-visible');
+});
+
+test('fixture focus-pairing (valide/nu/pointeur/incomplète) — FOCUS = l\'inventaire réel des paires non appariées', () => {
+  const d = diagnoseV2(collect(FIX('focus-pairing')), REF);
+  const focus = d.families.find((f) => f.family === 'FOCUS');
+  eq(focus.count, 3, `FOCUS attendu 3 (nu, pointeur, incomplète), reçu ${focus.count}`);
+  eq(focus.screens, 3, `les 3 écarts sont bien sur l\'écran App, reçu ${focus.screens}`);
+  eq(d.ecarts, 3, `total écarts attendu 3, reçu ${d.ecarts}`);
+  /* la paire valide n\'est PAS nommée — elle n\'est pas un écart */
+  ok(!focus.top.some((i) => /Valide/.test(i.message) || /ring-ring/.test(i.message)), 'la paire valide est facturée');
+  /* les trois paires non appariées sont nommées, jamais tues */
+  ok(focus.top.some((i) => /nu/.test(i.message)), 'l\'écart « nu » n\'est pas nommé');
+  ok(focus.top.some((i) => /pointeur/.test(i.message)), 'l\'écart « pointeur » n\'est pas nommé');
+  ok(focus.top.some((i) => /incomplète|sans focus-visible/.test(i.message)), 'la paire incomplète n\'est pas nommée');
+});
+
+test('focus-pairing : aucun retrait d\'outline, aucun écart FOCUS inventé', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'aime-focus-ring-only-'));
+  writeFileSync(join(dir, 'package.json'), '{"dependencies":{"react":"^18"}}');
+  mkdirSync(join(dir, 'src'));
+  /* ring sans retrait d'outline : rien à signaler dans FOCUS (pas d'anneau supprimé). */
+  writeFileSync(join(dir, 'src/App.jsx'), 'export default function App(){return <button className="focus-visible:ring-2 focus-visible:ring-ring">T</button>}');
+  const d = diagnoseV2(collect(dir), REF);
+  eq(d.families.find((f) => f.family === 'FOCUS').count, 0, 'un ring seul (aucun outline retiré) ne doit pas produire d\'écart FOCUS');
+});
+
+test('focus-pairing : double outline retiré sans substitution = un seul écart par attribut', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'aime-focus-double-'));
+  writeFileSync(join(dir, 'package.json'), '{"dependencies":{"react":"^18"}}');
+  mkdirSync(join(dir, 'src'));
+  /* outline-none nu + focus:outline-none dans le même attribut : un retrait, un écart. */
+  writeFileSync(join(dir, 'src/App.jsx'), 'export default function App(){return <button className="outline-none focus:outline-none">T</button>}');
+  const d = diagnoseV2(collect(dir), REF);
+  eq(d.families.find((f) => f.family === 'FOCUS').count, 1, 'double retrait facturé deux fois (un seul anneau en jeu)');
 });
 
 

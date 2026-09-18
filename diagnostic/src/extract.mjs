@@ -82,7 +82,85 @@ export function classLiterals(text) {
   return { found, unresolved };
 }
 
-/* ══ Jugement d'une classe utilitaire ════════════════════════════ */
+/* ══ Pairing FOCUS — la substitution, pas le token ═════════════════════
+   Pont §9 : la famille FOCUS saturait de faux positifs — l'idiome
+   canonique accessible shadcn/Tailwind
+   `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring`
+   était compté « anneau supprimé sans substitution ». Or c'est une
+   substitution valide, plus accessible que l'outline par défaut.
+
+   La règle, par attribut de classes (SEUL substitut reconnu = le même
+   attribut, symétrique de l'exemption CSS `:focus:not(:focus-visible)`) :
+
+     1. `focus-visible:outline-none` ACCOMPAGNÉ de `focus-visible:ring-*`
+        (ou `focus-visible:shadow-*`) dans le même attribut = substitution
+        valide → PAS un écart ;
+     2. `focus:outline-none` (suppression au pointeur) sans substitution
+        dans le même attribut = écart ;
+     3. `outline-none` nu sans ring adjacent = écart ;
+     4. toute paire non appariée est publiée : comptée en écarts et
+        nommée dans le détail FOCUS (jamais devinée, jamais tue).
+
+   Le `focus:ring-*` sans suppression d'outline n'est pas évalué ici
+   (aucun outline n'est retiré — rien à signaler). Le withdraw
+   pointer-only `focus:outline-none` n'est PAS une subsitution : au
+   clavier, aucun `focus-visible:` ne restaure l'anneau — écart.
+   Un ring au scope `focus:` ne couvre pas le clavier — écart.        */
+
+/* Éclate « variant:base » → variant null si absent. */
+const splitVariant = (t) => {
+  const i = t.indexOf(':');
+  if (i < 0) return { variant: null, rest: t };
+  return { variant: t.slice(0, i), rest: t.slice(i + 1) };
+};
+
+/* Un substituant est un ring (ou une ombre portée) — reconnaissable par
+   son préfixe, quel que soit son scope ou sa valeur (`ring-ring`,
+   `ring-2`, `ring-[3px]`, `shadow-[0_0_0_2px]`…). */
+const RING_OR_SHADOW = /^(ring|shadow)-/;
+
+/**
+ * Juge le pairing FOCUS d'un attribut de classes (valeur de classe,
+ * intacte). La substitution n'est valide qu'au MÊME scope, dans le MÊME
+ * attribut — la règle 1 du pont §9 nomme `focus-visible:ring-*` pour un
+ * retrait au scope `focus-visible:` ; la règle 3 (`nu sans ring adjacent`)
+ * exige pour un retrait nu un ring *nu* adjacent. Généralisation stricte :
+ * un retrait au scope V est substitué ssi le même attribut porte un
+ * `V:ring-*` / `V:shadow-*` de même scope V (V = focus-visible, focus,
+ * focus-within, ou aucun scope pour un retrait nu).
+ *   - `focus:ring-*` ne substitue PAS un `focus-visible:outline-none`
+ *     (scope différent) — la fixture « incomplète » ;
+ *   - `focus-within:ring-*` substitue un `focus-within:outline-none`
+ *     (même scope) — le retrait n'est pas orphelin.
+ * Retourne `{ outline, substitute, ecart }` — `ecart` non nul ssi un
+ * retrait d'outline reste sans substitution de même scope.
+ */
+export function focusPairing(tokenString) {
+  const matches = tokenString.match(/\S+/g) || [];
+  let outline = null;
+  const ringScopes = new Set();
+
+  for (const raw of matches) {
+    let t = raw.replace(/^!/, '').replace(/!$/, '');
+    if (!t || t === '-') continue;
+    const { variant, rest } = splitVariant(t);
+    if (rest === 'outline-none') { if (!outline) outline = { variant, raw }; continue; }
+    if (RING_OR_SHADOW.test(rest)) ringScopes.add(variant);
+  }
+
+  const substitute = outline ? ringScopes.has(outline.variant) : false;
+
+  let ecart = null;
+  if (outline && !substitute) {
+    ecart = outline.variant === null
+      ? `« ${outline.raw} » nu sans ring adjacent de même scope dans le même attribut`
+      : outline.variant === 'focus'
+        ? `« ${outline.raw} » (suppression au pointeur) sans substitution de même scope (${outline.variant}:ring-* / ${outline.variant}:shadow-*)`
+        : `« ${outline.raw} » sans ${outline.variant}:ring-* / ${outline.variant}:shadow-* de même scope dans le même attribut`;
+  }
+
+  return { outline, substitute, ecart };
+}
 /**
  * Transforme UNE classe en atome(s) jugés. La valeur retour n'est
  * jamais un verdict : seul le moteur juge. `tokenized` compte les
@@ -139,10 +217,11 @@ function judgeClass(rawToken, opts) {
   }
 
   /* Classes standard. */
-  if (token === 'outline-none') {
-    atoms.push({ kind: 'outline-none', value: rawToken });
-    return { atoms, unresolved, tokenized };
-  }
+  /* `outline-none` n'est plus un atome direct : il est jugé par pairing
+     dans son attribut de classes (focusPairing ci-dessous, pont §9).
+     « focus-visible:outline-none focus-visible:ring-* » est une
+     substitution valide — jamais un écart. Un outline-none réellement
+     défaillant remonte comme atome `focus-unpaired`, jugé FOCUS par qa.js. */
   let m = token.match(/^((?:p|px|py|pt|pr|pb|pl|ps|pe|m|mx|my|mt|mr|mb|ml|ms|me|gap|gap-x|gap-y|space-x|space-y))-(.+)$/);
   if (m) {
     const key = m[2];
@@ -359,6 +438,15 @@ export function extractProject(collected, profile) {
         tokenized += r.tokenized;
         for (const a of r.atoms) atoms.push({ ...a, file: src.name, line, source: `classe utilitaire « ${a.context || rawToken} »`.slice(0, 120) });
       }
+
+      /* pairing FOCUS (pont §9) : un retrait d'outline n'est pas jugé seul,
+         il est jugé dans son attribut de classes. outline présent et aucune
+         substitution de même scope (ring ou shadow) → atome focus-unpaired.
+         Substitution valide → rien. Pas d'outline → rien. */
+      const { outline, ecart } = focusPairing(classes);
+      if (ecart) {
+        atoms.push({ kind: 'focus-unpaired', variant: outline.variant, token: outline.raw, value: ecart, file: src.name, line, source: `classe utilitaire « ${outline.raw} »`.slice(0, 120) });
+      }
     }
 
     /* styles inline d'objets → atomes */
@@ -404,6 +492,10 @@ export function extractProject(collected, profile) {
           unresolved += r.unresolved;
           tokenized += r.tokenized;
           for (const a of r.atoms) atoms.push({ ...a, file: p.name, line, source: `classe utilitaire « ${a.context || rawToken} »`.slice(0, 120) });
+        }
+        const { outline, ecart } = focusPairing(classes);
+        if (ecart) {
+          atoms.push({ kind: 'focus-unpaired', variant: outline.variant, token: outline.raw, value: ecart, file: p.name, line, source: `classe utilitaire « ${outline.raw} »`.slice(0, 120) });
         }
       }
     }
