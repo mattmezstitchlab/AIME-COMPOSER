@@ -3,7 +3,7 @@
 ## Page d'accueil
 
 `index.html` is the repository's front door — an AIME screen like any other, audited
-by Design QA with the other 31. It is where the concept is shown working: a
+by Design QA with the other 34. It is where the concept is shown working: a
 conversation field with NOEMA, the Universal Card, the Universal Timeline (both
 fed live by the loop when `node loop/server.mjs` runs), the Universal Grid with a
 working format selector, the Composer, and the diagnostic applied to external
@@ -26,7 +26,7 @@ TOKENS → FOUNDATIONS → COMPONENTS → PATTERNS → LAYOUTS → EXPERIENCES
 cd design-system
 npm run build   # generate tokens + icons; refuses any colour that misses its contrast target
 npm run qa      # build + audit the 12 QA families over the shipped system
-npm run verify  # execute the scripts of all 35 audited screens in a DOM (needs the jsdom devDependency)
+npm run verify  # execute the scripts of all 36 audited screens in a DOM (needs the jsdom devDependency)
 npm run check   # qa then verify
 npm run serve   # serve the repository on http://0.0.0.0:8080/design-system/
 ```
@@ -36,9 +36,10 @@ contract · 9 typographic roles · a closed 10-step spacing scale · 86 glyphs i
 categories, no emoji · 29 fundamental components · the five AIME organs (Universal
 Card, Universal Timeline, Universal Grid, Composer, Universal Media) · the NOEMA
 layer with its six epistemic states · 13 patterns · a data-visualization language ·
-12 automatic Design QA families · 35 audited screens (19 documentation chapters,
+12 automatic Design QA families · 36 audited screens (19 documentation chapters,
 the art-direction brief page, 11 experience screens, the NOEMA loop screen, the
-Atlas media library, the repository homepage, and the Point Zero shell).
+Atlas media library, the repository homepage, the Point Zero shell, and the
+Studio composer).
 
 `design-system/direction.html` picks an artistic direction **inside** the system
 (theme, accent step in the fuchsia ramp, density, motion, radius level), previews
@@ -48,6 +49,30 @@ it to a project stays a human decision, re-measured by the diagnostic.
 
 Normative specification: `ARCHITECTURE/AIME-DESIGN-SYSTEM-V1.md`.
 System documentation and live screens: `design-system/index.html`.
+
+## Studio
+
+`design-system/studio.html` is the **composing application** — the system turned
+into software, for what it does best: composing interfaces *with* the grammar
+instead of around it. One canvas (the Universal Grid: nine format profiles,
+columns, safe area, thirds, 0,0 origin, STOP 24 magnetic snapping), a library
+that makes **every chapter of the left menu placeable** (the five organs, the
+fundamental components, the six NOEMA states, data-viz, patterns as named
+specimens, all 86 sprite glyphs, colour and type roles — no literal ever), an
+inspector, a **NOEMA studio** (a local proposition engine — off-page, off-safe,
+off-grid, overlaps, duplicates, unnamed objects — where nothing is applied
+without an explicit human decision, each one journaled with its actor), a **QA
+studio** (the system's own `auditLive()` module applied to the open composition,
+published as a density — never an invented score) and an **export** in three
+honest outputs: an agent-ready brief, an HTML projection consuming only system
+classes, and the JSON document (reloadable).
+
+The keyboard is a first-class input (V/T/F/L tools, arrows nudge, Shift = STOP,
+Ctrl+D/Z/K/E), the command bar doubles the visible navigation, theme/density/
+motion follow the site-wide settings, and the document autosaves locally — the
+export is how it travels, nothing is uploaded. Behavioral smokes run in
+`design-system/qa/smoke-studio.mjs`: the software is *used* in a DOM — place,
+name, drag with magnetism, link, export, undo.
 
 ## Diagnostic
 
@@ -60,7 +85,7 @@ node diagnostic/diagnose.mjs --owner O --repo R       # a GitHub repository
 node diagnostic/survey.mjs                            # every repo of the account, ranked
 ```
 
-It is the same engine that audits the 35 screens of the system, not a copy, so a
+It is the same engine that audits the 36 screens of the system, not a copy, so a
 project is judged under the same conditions as the screens that ship. The report
 publishes a **density** (issues per screen), the families involved, the screens most
 affected, and an order of repair — never an invented score out of 100.

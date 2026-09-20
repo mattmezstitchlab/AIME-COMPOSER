@@ -6,6 +6,12 @@
 (function () {
   const NAV = [
     {
+      group: 'Studio',
+      items: [
+        { n: '00', href: 'studio.html', label: 'Composer — le logiciel' },
+      ],
+    },
+    {
       group: 'Système',
       items: [
         { n: '01', href: 'index.html', label: 'Accueil' },
