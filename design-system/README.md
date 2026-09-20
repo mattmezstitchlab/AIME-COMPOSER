@@ -21,13 +21,30 @@ TOKENS → FOUNDATIONS → COMPONENTS → PATTERNS → LAYOUTS → EXPERIENCES
 Une règle posée au niveau des tokens se propage jusqu'aux écrans. Un écran est une
 projection du système, jamais l'inverse.
 
+## 1 bis. Le Studio — le système devenu logiciel
+
+`studio.html` est l'application de composition : ce que la grammaire sait faire de
+mieux, outillé. Un canevas (Grille Universelle : profils de format, colonnes, zone
+sûre, magnétisme STOP 24, origine 0,0), une **bibliothèque qui transforme tout le
+menu de gauche en objets posables** (organes, composants, états NOEMA, dataviz,
+patterns, les 86 glyphes du sprite, les rôles de couleur et de typographie), un
+inspecteur, un studio **NOEMA** (moteur local de propositions, décisions
+humaines uniquement, journal), un studio **QA** (le module `auditLive()` du
+système appliqué à la composition ouverte, publiée en densité — jamais en note)
+et un **export** en trois sorties : brief agent, projection HTML ne consommant
+que les classes du système, document JSON rechargeable.
+
+La position est une donnée (`--a-x`/`--a-y`), jamais un style en dur ; le cadre
+d'un organe ne change jamais ; une proposition ne ressemble jamais à un fait ;
+une absence reste nommée. Le Studio est audité comme les autres écrans (36ᵉ).
+
 ## 2. Commandes
 
 ```bash
 cd design-system
 npm run build   # génère tokens + icônes, refuse toute couleur non conforme
 npm run qa      # build + audit des 12 familles sur le système livré
-npm run verify  # exécute réellement les scripts des 19 écrans dans un DOM
+npm run verify  # exécute réellement les scripts des 36 écrans dans un DOM
 npm run check   # qa puis verify — la vérification complète
 npm run serve   # sert le dépôt sur http://0.0.0.0:8080/design-system/
 ```
@@ -59,6 +76,7 @@ taille des cibles — ne sont pas vérifiés. Ils demandent un navigateur réel.
 | `qa/run-qa.mjs` | Exécuteur : `npm run qa` |
 | `qa/verify-dom.mjs` | Exécuteur : `npm run verify` — exécution réelle des scripts des écrans |
 | `qa/serve.mjs` | Serveur statique, sans dépendance |
+| `qa/smoke-studio.mjs` | Fumées comportementales du Studio : pose, magnétisme STOP 24, liaison, NOEMA, export — le logiciel est *utilisé*, pas seulement exécuté |
 
 ## 4. Ce qui est garanti, et par quoi
 
@@ -108,7 +126,7 @@ Afficher 87 % de certitude serait une fausse précision.
 - Iconographie : 86 pictogrammes, 17 catégories, contrat de grille unique.
 - Couches CSS 2 à 5 : 29 composants fondamentaux, 5 organes AIME, couche NOEMA,
   13 patterns, langage de data visualisation, moteur de layout responsive.
-- Design QA : 12 familles statiques, plus une vérification DOM des 35 écrans — dont `loop/index.html`, la page d'accueil du dépôt, la Médiathèque et la coquille Point Zero.
+- Design QA : 12 familles statiques, plus une vérification DOM des 36 écrans — dont le Studio, `loop/index.html`, la page d'accueil du dépôt, la Médiathèque et la coquille Point Zero — et les fumées comportementales du Studio (`node qa/smoke-studio.mjs`).
 - 19 chapitres de documentation, du chapitre 00 au chapitre 19.
 - 10 écrans d'expérience (`experiences/`) : Playground, Composer, Carte Universelle,
   Timeline, Grille, Bureau, Médiathèque, NOEMA, site public, portail client — plus

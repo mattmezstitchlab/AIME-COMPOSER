@@ -113,6 +113,8 @@ Categories: NAVIGATION · MEMORY · PEOPLE · PROJECT · TIMELINE · MEDIA · GR
 
 An unknown value is displayed as unknown, in muted italics. The system never invents demonstration data to fill a gap.
 
+**The composing application.** `design-system/studio.html` — AIME Studio — is the organs' software projection: a canvas (Universal Grid: format profiles, columns, safe area, STOP 24 magnetism), a library that turns every chapter of the documentation menu into placeable objects (organs, components, NOEMA states, data-viz, patterns, the icon sprite, colour roles, type roles), an inspector, a NOEMA studio (local proposition engine, human-only decisions, decision journal), a QA studio (the same `auditLive()` module, applied to the open composition, published as a density) and an export (agent brief, HTML projection consuming only system classes, JSON document). Position is data (`--a-x/--a-y`), never a hard style; the frame of an organ never changes; a proposal never looks like a fact.
+
 ## 7. The NOEMA layer
 
 **NOEMA proposes. The human validates.**

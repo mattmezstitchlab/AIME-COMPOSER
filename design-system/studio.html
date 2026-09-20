@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="fr" data-aime-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="a-root" content="./">
+<title>Studio — AIME Design System V1</title>
+<link rel="stylesheet" href="tokens/tokens.css">
+<link rel="stylesheet" href="styles/foundations.css">
+<link rel="stylesheet" href="styles/layout.css">
+<link rel="stylesheet" href="styles/components.css">
+<link rel="stylesheet" href="styles/aime.css">
+<link rel="stylesheet" href="styles/noema.css">
+<link rel="stylesheet" href="styles/patterns.css">
+<link rel="stylesheet" href="styles/dataviz.css">
+<script src="js/doc.js" defer></script>
+<script src="js/aime-ui.js" defer></script>
+<script type="module">
+  /* Pont d'audit : le module QA du système est chargé tel quel, jamais recopié. */
+  import { auditLive } from './js/qa.js';
+  window.AIME_AUDIT = { auditLive };
+</script>
+<script src="js/studio.js" defer></script>
+<style>
+/* ══════════════════════════════════════════════════════════════
+   AIME STUDIO — chrome d'application.
+   Toutes les valeurs viennent des tokens : aucune n'est inventée ici.
+   Le préfixe studio- n'appartient pas au système : il désigne le seul
+   chrome de cet écran. Tout le contenu, lui, est porté par les classes
+   du système (ucard, utl, viz, noema-card, a-btn…).
+   ══════════════════════════════════════════════════════════════ */
+.studio {
+  position: fixed; inset: 0;
+  display: grid; grid-template-rows: 48px minmax(0, 1fr) 28px;
+  background: var(--aime-color-background);
+  color: var(--aime-color-text);
+}
+.studio-top {
+  display: flex; align-items: center; gap: var(--aime-space-2);
+  padding-inline: var(--aime-space-3);
+  border-bottom: var(--aime-border-subtle);
+  background: var(--aime-color-surface);
+}
+.studio-brand {
+  font-size: var(--aime-text-h3-size);
+  font-weight: var(--aime-font-semibold);
+  letter-spacing: var(--aime-text-h3-ls);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.studio-brand i { font-style: normal; color: var(--aime-color-accent-text); }
+.studio-brand small {
+  font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size);
+  letter-spacing: var(--aime-text-meta-ls); color: var(--aime-color-text-subtle);
+  margin-inline-start: var(--aime-space-2);
+}
+.studio-top__sep { width: 1px; height: 24px; background: var(--aime-color-border); }
+.studio-docname {
+  max-width: 280px; min-height: var(--aime-control-sm);
+  padding-block: var(--aime-space-1);
+}
+.studio-body { display: flex; min-height: 0; }
+
+/* ── Rail d'outils ─────────────────────────────────────────── */
+.studio-rail {
+  display: flex; flex-direction: column; align-items: center; gap: var(--aime-space-1);
+  width: 48px; flex: none; padding-block: var(--aime-space-2);
+  border-inline-end: var(--aime-border-subtle);
+  background: var(--aime-color-surface);
+}
+.studio-tool {
+  display: grid; place-items: center;
+  width: 40px; height: 40px; flex: none;
+  border: var(--aime-border-default); border-radius: var(--aime-radius-medium);
+  background: var(--aime-color-surface-elevated); color: var(--aime-color-text-muted);
+  transition: border-color var(--aime-motion-fast) var(--aime-ease-out), background-color var(--aime-motion-fast) var(--aime-ease-out), color var(--aime-motion-fast) var(--aime-ease-out);
+}
+.studio-tool:hover { border-color: var(--aime-color-border-strong); color: var(--aime-color-text); }
+.studio-tool[aria-pressed='true'] {
+  border-color: var(--aime-color-accent); background: var(--aime-color-accent-subtle); color: var(--aime-color-accent-text);
+}
+.studio-rail__spacer { flex: 1; }
+.studio-rail__foot {
+  display: grid; place-items: center; width: 40px; height: 40px; flex: none;
+  border: 0; border-radius: var(--aime-radius-pill);
+  background: none; color: var(--aime-color-accent-text);
+}
+
+/* ── Bibliothèque ──────────────────────────────────────────── */
+.studio-side {
+  display: flex; flex-direction: column; min-height: 0;
+  width: 252px; flex: none;
+  border-inline-end: var(--aime-border-subtle);
+  background: var(--aime-color-surface);
+  overflow: hidden;
+}
+.studio-side.is-closed { width: 0; border-inline-end-width: 0; }
+.studio-side__search { padding: var(--aime-space-3); padding-block-end: var(--aime-space-2); }
+.studio-side__scroll { flex: 1; min-height: 0; overflow-y: auto; padding-inline: var(--aime-space-3); padding-block-end: var(--aime-space-4); }
+.studio-side__foot {
+  padding: var(--aime-space-2) var(--aime-space-3);
+  border-top: var(--aime-border-subtle);
+  display: grid; gap: var(--aime-space-1);
+}
+.studio-libgroup { display: grid; gap: var(--aime-space-2); padding-block-start: var(--aime-space-3); }
+.studio-libgrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--aime-space-2); }
+.studio-libitem {
+  display: grid; place-items: center; gap: var(--aime-space-1);
+  min-height: 64px; padding: var(--aime-space-2);
+  border: var(--aime-border-default); border-radius: var(--aime-radius-medium);
+  background: var(--aime-color-surface-elevated); color: var(--aime-color-text-muted);
+  font-size: var(--aime-text-caption-size);
+  text-align: center; overflow: hidden;
+  transition: border-color var(--aime-motion-fast) var(--aime-ease-out), background-color var(--aime-motion-fast) var(--aime-ease-out);
+}
+.studio-libitem:hover { border-color: var(--aime-color-accent); background: var(--aime-color-surface-overlay); }
+.studio-libitem span { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; color: var(--aime-color-text); }
+.studio-libitem--wide { grid-column: 1 / -1; place-items: start; text-align: start; }
+.studio-glyphs { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--aime-space-1); }
+.studio-glyph {
+  display: grid; place-items: center;
+  width: 44px; height: 44px;
+  border: var(--aime-border-subtle); border-radius: var(--aime-radius-small);
+  background: var(--aime-color-surface-elevated); color: var(--aime-color-text-muted);
+  transition: border-color var(--aime-motion-fast) var(--aime-ease-out), color var(--aime-motion-fast) var(--aime-ease-out);
+}
+.studio-glyph:hover { border-color: var(--aime-color-accent); color: var(--aime-color-accent-text); }
+.studio-swatchgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--aime-space-2); }
+.studio-swatch { height: 44px; border: var(--aime-border-subtle); border-radius: var(--aime-radius-small); }
+.studio-swatch:hover { border-color: var(--aime-color-border-strong); border-width: var(--aime-border-width-strong); }
+
+/* ── Scène ─────────────────────────────────────────────────── */
+.studio-stage { flex: 1; min-width: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); }
+.studio-canvasbar {
+  display: flex; align-items: center; gap: var(--aime-space-2); flex-wrap: wrap;
+  padding: var(--aime-space-2) var(--aime-space-3);
+  border-bottom: var(--aime-border-subtle);
+  background: var(--aime-color-surface);
+}
+.studio-canvasbar .a-select { min-height: var(--aime-control-sm); width: auto; }
+.studio-chip {
+  display: inline-flex; align-items: center; gap: var(--aime-space-1);
+  min-height: var(--aime-control-sm);
+  padding-inline: var(--aime-space-2);
+  border: var(--aime-border-default); border-radius: var(--aime-radius-pill);
+  background: var(--aime-color-surface-elevated); color: var(--aime-color-text-muted);
+  font-size: var(--aime-text-caption-size);
+  transition: border-color var(--aime-motion-fast) var(--aime-ease-out), background-color var(--aime-motion-fast) var(--aime-ease-out), color var(--aime-motion-fast) var(--aime-ease-out);
+}
+.studio-chip:hover { border-color: var(--aime-color-border-strong); color: var(--aime-color-text); }
+.studio-chip[aria-pressed='true'] {
+  border-color: var(--aime-color-accent); background: var(--aime-color-accent-subtle); color: var(--aime-color-accent-text);
+}
+.studio-zoom { display: inline-flex; align-items: center; gap: var(--aime-space-2); }
+.studio-zoom .a-btn { min-width: 32px; padding-inline: var(--aime-space-2); }
+
+.studio-canvaswrap {
+  position: relative; display: flex; overflow: auto;
+  background-color: var(--aime-color-surface-sunken);
+  background-image:
+    linear-gradient(var(--aime-color-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--aime-color-grid-line) 1px, transparent 1px);
+  background-size: var(--aime-space-6) var(--aime-space-6);
+}
+.studio-sizer { position: relative; margin: auto; flex: none; }
+.studio-page {
+  position: relative;
+  width: 480px; aspect-ratio: 210 / 297;
+  transform-origin: 0 0;
+  border: var(--aime-border-default);
+  background: var(--aime-color-surface-elevated);
+  box-shadow: var(--aime-shadow-raise);
+  overflow: hidden;
+}
+.studio-cols {
+  position: absolute; inset: var(--aime-space-6);
+  display: none; gap: var(--aime-space-2);
+  pointer-events: none;
+}
+.studio-page[data-show-cols='true'] .studio-cols { display: grid; }
+.studio-cols i { background: var(--aime-color-accent-subtle); border-inline: var(--aime-border-width) solid var(--aime-color-accent); opacity: .35; }
+.studio-thirds {
+  position: absolute; inset: 0; display: none; pointer-events: none; opacity: .5;
+  background-image:
+    linear-gradient(90deg, transparent calc(33.333% - .5px), var(--aime-color-border-strong) calc(33.333% - .5px), var(--aime-color-border-strong) calc(33.333% + .5px), transparent calc(33.333% + .5px)),
+    linear-gradient(90deg, transparent calc(66.666% - .5px), var(--aime-color-border-strong) calc(66.666% - .5px), var(--aime-color-border-strong) calc(66.666% + .5px), transparent calc(66.666% + .5px)),
+    linear-gradient(0deg, transparent calc(33.333% - .5px), var(--aime-color-border-strong) calc(33.333% - .5px), var(--aime-color-border-strong) calc(33.333% + .5px), transparent calc(33.333% + .5px)),
+    linear-gradient(0deg, transparent calc(66.666% - .5px), var(--aime-color-border-strong) calc(66.666% - .5px), var(--aime-color-border-strong) calc(66.666% + .5px), transparent calc(66.666% + .5px));
+}
+.studio-page[data-show-thirds='true'] .studio-thirds { display: block; }
+.studio-safe {
+  position: absolute; inset: var(--aime-space-6);
+  border: var(--aime-border-width) dashed var(--aime-color-border-strong);
+  display: none; pointer-events: none;
+}
+.studio-page[data-show-safe='true'] .studio-safe { display: block; }
+.studio-origin {
+  position: absolute; inset-block-start: calc(var(--aime-space-6) * -1); inset-inline-start: calc(var(--aime-space-6) * -1);
+  width: 48px; height: 48px; display: none; pointer-events: none;
+  border-inline-end: var(--aime-border-width-strong) solid var(--aime-color-accent);
+  border-block-start: var(--aime-border-width-strong) solid var(--aime-color-accent);
+}
+.studio-page[data-show-origin='true'] .studio-origin { display: block; }
+.studio-links { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.studio-links path { pointer-events: stroke; }
+.studio-snapline {
+  position: absolute; inset-block: 0; width: 1px;
+  background: var(--aime-color-accent); pointer-events: none; z-index: 60;
+}
+.studio-snapline--h { inset-block: auto; inset-inline: 0; height: 1px; width: auto; }
+.studio-snapline::after {
+  content: attr(data-a-snap);
+  position: absolute; inset-block-start: var(--aime-space-2); inset-inline-start: var(--aime-space-2);
+  display: inline-flex; align-items: center; height: 16px; max-width: 160px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  padding-inline: var(--aime-space-2); border-radius: var(--aime-radius-small);
+  background: var(--aime-color-accent); color: var(--aime-color-accent-on);
+  font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size); letter-spacing: var(--aime-text-meta-ls);
+}
+.studio-empty {
+  position: absolute; inset: 0;
+  display: grid; place-items: center; pointer-events: none;
+}
+.studio-empty[hidden] { display: none; }
+.studio-empty__card {
+  display: grid; gap: var(--aime-space-2); justify-items: center; text-align: center;
+  max-width: 320px; padding: var(--aime-space-6);
+  border: var(--aime-border-default); border-radius: var(--aime-radius-large);
+  background: var(--aime-color-surface-elevated);
+  box-shadow: var(--aime-shadow-raise);
+}
+
+/* ── Objets posés sur la page ──────────────────────────────── */
+.studio-obj {
+  position: absolute;
+  left: calc(var(--a-x, 0) * 1px);
+  top: calc(var(--a-y, 0) * 1px);
+  width: calc(var(--a-w, 240) * 1px);
+  touch-action: none;
+}
+.studio-obj[hidden] { display: none; }
+.studio-obj--auto { width: auto; max-width: calc(var(--a-w, 240) * 1px); }
+.studio-obj--fixed { height: calc(var(--a-h, 160) * 1px); }
+.studio-obj--fixed .studio-obj__frame { height: 100%; }
+.studio-obj.is-selected { outline: var(--aime-border-width-strong) solid var(--aime-color-accent); outline-offset: 2px; }
+.studio-obj[data-state='proposed'] .ucard, .studio-obj[data-state='proposed'] .cnode { border-style: dashed; border-color: var(--aime-color-accent); }
+.studio-obj.is-locked { cursor: default; opacity: .85; }
+.studio-obj.is-dragging { cursor: grabbing; z-index: 50; }
+.studio-obj__frame {
+  border: var(--aime-border-default); border-radius: var(--aime-radius-medium);
+  background: var(--aime-color-surface-elevated);
+}
+.studio-obj__handle {
+  position: absolute; inset-block-end: -6px; inset-inline-end: -6px;
+  width: 12px; height: 12px;
+  border: 1px solid var(--aime-color-background);
+  border-radius: var(--aime-radius-small);
+  background: var(--aime-color-accent);
+  cursor: nwse-resize;
+}
+.studio-obj__tag {
+  position: absolute; inset-block-start: -20px; inset-inline-start: 0;
+  display: inline-flex; align-items: center; height: 16px;
+  max-width: calc(var(--a-w, 240) * 1px);
+  overflow: hidden; text-overflow: ellipsis;
+  padding-inline: var(--aime-space-2);
+  border-radius: var(--aime-radius-small);
+  background: var(--aime-color-background); color: var(--aime-color-text-subtle);
+  font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size); letter-spacing: var(--aime-text-meta-ls);
+  white-space: nowrap; pointer-events: none;
+}
+
+/* ── Studios de droite ─────────────────────────────────────── */
+.studio-inspect {
+  display: flex; flex-direction: column; min-height: 0;
+  width: 300px; flex: none;
+  border-inline-start: var(--aime-border-subtle);
+  background: var(--aime-color-surface);
+  overflow: hidden;
+}
+.studio-inspect.is-closed { width: 0; border-inline-start-width: 0; }
+.studio-tabs {
+  display: flex; gap: var(--aime-space-1);
+  padding: var(--aime-space-2) var(--aime-space-3);
+  border-bottom: var(--aime-border-subtle);
+}
+.studio-tab {
+  display: inline-flex; align-items: center; gap: var(--aime-space-1);
+  min-height: var(--aime-control-sm); padding-inline: var(--aime-space-2);
+  border: var(--aime-border-default); border-radius: var(--aime-radius-pill);
+  background: var(--aime-color-surface-elevated); color: var(--aime-color-text-muted);
+  font-size: var(--aime-text-caption-size);
+  transition: border-color var(--aime-motion-fast) var(--aime-ease-out), color var(--aime-motion-fast) var(--aime-ease-out);
+}
+.studio-tab:hover { border-color: var(--aime-color-border-strong); color: var(--aime-color-text); }
+.studio-tab[aria-selected='true'] { border-color: var(--aime-color-accent); color: var(--aime-color-accent-text); }
+.studio-tab .a-badge { min-width: 20px; }
+.studio-pane { flex: 1; min-height: 0; overflow-y: auto; padding: var(--aime-space-3); display: grid; gap: var(--aime-space-4); align-content: start; }
+.studio-pane[hidden] { display: none; }
+.studio-group { display: grid; gap: var(--aime-space-2); padding-block-start: var(--aime-space-3); border-top: var(--aime-border-subtle); }
+.studio-group:first-child { border-top: 0; padding-block-start: 0; }
+.studio-row { display: grid; grid-template-columns: 80px minmax(0, 1fr); gap: var(--aime-space-2); align-items: center; }
+.studio-row > dt, .studio-row > label {
+  font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size);
+  letter-spacing: var(--aime-text-meta-ls); text-transform: uppercase; color: var(--aime-color-text-subtle);
+}
+.studio-row .a-input, .studio-row .a-select, .studio-row .a-textarea { min-height: var(--aime-control-sm); padding-block: var(--aime-space-1); }
+.studio-geom { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--aime-space-2); }
+.studio-geom .studio-row { grid-template-columns: minmax(0, 1fr); gap: var(--aime-space-1); }
+.studio-pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--aime-space-2); }
+.studio-actions { display: flex; gap: var(--aime-space-2); flex-wrap: wrap; }
+
+/* ── NOEMA / QA / journal ──────────────────────────────────── */
+.studio-prop { display: grid; gap: var(--aime-space-2); padding: var(--aime-space-3); border: var(--aime-border-default); border-radius: var(--aime-radius-medium); background: var(--aime-color-surface-elevated); }
+.studio-prop[data-severity='warning'] { border-color: var(--aime-color-warning-border); }
+.studio-prop[data-severity='accent'] { border-color: var(--aime-color-accent); border-style: dashed; }
+.studio-prop__actions { display: flex; gap: var(--aime-space-2); flex-wrap: wrap; }
+.studio-journal { display: grid; gap: var(--aime-space-1); }
+.studio-journal__row {
+  display: flex; align-items: baseline; gap: var(--aime-space-2);
+  font-size: var(--aime-text-caption-size); color: var(--aime-color-text-muted);
+  overflow: hidden;
+}
+.studio-journal__row time { font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size); color: var(--aime-color-text-subtle); flex: none; }
+.studio-qa-row {
+  display: flex; align-items: baseline; gap: var(--aime-space-2);
+  padding-block: var(--aime-space-2); border-top: var(--aime-border-subtle);
+  font-size: var(--aime-text-caption-size);
+}
+.studio-qa-row .a-badge { flex: none; }
+
+/* ── Carte des chapitres ───────────────────────────────────── */
+.studio-map { display: grid; gap: 0; }
+.studio-map__row {
+  display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: var(--aime-space-3);
+  padding-block: var(--aime-space-2); border-top: var(--aime-border-subtle);
+  align-items: baseline;
+}
+.studio-map__row:first-child { border-top: 0; }
+.studio-map__num { font-family: var(--aime-font-mono); font-size: var(--aime-text-meta-size); letter-spacing: var(--aime-text-meta-ls); color: var(--aime-color-text-subtle); }
+.studio-map__where { font-size: var(--aime-text-caption-size); color: var(--aime-color-text-muted); }
+.studio-flip { transform: scaleX(-1); }
+
+/* ── Barre d'état ──────────────────────────────────────────── */
+.studio-status {
+  display: flex; align-items: center; gap: var(--aime-space-4);
+  padding-inline: var(--aime-space-3);
+  border-top: var(--aime-border-subtle);
+  background: var(--aime-color-surface);
+  color: var(--aime-color-text-subtle);
+  overflow: hidden;
+}
+.studio-status .u-mono { font-variant-numeric: tabular-nums; }
+
+/* ── Aperçus compacts de la bibliothèque ───────────────────── */
+.studio-libitem .a-btn, .studio-libitem .a-badge, .studio-libitem .a-pill, .studio-libitem .a-tag { pointer-events: none; }
+.studio-obj .a-input, .studio-obj .a-select, .studio-obj .a-textarea { pointer-events: none; }
+.studio-obj button, .studio-obj a, .studio-obj input, .studio-obj select, .studio-obj textarea, .studio-obj label { pointer-events: none; }
+.studio-obj .ucard, .studio-obj .umedia, .studio-obj .utl, .studio-obj .noema-card, .studio-obj .approval, .studio-obj .viz, .studio-obj .viz-bars, .studio-obj .viz-cols, .studio-obj .viz-proof, .studio-obj .ohead, .studio-obj .cmdbar, .studio-obj .sresults, .studio-obj .vdiff, .studio-obj .ba, .studio-obj .prov { width: 100%; }
+.studio-obj .viz-graph, .studio-obj .viz-matrix, .studio-obj .viz-spark { width: 100%; }
+.studio-obj .utl { --utl-axis: 20px; }
+.studio-obj .cnode { position: static; }
+.studio-obj .a-field { width: 100%; }
+
+/* Sous le seuil desktop : la bibliothèque et l'inspecteur se replient. */
+@media (max-width: 1023px) {
+  .studio-docname { display: none; }
+  .studio-top__sep { display: none; }
+}
+</style>
+</head>
+<body>
+<noscript><p class="t-body-sm">Le Studio est un logiciel de composition : il demande JavaScript. La grammaire du système reste lisible sans lui dans <a class="a-text-btn" href="index.html">la documentation</a>.</p></noscript>
+
+<div class="studio" id="st-app">
+  <header class="studio-top">
+    <h1 class="studio-brand">AIME<i>·</i>STUDIO <small>V1</small></h1>
+    <span class="studio-top__sep" role="presentation"></span>
+    <label class="u-sr" for="st-docname">Nom du document</label>
+    <input class="a-input studio-docname" id="st-docname" type="text" value="Composition sans titre" autocomplete="off" spellcheck="false">
+    <span class="l-spacer"></span>
+    <button type="button" class="a-icon-btn" id="st-undo" aria-label="Annuler la dernière action" disabled><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="act-undo"/></svg></button>
+    <button type="button" class="a-icon-btn" id="st-redo" aria-label="Rétablir la dernière action annulée" disabled><svg class="a-ic studio-flip" aria-hidden="true" width="20" height="20"><use data-a-icon="act-undo"/></svg></button>
+    <button type="button" class="a-icon-btn" id="st-cmdk-open" data-a-open="#st-cmdk" aria-label="Rechercher une commande" data-a-tip="Commandes"><span class="a-tip" data-a-tip="Commandes · Ctrl K"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="src-search"/></svg></span></button>
+    <span class="studio-top__sep" role="presentation"></span>
+    <button type="button" class="a-icon-btn" id="st-theme" aria-label="Changer de thème" data-a-tip="Thème"><span class="a-tip" data-a-tip="Thème clair / sombre"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="set-theme"/></svg></span></button>
+    <button type="button" class="a-icon-btn" id="st-density" aria-label="Changer la densité de cibles" data-a-tip="Densité"><span class="a-tip" data-a-tip="Densité"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="grd-ruler"/></svg></span></button>
+    <button type="button" class="a-icon-btn" id="st-motion" aria-label="Basculer le mouvement réduit" aria-pressed="false" data-a-tip="Mouvement"><span class="a-tip" data-a-tip="Mouvement réduit"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="time-clock"/></svg></span></button>
+    <span class="studio-top__sep" role="presentation"></span>
+    <button type="button" class="a-icon-btn" id="st-toggle-side" aria-label="Afficher ou masquer la bibliothèque" aria-pressed="true"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="nav-menu"/></svg></button>
+    <button type="button" class="a-icon-btn" id="st-toggle-inspect" aria-label="Afficher ou masquer les studios" aria-pressed="true"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="cmp-layers"/></svg></button>
+    <button type="button" class="a-btn a-btn--sm a-btn--primary" id="st-export-open" data-a-open="#st-export"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="act-export"/></svg>Exporter</button>
+  </header>
+
+  <div class="studio-body" id="st-body">
+    <nav class="studio-rail" aria-label="Outils du Studio">
+      <button type="button" class="studio-tool" data-st-tool="select" aria-pressed="true" aria-label="Sélection et déplacement · V" data-a-tip="Sélection"><span class="a-tip" data-a-tip="Sélection · V"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="cmp-cursor"/></svg></span></button>
+      <button type="button" class="studio-tool" data-st-tool="text" aria-pressed="false" aria-label="Poser du texte · T" data-a-tip="Texte"><span class="a-tip" data-a-tip="Texte · T"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="doc-document"/></svg></span></button>
+      <button type="button" class="studio-tool" data-st-tool="frame" aria-pressed="false" aria-label="Poser un cadre · F" data-a-tip="Cadre"><span class="a-tip" data-a-tip="Cadre · F"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="grd-format"/></svg></span></button>
+      <button type="button" class="studio-tool" data-st-tool="link" aria-pressed="false" aria-label="Lier deux objets · L" data-a-tip="Lier"><span class="a-tip" data-a-tip="Lier · L"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="cmp-connect"/></svg></span></button>
+      <span class="studio-rail__spacer" role="presentation"></span>
+      <button type="button" class="studio-rail__foot" id="st-rail-noema" aria-label="Ouvrir le studio NOEMA"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="noe-mark"/></svg></button>
+    </nav>
+
+    <aside class="studio-side" id="st-side" aria-label="Bibliothèque du système">
+      <div class="studio-side__search">
+        <span class="a-search">
+          <span class="a-search__icon"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="src-search"/></svg></span>
+          <label class="u-sr" for="st-libq">Filtrer la bibliothèque</label>
+          <input class="a-search__input" id="st-libq" type="text" placeholder="Filtrer la bibliothèque…" autocomplete="off">
+        </span>
+      </div>
+      <div class="studio-side__scroll" id="st-lib"><!-- groupes générés depuis le système --></div>
+      <div class="studio-side__foot">
+        <p class="t-caption u-muted">Bibliothèque générée depuis le système livré — aucune valeur recopiée.</p>
+        <button type="button" class="a-text-btn" id="st-map-open" data-a-open="#st-map">Les 21 chapitres dans le Studio</button>
+      </div>
+    </aside>
+
+    <section class="studio-stage" aria-label="Canevas de composition">
+      <div class="studio-canvasbar">
+        <label class="u-sr" for="st-format">Format de page</label>
+        <select class="a-select" id="st-format">
+          <option value="a4">A4 · portrait</option>
+          <option value="a5">A5 · portrait</option>
+          <option value="card">Carte · 85 × 55</option>
+          <option value="16-9">Écran · 16:9</option>
+          <option value="9-16">Écran · 9:16</option>
+          <option value="1-1">Carré · 1:1</option>
+          <option value="web">Web · 16:10</option>
+          <option value="mobile">Mobile · 375</option>
+          <option value="tablet">Tablette · 768</option>
+        </select>
+        <label class="u-sr" for="st-cols">Colonnes de la grille</label>
+        <select class="a-select" id="st-cols">
+          <option value="">colonnes — profil</option>
+          <option value="4">4 colonnes</option>
+          <option value="6">6 colonnes</option>
+          <option value="12">12 colonnes</option>
+        </select>
+        <button type="button" class="studio-chip" id="st-ov-cells" aria-pressed="false" aria-label="Afficher les cellules de la grille"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="grd-grid"/></svg>Cellules</button>
+        <button type="button" class="studio-chip" id="st-ov-thirds" aria-pressed="false" aria-label="Afficher la règle des tiers"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="grd-guides"/></svg>Tiers</button>
+        <button type="button" class="studio-chip" id="st-ov-safe" aria-pressed="false" aria-label="Afficher la zone sûre"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="grd-ruler"/></svg>Zone sûre</button>
+        <button type="button" class="studio-chip" id="st-ov-origin" aria-pressed="true" aria-label="Afficher l'origine 0,0"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="grd-snap"/></svg>0,0</button>
+        <button type="button" class="studio-chip" id="st-snap" aria-pressed="true" aria-label="Basculer le magnétisme STOP 24"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="cmp-move"/></svg>Magnétisme</button>
+        <span class="l-spacer"></span>
+        <span class="studio-zoom">
+          <button type="button" class="a-btn a-btn--sm" id="st-zoom-out" aria-label="Réduire le zoom">−</button>
+          <span class="t-meta u-mono" id="st-zoom-label">100 %</span>
+          <button type="button" class="a-btn a-btn--sm" id="st-zoom-in" aria-label="Augmenter le zoom">+</button>
+          <button type="button" class="a-btn a-btn--sm" id="st-zoom-fit">Ajuster</button>
+        </span>
+      </div>
+      <div class="studio-canvaswrap" id="st-wrap">
+        <div class="studio-sizer" id="st-sizer">
+          <div class="studio-page" id="st-page" data-format="a4" data-show-cols="false" data-show-thirds="false" data-show-safe="false" data-show-origin="true">
+            <div class="studio-cols" id="st-colsbg" aria-hidden="true"></div>
+            <div class="studio-thirds" aria-hidden="true"></div>
+            <div class="studio-safe" aria-hidden="true"></div>
+            <div class="studio-origin" aria-hidden="true"></div>
+            <svg class="studio-links" id="st-links" aria-hidden="true"></svg>
+            <div class="studio-snapline" id="st-snapx" hidden aria-hidden="true"></div>
+            <div class="studio-snapline studio-snapline--h" id="st-snapy" hidden aria-hidden="true"></div>
+            <!-- objets composés --></div>
+        </div>
+        <div class="studio-empty" id="st-empty">
+          <div class="studio-empty__card">
+            <p class="t-h2">Canevas vide</p>
+            <p class="t-body u-muted">Choisissez un objet dans la bibliothèque — organes, composants, NOEMA, dataviz, patterns — ou posez du texte et des cadres à l'outil.</p>
+            <p class="t-caption u-muted"><kbd class="a-kbd">Ctrl</kbd> <kbd class="a-kbd">K</kbd> commandes · <kbd class="a-kbd">V</kbd> sélection · <kbd class="a-kbd">T</kbd> texte · <kbd class="a-kbd">L</kbd> lier</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="studio-inspect" id="st-inspect" aria-label="Studios de droite">
+      <div class="studio-tabs" role="tablist" aria-label="Studios">
+        <button type="button" class="studio-tab" id="st-tab-inspect" role="tab" aria-selected="true" aria-controls="st-pane-inspect">Inspecteur</button>
+        <button type="button" class="studio-tab" id="st-tab-noema" role="tab" aria-selected="false" aria-controls="st-pane-noema">NOEMA <span class="a-badge" id="st-noema-count" hidden>0</span></button>
+        <button type="button" class="studio-tab" id="st-tab-qa" role="tab" aria-selected="false" aria-controls="st-pane-qa">QA</button>
+        <button type="button" class="studio-tab" id="st-tab-dir" role="tab" aria-selected="false" aria-controls="st-pane-dir">Direction</button>
+      </div>
+      <div class="studio-pane" id="st-pane-inspect" role="tabpanel" aria-labelledby="st-tab-inspect" tabindex="0"><!-- généré --></div>
+      <div class="studio-pane" id="st-pane-noema" role="tabpanel" aria-labelledby="st-tab-noema" tabindex="0" hidden><!-- généré --></div>
+      <div class="studio-pane" id="st-pane-qa" role="tabpanel" aria-labelledby="st-tab-qa" tabindex="0" hidden><!-- généré --></div>
+      <div class="studio-pane" id="st-pane-dir" role="tabpanel" aria-labelledby="st-tab-dir" tabindex="0" hidden><!-- généré --></div>
+    </aside>
+  </div>
+
+  <footer class="studio-status">
+    <span class="t-meta u-mono" id="st-pos">x — · y —</span>
+    <span class="t-meta" id="st-fmt">A4</span>
+    <span class="t-meta" id="st-snapstate">magnétisme STOP 24 actif</span>
+    <span class="l-spacer"></span>
+    <span class="t-meta" id="st-selinfo"></span>
+    <span class="t-meta" id="st-counts">0 objet · 0 relation</span>
+    <span class="t-meta" id="st-noema-badge">NOEMA local · moteur intégré</span>
+    <span class="t-meta" id="st-saved">non enregistré</span>
+  </footer>
+</div>
+
+<!-- ── Barre de commande ─────────────────────────────────────── -->
+<div class="a-modal" id="st-cmdk" data-a-layer hidden role="dialog" aria-modal="true" aria-labelledby="st-cmdk-title">
+  <div class="a-modal__head"><h2 class="t-h3" id="st-cmdk-title">Commandes</h2><button type="button" class="a-icon-btn" data-a-close aria-label="Fermer la barre de commande"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="nav-close"/></svg></button></div>
+  <div class="a-modal__body">
+    <div class="cmdbar">
+      <div class="cmdbar__field">
+        <svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="src-search"/></svg>
+        <label class="u-sr" for="st-cmd-input">Rechercher une commande</label>
+        <input class="cmdbar__input" id="st-cmd-input" type="text" placeholder="Ajouter une carte, zoomer, exporter…" autocomplete="off">
+        <kbd class="a-kbd">esc</kbd>
+      </div>
+      <div class="cmdbar__results" id="st-cmd-results"><!-- généré --></div>
+      <div class="cmdbar__foot">
+        <span class="cmdbar__hint"><kbd class="a-kbd">↑</kbd><kbd class="a-kbd">↓</kbd>naviguer</span>
+        <span class="cmdbar__hint"><kbd class="a-kbd">↵</kbd>exécuter</span>
+        <span class="cmdbar__hint"><kbd class="a-kbd">esc</kbd>fermer</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Export ────────────────────────────────────────────────── -->
+<div class="a-drawer" id="st-export" data-a-layer hidden role="dialog" aria-modal="true" aria-labelledby="st-export-title">
+  <div class="a-drawer__head"><h2 class="t-h3" id="st-export-title">Exporter la composition</h2><button type="button" class="a-icon-btn" data-a-close aria-label="Fermer le tiroir d'export"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="nav-close"/></svg></button></div>
+  <div class="a-drawer__body">
+    <p class="t-body-sm u-muted">Trois sorties : un brief lisible par un agent, une projection HTML qui ne consomme que les classes du système, et le document JSON. La composition reste référencée — l'export ne déplace aucune source.</p>
+    <div class="a-field">
+      <label class="a-field__label" for="st-out-brief">Brief agent</label>
+      <textarea class="a-textarea" id="st-out-brief" rows="10" readonly></textarea>
+      <span class="a-field__hint">Choix, règles appliquées, manifeste des objets, état QA.</span>
+    </div>
+    <div class="studio-actions">
+      <button type="button" class="a-btn a-btn--sm" id="st-copy-brief"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-clipboard"/></svg>Copier</button>
+      <button type="button" class="a-btn a-btn--sm" id="st-dl-brief"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="prj-brief"/></svg>Télécharger .md</button>
+    </div>
+    <div class="a-field">
+      <label class="a-field__label" for="st-out-html">Projection HTML</label>
+      <textarea class="a-textarea" id="st-out-html" rows="10" readonly></textarea>
+      <span class="a-field__hint">À servir depuis design-system/ pour que tokens et feuilles se résolvent.</span>
+    </div>
+    <div class="studio-actions">
+      <button type="button" class="a-btn a-btn--sm" id="st-copy-html"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-clipboard"/></svg>Copier</button>
+      <button type="button" class="a-btn a-btn--sm" id="st-dl-html"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="act-export"/></svg>Télécharger .html</button>
+    </div>
+    <div class="a-field">
+      <label class="a-field__label" for="st-out-json">Document JSON</label>
+      <textarea class="a-textarea" id="st-out-json" rows="10" readonly></textarea>
+      <span class="a-field__hint">Coller un document ici puis « Charger » restaure une composition.</span>
+    </div>
+    <div class="studio-actions">
+      <button type="button" class="a-btn a-btn--sm" id="st-copy-json"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-clipboard"/></svg>Copier</button>
+      <button type="button" class="a-btn a-btn--sm" id="st-dl-json"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="doc-version"/></svg>Télécharger .json</button>
+      <button type="button" class="a-btn a-btn--sm a-btn--primary" id="st-load-json"><svg class="a-ic a-ic--sm" aria-hidden="true" width="16" height="16"><use data-a-icon="nav-external"/></svg>Charger</button>
+    </div>
+  </div>
+  <div class="a-drawer__foot"><button type="button" class="a-btn a-btn--ghost" data-a-close>Fermer</button></div>
+</div>
+
+<!-- ── Carte des chapitres ───────────────────────────────────── -->
+<div class="a-drawer" id="st-map" data-a-layer hidden role="dialog" aria-modal="true" aria-labelledby="st-map-title">
+  <div class="a-drawer__head"><h2 class="t-h3" id="st-map-title">Les 21 chapitres du menu, dans le Studio</h2><button type="button" class="a-icon-btn" data-a-close aria-label="Fermer la carte des chapitres"><svg class="a-ic" aria-hidden="true" width="20" height="20"><use data-a-icon="nav-close"/></svg></button></div>
+  <div class="a-drawer__body">
+    <p class="t-body-sm u-muted">Le Studio compose avec tout ce que le menu de gauche documente. Chaque chapitre y a une fonction réelle, pas une citation.</p>
+    <div class="studio-map">
+      <div class="studio-map__row"><span class="studio-map__num">01</span><span><span class="t-body-sm u-strong">Accueil</span><br><span class="studio-map__where">Ce logiciel est la projection vivante de la grammaire : un écran composé uniquement avec elle.</span></span></div>
+      <div class="studio-map__row"><span class="studio-map__num">02</span><span><span class="t-body-sm u-strong">Foundations</span><br><span class="studio-map__where">Surfaces, focus visible, états — l'inspecteur n'offre que les rôles que les fondations définissent.</span></span></div>
+      <div class="studio-map__row"><span class="studio-map__num">03</span><span><span class="t-body-sm u-strong">Couleur</span><br><span class="studio-map__where">Nuancier des rôles dans la bibliothèque ; aucun objet ne porte de couleur littérale.</span></span></div>
+      <div class="studio-map__row"><span class="studio-map__num">04</span><span><span class="t-body-sm u-strong">Typographie</span><br><span class="studio-map__where">L'objet Texte se pose par rôle typographique — neuf rôles, aucun px.</span></span></div>
+      <div class="studio-map__row"><span class="studio-map__num">05</span><span><span class="t-body-sm u-strong">Espace &amp; grille</span><br><span class="studio-map__where">Le canevas est la grille universelle : colonnes, zone sûre, magnétisme STOP 24, marges du profil.</span></span></div>
+      <div class="studio-map__row"><span class="studio-map__num">06</span><span><span class="t-body-sm u-strong">Iconographie</span><br><span class="studio-map__where">Le navigateur de glyphes pose un objet Icône depuis le sprite AIME — jamais d'emoji.</span></span></div>
+      <div class="studio-map__row"><span class="studio-map__num">07</span><span><span class="t-body-sm u-strong">Fondamentaux</span><br><span class="studio-map__where">Boutons, badges, champs, interrupteurs : la bibliothèque pose les composants réels, pas des images.</span></span></div>
+      <div class="studio-map__row"><span class="studio-map__num">08</span><span><span class="t-body-sm u-strong">Composants AIME</span><br><span class="studio-map__where">Les organes sont des objets natifs : carte, frise, média, nœud Composer, zone de grille.</span></span></div>
+      <div class="studio-map__row"><span class="studio-map__num">09</span><span><span class="t-body-sm u-strong">Composants NOEMA</span><br><span class="studio-map__where">États épistémiques, cartes, approbations, inconnues : posables et éditables comme les autres.</span></span></div>
+      <div class="studio-map__row"><span class="studio-map__num">10</span><span><span class="t-body-sm u-strong">Carte Universelle</span><br><span class="studio-map__where">Huit types, un seul cadre — le type se change à l'inspecteur, le cadre ne bouge pas.</span></span></div>
+      <div class="studio-map__row"><span class="studio-map__num">11</span><span><span class="t-body-sm u-strong">Timeline Universelle</span><br><span class="studio-map__where">L'objet Frise édite ses éléments ; marqueurs et états restent ceux du moteur unique.</span></span></div>
+      <div class="studio-map__row"><span class="studio-map__num">12</span><span><span class="t-body-sm u-strong">Grille Universelle</span><br><span class="studio-map__where">Le sélecteur de format du canevas reprend les profils de la grille : A4, carte, écrans, appareils.</span></span></div>
+      <div class="studio-map__row"><span class="studio-map__num">13</span><span><span class="t-body-sm u-strong">Composer</span><br><span class="studio-map__where">L'outil Lier trace des relations entre objets ; la position est une donnée, jamais un style en dur.</span></span></div>
+      <div class="studio-map__row"><span class="studio-map__num">14</span><span><span class="t-body-sm u-strong">Responsive</span><br><span class="studio-map__where">Les profils d'appareils (375, 768) sont des formats à part entière du canevas.</span></span></div>
+      <div class="studio-map__row"><span class="studio-map__num">15</span><span><span class="t-body-sm u-strong">Accessibilité</span><br><span class="studio-map__where">Le studio QA mesure noms accessibles, cibles et débordements de la composition ouverte.</span></span></div>
+      <div class="studio-map__row"><span class="studio-map__num">16</span><span><span class="t-body-sm u-strong">Motion</span><br><span class="studio-map__where">Mouvement complet ou réduit, durées toujours portées par les tokens de motion.</span></span></div>
+      <div class="studio-map__row"><span class="studio-map__num">17</span><span><span class="t-body-sm u-strong">Data visualisation</span><br><span class="studio-map__where">Barres, colonnes, preuves, étincelles, matrices : données éditables, certitude affichée.</span></span></div>
+      <div class="studio-map__row"><span class="studio-map__num">18</span><span><span class="t-body-sm u-strong">Patterns</span><br><span class="studio-map__where">En-tête d'objet, barre de commande, comparaisons : posés comme spécimens nommés du système.</span></span></div>
+      <div class="studio-map__row"><span class="studio-map__num">19</span><span><span class="t-body-sm u-strong">Design QA</span><br><span class="studio-map__where">L'onglet QA juge la composition avec le module d'audit du système, densité à l'appui.</span></span></div>
+      <div class="studio-map__row"><span class="studio-map__num">20</span><span><span class="t-body-sm u-strong">Écrans réels</span><br><span class="studio-map__where">L'export produit une projection HTML construite avec les mêmes classes que les écrans réels.</span></span></div>
+      <div class="studio-map__row"><span class="studio-map__num">21</span><span><span class="t-body-sm u-strong">Direction artistique</span><br><span class="studio-map__where">Thème, densité, mouvement se règlent ici ; le brief agent reprend le format de la direction.</span></span></div>
+    </div>
+  </div>
+  <div class="a-drawer__foot"><button type="button" class="a-btn a-btn--ghost" data-a-close>Fermer</button></div>
+</div>
+
+<div class="a-toast-region" aria-live="polite"></div>
+</body>
+</html>
